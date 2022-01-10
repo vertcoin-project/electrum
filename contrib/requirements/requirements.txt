@@ -7,6 +7,8 @@ aiohttp_socks>=0.3
 certifi
 bitstring
 attrs>=19.2.0
+lyra2re2_hash>=1.2.0
+vtc_scrypt_new
 
 # Note that we also need the dnspython[DNSSEC] extra which pulls in cryptography,
 # but as that is not pure-python it cannot be listed in this file!
