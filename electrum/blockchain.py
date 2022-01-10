@@ -38,12 +38,23 @@ import lyra2re2_hash
 import lyra2re3_hash
 import vtc_scrypt_new
 
+import verthash
+
+verthash_data = None
+if verthash_data is None:
+    with open('verthash.dat', 'rb') as f:
+        verthash_data = f.read()
+
+def verthash_hash(dat):
+    return verthash.getPoWHash(dat, verthash_data)
+
 _logger = get_logger(__name__)
 
 HEADER_SIZE = 80  # bytes
 
 # see https://github.com/vertcoin-project/vertcoin-core/blob/master/src/chainparams.cpp#L82
-MAX_TARGET = 0x00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+MAX_TARGET = 0X7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PRE_VERTHASH_MAX_TARGET = 0x00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
 
 class MissingHeader(Exception):
@@ -91,6 +102,8 @@ def hash_raw_header(header: str) -> str:
 def pow_hash_header(header):
     height = header.get('block_height')
     header_bytes = bfh(serialize_header(header))
+    if height >= 1500000:
+        return hash_encode(verthash_hash(header_bytes))
     if height > 1080000:
         return hash_encode(lyra2re3_hash.getPoWHash(header_bytes))
     elif height >= 347000:
@@ -578,7 +591,8 @@ class Blockchain(Logger):
         BlockLastSolvedIndex = height - 1
         TargetBlocksSpacingSeconds = BlocksTargetSpacing
         PastRateAdjustmentRatio = 1.0
-        bnProofOfWorkLimit = 0x00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        bnProofOfWorkLimit = 0X7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+        bnPreVerthashProofOfWorkLimit = 0x00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
         if (BlockLastSolvedIndex <= 0 or BlockLastSolvedIndex < PastSecondsMin):
             new_target = bnProofOfWorkLimit
@@ -624,7 +638,7 @@ class Blockchain(Logger):
                 if ((PastRateAdjustmentRatio <= EventHorizonDeviationSlow) or (PastRateAdjustmentRatio >= EventHorizonDeviationFast)):
                     break
 
-            if (BlockReadingIndex < 1 or (BlockReadingIndex == 1080000 and not constants.net.TESTNET)):
+            if (BlockReadingIndex < 1 or (BlockReadingIndex in (1080000, 1500000) and not constants.net.TESTNET)):
                 break
 
             BlockReadingIndex = BlockReadingIndex - 1
@@ -634,8 +648,11 @@ class Blockchain(Logger):
             bnNew *= float(PastRateActualSeconds)
             bnNew /= float(PastRateTargetSeconds)
 
-        if (bnNew > bnProofOfWorkLimit):
-            bnNew = bnProofOfWorkLimit
+        if BlockLastSolvedIndex >= 1500000:
+            if bnNew > bnProofOfWorkLimit:
+                bnNew = bnProofOfWorkLimit
+        elif bnNew > bnPreVerthashProofOfWorkLimit:
+            bnNew = bnPreVerthashProofOfWorkLimit
 
         # new target
         new_target = bnNew
@@ -659,6 +676,9 @@ class Blockchain(Logger):
             return bits, target
         if height >= 1080000 and height < 1080010:
             bits = 0x1b0ffff0
+            return bits, self.convbignum(bits)
+        if height >= 1500000 and height < 1500010:
+            bits = 0x1c07fff8
             return bits, self.convbignum(bits)
         index = height // 2016
         if index < len(self.checkpoints) and (height % 2016 == 0):
@@ -687,7 +707,7 @@ class Blockchain(Logger):
             nTargetTimespan = 84 * 60 * 60
             nActualTimespan = max(nActualTimespan, nTargetTimespan // 4)
             nActualTimespan = min(nActualTimespan, nTargetTimespan * 4)
-            new_target = min(MAX_TARGET, (target*nActualTimespan) // nTargetTimespan)
+            new_target = min(PRE_VERTHASH_MAX_TARGET, (target*nActualTimespan) // nTargetTimespan)
             # convert new target to bits
             c = ("%064x" % int(new_target))[2:]
             while c[:2] == '00' and len(c) > 6:
