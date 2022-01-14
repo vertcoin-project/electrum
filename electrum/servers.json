@@ -16,5 +16,11 @@
         "s": "55002",
         "t": "55001",
         "version": "1.4"
+    },
+    "electrumx-brn.webhop.me": {
+        "pruning": "-",
+        "s": "55002",
+        "t": "55001",
+        "version": "1.4"
     }
 }
