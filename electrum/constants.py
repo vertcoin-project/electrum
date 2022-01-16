@@ -75,13 +75,12 @@ class BitcoinMainnet(AbstractNet):
     WIF_PREFIX = 0x80
     ADDRTYPE_P2PKH = 71
     ADDRTYPE_P2SH = 5
-    BIP44_COIN_TYPE = 28
     SEGWIT_HRP = "vtc"
     BOLT11_HRP = SEGWIT_HRP
     GENESIS = "4d96a915f49d40b1e5c2844d1ee2dccb90013a990ccea12c492d22110489f0c4"
     DEFAULT_PORTS = {'t': '55001', 's': '55002'}
     DEFAULT_SERVERS = read_json('servers.json', {})
-    CHECKPOINTS = []
+    CHECKPOINTS = read_json('checkpoints.json', [])
     BLOCK_HEIGHT_FIRST_LIGHTNING_CHANNELS = 497000
 
     XPRV_HEADERS = {
@@ -187,22 +186,22 @@ NETS_LIST = tuple(all_subclasses(AbstractNet))
 # don't import net directly, import the module instead (so that net is singleton)
 net = BitcoinMainnet
 
-def set_signet():
-    global net
-    net = BitcoinSignet
-
-def set_simnet():
-    global net
-    net = BitcoinSimnet
+# def set_signet():
+#     global net
+#     net = BitcoinSignet
+#
+# def set_simnet():
+#     global net
+#     net = BitcoinSimnet
 
 def set_mainnet():
     global net
     net = BitcoinMainnet
-
-def set_testnet():
-    global net
-    net = BitcoinTestnet
-
-def set_regtest():
-    global net
-    net = BitcoinRegtest
+#
+# def set_testnet():
+#     global net
+#     net = BitcoinTestnet
+#
+# def set_regtest():
+#     global net
+#     net = BitcoinRegtest

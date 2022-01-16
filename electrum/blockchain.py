@@ -20,6 +20,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import hashlib
 import os
 import threading
 import time
@@ -44,6 +45,9 @@ verthash_data = None
 if verthash_data is None:
     with open('verthash.dat', 'rb') as f:
         verthash_data = f.read()
+
+    verthash_sum = hashlib.sha256(verthash_data).hexdigest()
+    assert verthash_sum == 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48'
 
 def verthash_hash(dat):
     return verthash.getPoWHash(dat, verthash_data)
@@ -550,7 +554,7 @@ class Blockchain(Logger):
             return constants.net.GENESIS
         elif is_height_checkpoint():
             index = height // 2016
-            h, _, _, _ = self.checkpoints[index]
+            h, t = self.checkpoints[index]
             return h
         else:
             header = self.read_header(height)
@@ -681,9 +685,9 @@ class Blockchain(Logger):
             bits = 0x1c07fff8
             return bits, self.convbignum(bits)
         index = height // 2016
-        if index < len(self.checkpoints) and (height % 2016 == 0):
-            _, t, b, _ = self.checkpoints[index]
-            return b, t
+        if index < len(self.checkpoints):
+            h, t = self.checkpoints[index]
+            return t
         if height < 26754:
             # Litecoin: go back the full period unless it's the first retarget
             first = self.read_header((height - 2016 - 1 if height > 2016 else 0))
