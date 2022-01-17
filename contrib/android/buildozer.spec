@@ -48,7 +48,8 @@ requirements =
     kivy,
     libffi,
     libsecp256k1,
-    cryptography
+    cryptography,
+    vertcoinhash
 
 # (str) Presplash of the application
 #presplash.filename = %(source.dir)s/gui/kivy/theming/splash.png
