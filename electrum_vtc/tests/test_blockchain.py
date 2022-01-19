@@ -428,17 +428,18 @@ class TestBlockchain(ElectrumTestCase):
 
 class TestVerifyHeader(ElectrumTestCase):
 
-    # Data for Bitcoin block header #100.
-    valid_header = "0100000095194b8567fe2e8bbda931afd01a7acd399b9325cb54683e64129bcd00000000660802c98f18fd34fd16d61c63cf447568370124ac5f3be626c2e1c3c9f0052d19a76949ffff001d33f3c25d"
-    target = Blockchain.bits_to_target(0x1d00ffff)
-    prev_hash = "00000000cd9b12643e6854cb25939b39cd7a1ad0af31a9bd8b2efe67854b1995"
+    # Data for Vertcoin block header #100.
+    valid_header = "02000000ca67c2f2518f668c469ef377a5614847ee079d7d13a881b1a298a53470207b2c4612e324a347272eb7d9441d76ffba4050f6aaf5a9b52555ad67524948a51ee13e0ad152f0ff0f1e4a020000"
+    target = Blockchain.bits_to_target(0x1e0ffff0)
+    bits = 504365040
+    prev_hash = "2c7b207034a598a2b181a8137d9d07ee474861a577f39e468c668f51f2c267ca"
 
     def setUp(self):
         super().setUp()
         self.header = deserialize_header(bfh(self.valid_header), 100)
 
     def test_valid_header(self):
-        Blockchain.verify_header(self.header, self.prev_hash, self.target)
+        Blockchain.verify_header(self.header, self.prev_hash, self.bits, self.target)
 
     def test_expected_hash_mismatch(self):
         with self.assertRaises(Exception):
@@ -457,4 +458,4 @@ class TestVerifyHeader(ElectrumTestCase):
     def test_insufficient_pow(self):
         with self.assertRaises(Exception):
             self.header["nonce"] = 42
-            Blockchain.verify_header(self.header, self.prev_hash, self.target)
+            Blockchain.verify_header(self.header, self.prev_hash, self.bits, self.target, self.check_bits_target)
