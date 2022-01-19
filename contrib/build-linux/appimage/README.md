@@ -1,14 +1,16 @@
-# Kivy GUI
+AppImage binary for Electrum
+============================
 
-The Kivy GUI is used with Electrum on Android devices.
-To generate an APK file, follow these instructions.
+✓ _This binary should be reproducible, meaning you should be able to generate
+binaries that match the official releases._
 
-## Android binary with Docker
+This assumes an Ubuntu host, but it should not be too hard to adapt to another
+similar system. The host architecture should be x86_64 (amd64).
 
-✓ _These binaries should be reproducible.
+We currently only build a single AppImage, for x86_64 architecture.
+Help to adapt these scripts to build for (some flavor of) ARM would be welcome,
+see [issue #5159](https://github.com/spesmilo/electrum/issues/5159).
 
-This assumes an Ubuntu (x86_64) host, but it should not be too hard to adapt to another
-similar system.
 
 1. Install Docker
 
@@ -19,88 +21,42 @@ similar system.
     $ sudo apt-get install -y docker-ce
     ```
 
-2. Build binaries (Note that this only works for debug builds! Otherwise the security model of Android does not let you access the internal storage of an app without root)
+2. Build binary
 
     ```
-    $ ./build.sh debug
+    $ ./build.sh
     ```
    If you want reproducibility, try instead e.g.:
     ```
-    $ ELECBUILD_COMMIT=HEAD ELECBUILD_NOCACHE=1 ./build.sh debug
+    $ ELECBUILD_COMMIT=HEAD ELECBUILD_NOCACHE=1 ./build.sh
     ```
 
 3. The generated binary is in `./dist`.
 
 
-4. Install [adb](https://developer.android.com/studio/command-line/adb)
-
-
-5. Install .apk to connected phone
-
-   ```
-   $ adb -d install -r fresh_clone/electrum/dist/Electrum-*-arm64-v8a-debug.apk
-   ```
-
-6. Open Electrum app on phone.  It will close after a few seconds.  Now that the app internal storage is created, we can copy verthash.dat.
-
-   ```
-   $ adb push verthash.dat /data/local/tmp
-   $ adb shell run-as org.electrum.electrum cp /data/local/tmp/verthash.dat /data/data/org.electrum.electrum/files/app
-   ```
-
 ## FAQ
 
-### I changed something but I don't see any differences on the phone. What did I do wrong?
-You probably need to clear the cache: `rm -rf .buildozer/android/platform/build-*/{build,dists}`
+### How can I see what is included in the AppImage?
+Execute the binary as follows: `./electrum*.AppImage --appimage-extract`
 
-
-### How do I deploy on connected phone for quick testing?
-Assuming `adb` is installed:
+### How to investigate diff between binaries if reproducibility fails?
 ```
-$ adb -d install -r dist/Electrum-*-arm64-v8a-debug.apk
-$ adb shell monkey -p org.electrum.electrum 1
-```
-
-
-### How do I get an interactive shell inside docker?
-```
-$ sudo docker run -it --rm \
-    -v $PWD:/home/user/wspace/electrum \
-    -v $PWD/.buildozer/.gradle:/home/user/.gradle \
-    --workdir /home/user/wspace/electrum \
-    electrum-android-builder-img
+cd dist/
+./electrum-*-x86_64.AppImage1 --appimage-extract
+mv squashfs-root/ squashfs-root1/
+./electrum-*-x86_64.AppImage2 --appimage-extract
+mv squashfs-root/ squashfs-root2/
+$(cd squashfs-root1; find -type f -exec sha256sum '{}' \; > ./../sha256sum1)
+$(cd squashfs-root2; find -type f -exec sha256sum '{}' \; > ./../sha256sum2)
+diff sha256sum1 sha256sum2 > d
+cat d
 ```
 
-
-### How do I get more verbose logs for the build?
-See `log_level` in `buildozer.spec`
-
-
-### How can I see logs at runtime?
-This should work OK for most scenarios:
+For file metadata, e.g. timestamps:
 ```
-adb logcat | grep python
-```
-Better `grep` but fragile because of `cut`:
-```
-adb logcat | grep -F "`adb shell ps | grep org.electrum.electrum | cut -c14-19`"
+rsync -n -a -i --delete squashfs-root1/ squashfs-root2/
 ```
 
-
-### Kivy can be run directly on Linux Desktop. How?
-Install Kivy.
-
-Build atlas: `(cd contrib/android/; make theming)`
-
-Run electrum with the `-g` switch: `electrum -g kivy`
-
-
-### Access datadir on Android from desktop (e.g. to copy wallet file)
-Note that this only works for debug builds! Otherwise the security model
-of Android does not let you access the internal storage of an app without root.
-(See [this](https://stackoverflow.com/q/9017073))
-```
-$ adb shell
-$ run-as org.electrum.electrum ls /data/data/org.electrum.electrum/files/data
-$ run-as org.electrum.electrum cp /data/data/org.electrum.electrum/files/data/wallets/my_wallet /sdcard/some_path/my_wallet
-```
+Useful binary comparison tools:
+- vbindiff
+- diffoscope

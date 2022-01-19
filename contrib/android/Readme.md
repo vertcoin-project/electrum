@@ -5,8 +5,7 @@ To generate an APK file, follow these instructions.
 
 ## Android binary with Docker
 
-✓ _These binaries should be reproducible, meaning you should be able to generate
-   binaries that match the official releases._
+✓ _These binaries should be reproducible.
 
 This assumes an Ubuntu (x86_64) host, but it should not be too hard to adapt to another
 similar system.
@@ -20,41 +19,34 @@ similar system.
     $ sudo apt-get install -y docker-ce
     ```
 
-2. Build binaries
+2. Build binaries (Note that this only works for debug builds! Otherwise the security model of Android does not let you access the internal storage of an app without root)
 
     ```
-    $ ./build.sh
+    $ ./build.sh debug
     ```
-    If you want reproducibility, try instead e.g.:
+   If you want reproducibility, try instead e.g.:
     ```
-    $ ELECBUILD_COMMIT=HEAD ELECBUILD_NOCACHE=1 ./build.sh release-unsigned
+    $ ELECBUILD_COMMIT=HEAD ELECBUILD_NOCACHE=1 ./build.sh debug
     ```
-    
-    Note: `build.sh` takes an optional parameter which can be
-    `release`, `release-unsigned`, or `debug` (default).
 
 3. The generated binary is in `./dist`.
 
 
-## Verifying reproducibility and comparing against official binary
+4. Install [adb](https://developer.android.com/studio/command-line/adb)
 
-Every user can verify that the official binary was created from the source code in this 
-repository.
 
-1. Build your own binary as described above.
-   Make sure you don't build in `debug` mode (which is the default!),
-   instead use either of `release` or `release-unsigned`.
-   If you build in `release` mode, the apk will be signed, which requires a keystore
-   that you need to create manually (see source of `make_apk` for an example).
-2. Note that the binaries are not going to be byte-for-byte identical, as the official
-   release is signed by a keystore that only the project maintainers have.
-   You can use the `apkdiff.py` python script (written by the Signal developers) to compare
-   the two binaries.
-    ```
-    $ python3 contrib/android/apkdiff.py Electrum_apk_that_you_built.apk Electrum_apk_official_release.apk
-    ```
-   This should output `APKs match!`.
+5. Install .apk to connected phone
 
+   ```
+   $ adb -d install -r fresh_clone/electrum/dist/Electrum-*-arm64-v8a-debug.apk
+   ```
+
+6. Open Electrum app on phone.  It will close after a few seconds.  Now that the app internal storage is created, we can copy verthash.dat.
+
+   ```
+   $ adb push verthash.dat /data/local/tmp
+   $ adb shell run-as org.electrum.electrum cp /data/local/tmp/verthash.dat /data/data/org.electrum.electrum/files/app
+   ```
 
 ## FAQ
 
@@ -102,15 +94,6 @@ Build atlas: `(cd contrib/android/; make theming)`
 
 Run electrum with the `-g` switch: `electrum -g kivy`
 
-### debug vs release build
-If you just follow the instructions above, you will build the apk
-in debug mode. The most notable difference is that the apk will be
-signed using a debug keystore. If you are planning to upload
-what you build to e.g. the Play Store, you should create your own
-keystore, back it up safely, and run `./contrib/make_apk release`.
-
-See e.g. [kivy wiki](https://github.com/kivy/kivy/wiki/Creating-a-Release-APK)
-and [android dev docs](https://developer.android.com/studio/build/building-cmdline#sign_cmdline).
 
 ### Access datadir on Android from desktop (e.g. to copy wallet file)
 Note that this only works for debug builds! Otherwise the security model
@@ -120,23 +103,4 @@ of Android does not let you access the internal storage of an app without root.
 $ adb shell
 $ run-as org.electrum.electrum ls /data/data/org.electrum.electrum/files/data
 $ run-as org.electrum.electrum cp /data/data/org.electrum.electrum/files/data/wallets/my_wallet /sdcard/some_path/my_wallet
-```
-
-### How to investigate diff between binaries if reproducibility fails?
-```
-cd dist/
-unzip Electrum-*.apk1 -d apk1
-mkdir apk1/assets/private_mp3/
-tar -xzvf apk1/assets/private.mp3 --directory apk1/assets/private_mp3/
-
-unzip Electrum-*.apk2 -d apk2
-mkdir apk2/assets/private_mp3/
-tar -xzvf apk2/assets/private.mp3 --directory apk2/assets/private_mp3/
-
-sudo chown --recursive "$(id -u -n)" apk1/ apk2/
-chmod -R +Xr  apk1/ apk2/
-$(cd apk1; find -type f -exec sha256sum '{}' \; > ./../sha256sum1)
-$(cd apk2; find -type f -exec sha256sum '{}' \; > ./../sha256sum2)
-diff sha256sum1 sha256sum2 > d
-cat d
 ```
