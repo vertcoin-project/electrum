@@ -22,6 +22,7 @@
 # SOFTWARE.
 import hashlib
 import os
+import sys
 import threading
 import time
 from typing import Optional, Dict, Mapping, Sequence
@@ -41,13 +42,28 @@ import vtc_scrypt_new
 
 import verthash
 
-verthash_data = None
-if verthash_data is None:
-    with open('verthash.dat', 'rb') as f:
-        verthash_data = f.read()
+import tkinter as tk
+from tkinter import messagebox
 
-    verthash_sum = hashlib.sha256(verthash_data).hexdigest()
-    assert verthash_sum == 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48'
+verthash_data = None
+while verthash_data is None:
+    try:
+        if not os.path.isfile('verthash.dat'):
+            err = tk.Tk()
+            err.withdraw()
+            messagebox.showerror("Electrum-VTC requires verthash.dat", "Run create-verthash-datafile or copy verthash.dat to this folder")
+            err.update()
+            sys.exit(1)
+        with open('verthash.dat', 'rb') as f:
+            verthash_data = f.read()
+            verthash_sum = hashlib.sha256(verthash_data).hexdigest()
+            assert verthash_sum == 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48', "Verthash datafile mismatch"
+    except AssertionError:
+        err = tk.Tk()
+        err.withdraw()
+        messagebox.showerror("Bad verthash datafile", "Delete verthash.dat and run create-verthash-datafile again")
+        err.update()
+        sys.exit(1)
 
 def verthash_hash(dat):
     return verthash.getPoWHash(dat, verthash_data)
