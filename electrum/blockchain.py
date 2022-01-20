@@ -51,7 +51,7 @@ while verthash_data is None:
         if not os.path.isfile('verthash.dat'):
             err = tk.Tk()
             err.withdraw()
-            messagebox.showerror("Electrum-VTC requires verthash datafile", "Run create-verthash-datafile and move verthash.dat to the Electrum-VTC folder")
+            messagebox.showerror("Electrum-VTC requires verthash datafile", "Run create-verthash-datafile. verthash.dat must be in the program folder")
             err.update()
             sys.exit(1)
         with open('verthash.dat', 'rb') as f:

@@ -2,21 +2,16 @@
 # sudo desktop-file-install electrum.desktop
 
 [Desktop Entry]
-Comment=Lightweight Bitcoin Client
-Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\"; electrum %u"
-GenericName[en_US]=Bitcoin Wallet
-GenericName=Bitcoin Wallet
+Comment=Lightweight Vertcoin Client
+Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\"; electrum-vtc %u"
+GenericName[en_US]=Vertcoin Wallet
+GenericName=Vertcoin Wallet
 Icon=electrum
-Name[en_US]=Electrum Bitcoin Wallet
-Name=Electrum Bitcoin Wallet
+Name[en_US]=Electrum Vertcoin Wallet
+Name=Electrum Vertcoin Wallet
 Categories=Finance;Network;
 StartupNotify=true
-StartupWMClass=electrum
+StartupWMClass=electrum-vtc
 Terminal=false
 Type=Application
 MimeType=x-scheme-handler/bitcoin;x-scheme-handler/lightning;
-Actions=Testnet;
-
-[Desktop Action Testnet]
-Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\"; electrum --testnet %u"
-Name=Testnet mode
