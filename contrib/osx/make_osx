@@ -5,8 +5,8 @@ set -e
 # Parameterize
 PYTHON_VERSION=3.9.7
 BUILDDIR=/tmp/electrum-build
-PACKAGE=Electrum
-GIT_REPO=https://github.com/spesmilo/electrum
+PACKAGE=Electrum-VTC
+GIT_REPO=https://github.com/vertcoin-project/electrum-vtc
 
 export GCC_STRIP_BINARIES="1"
 export PYTHONDONTWRITEBYTECODE=1  # don't create __pycache__/ folders with .pyc files

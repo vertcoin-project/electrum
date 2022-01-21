@@ -1,40 +1,51 @@
-Electrum - Lightweight Bitcoin client
+Electrum - Lightweight Vertcoin client
 =====================================
-
-::
-
-  Licence: MIT Licence
-  Author: Thomas Voegtlin
-  Language: Python (>= 3.6)
-  Homepage: https://electrum.org/
-
 
 .. image:: https://api.cirrus-ci.com/github/spesmilo/electrum.svg?branch=master
     :target: https://cirrus-ci.com/github/spesmilo/electrum
-    :alt: Build Status
+    :alt: Upstream Build Status
 .. image:: https://coveralls.io/repos/github/spesmilo/electrum/badge.svg?branch=master
     :target: https://coveralls.io/github/spesmilo/electrum?branch=master
-    :alt: Test coverage statistics
+    :alt: Upstream Test coverage statistics
 .. image:: https://d322cqt584bo4o.cloudfront.net/electrum/localized.svg
     :target: https://crowdin.com/project/electrum
     :alt: Help translate Electrum online
 
-
-
-
-
 Getting started
 ===============
+Electrum-VTC is a rebase of [upstream Electrum](https://github.com/spesmilo/electrum/) and pulls in updates regularly
 
-(*If you've come here looking to simply run Electrum,* `you may download it here`_.)
+This program uses the verthash datafile to verify block headers.  It expects verthash.dat to be in the same directory that the program is run from.  Run `create-verthash-datafile`, copy `verthash.dat` from Vertcoin-Core or [build from source](https://github.com/vertcoin-project/vertcoinhash-python#building-verthashdat).
 
-.. _you may download it here: https://electrum.org/#download
+If you use the setup installer, verthash.dat must be inside `C:\Program Files (x86)\Electrum-VTC`.  Otherwise, verthash.dat must be in the same directory you run Electrum-VTC from or the data directory.
 
+Windows Data Directory
+ - `%APPDATA%\Electrum-VTC`
+Linux Data Directory
+ - `~/.electrum-vtc`
+
+How to verify GPG signatures
+============================
+
+GPG signatures are a proof that distributed files have been signed by the owner of the signing key. For example, if this website was compromised and the original Electrum files had been replaced, signature verification would fail, because the attacker would not be able to create valid signatures. (Note that an attacker would be able to create valid hashes, this is why we do not publish hashes of our binaries here, it does not bring any security).
+
+In order to be able to verify GPG signatures, you need to import the public key of the signer. Electrum binaries are signed with vertion's [public key](https://keys.openpgp.org/vks/v1/by-fingerprint/28E72909F1717FE9607754F8A7BEB2621678D37D). On Linux, you can import that key using the following command: gpg --import 28E72909F1717FE9607754F8A7BEB2621678D37D.asc. Here are tutorials for [Windows](https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-windows/) and [MacOS](https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-mac/).
+
+Notes for Windows users
+=======================
+
+Electrum binaries are often flagged by various anti-virus software. There is nothing we can do about it, so please stop reporting that to us. Anti-virus software uses heuristics in order to determine if a program is malware, and that often results in false positives. If you trust the developers of the project, you can verify the GPG signature of Electrum binaries, and safely ignore any anti-virus warnings. If you do not trust the developers of the project, you should build the binaries yourself, or run the software from source. Finally, if you are really concerned about malware, you should not use an operating system that relies on anti-virus software.
+
+Old versions of Windows might need to install the KB2999226 Windows update.
+
+
+Running from source
+================
 Electrum itself is pure Python, and so are most of the required dependencies,
 but not everything. The following sections describe how to run from source, but here
 is a TL;DR::
 
-    sudo apt-get install libsecp256k1-0
+    sudo apt-get install libsecp256k1-0 python3-tk
     python3 -m pip install --user .[gui,crypto]
 
 
@@ -94,7 +105,7 @@ Development version (git clone)
 
 Check out the code from GitHub::
 
-    git clone git://github.com/spesmilo/electrum.git
+    git clone git://github.com/vertcoin-project/electrum.git
     cd electrum
     git submodule update --init
 

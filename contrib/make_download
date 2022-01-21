@@ -6,7 +6,7 @@ import importlib
 from collections import defaultdict
 
 # load version.py; needlessly complicated alternative to "imp.load_source":
-version_spec = importlib.util.spec_from_file_location('version', 'electrum/version.py')
+version_spec = importlib.util.spec_from_file_location('version', 'electrum_vtc/version.py')
 version_module = importlib.util.module_from_spec(version_spec)
 version_spec.loader.exec_module(version_module)
 

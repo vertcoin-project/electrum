@@ -11,7 +11,7 @@ except ImportError as e:
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 os.chdir('..')
 
-cmd = "find electrum -type f -name '*.py' -o -name '*.kv'"
+cmd = "find electrum_vtc -type f -name '*.py' -o -name '*.kv'"
 
 files = subprocess.check_output(cmd, shell=True)
 
@@ -21,13 +21,13 @@ with open("app.fil", "wb") as f:
 print("Found {} files to translate".format(len(files.splitlines())))
 
 # Generate fresh translation template
-if not os.path.exists('electrum/locale'):
-    os.mkdir('electrum/locale')
+if not os.path.exists('electrum_vtc/locale'):
+    os.mkdir('electrum_vtc/locale')
 print('Generating template...')
-cmd = 'xgettext -s --from-code UTF-8 --language Python --no-wrap -f app.fil --output=electrum/locale/messages.pot'
+cmd = 'xgettext -s --from-code UTF-8 --language Python --no-wrap -f app.fil --output=electrum_vtc/locale/messages.pot'
 subprocess.check_output(cmd, shell=True)
 
-os.chdir('electrum')
+os.chdir('electrum_vtc')
 
 crowdin_api_key = None
 

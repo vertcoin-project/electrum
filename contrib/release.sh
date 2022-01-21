@@ -63,7 +63,7 @@ elif [ "$GPGUSER" == "sombernight_releasekey" ]; then
 fi
 
 
-VERSION=`python3 -c "import electrum; print(electrum.version.ELECTRUM_VERSION)"`
+VERSION=`python3 -c "import electrum_vtc; print(electrum_vtc.version.ELECTRUM_VERSION)"`
 info "VERSION: $VERSION"
 REV=`git describe --tags`
 info "REV: $REV"

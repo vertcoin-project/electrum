@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING, Optional
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 is_bundle = getattr(sys, 'frozen', False)
-is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum-vtc.desktop"))
 is_android = 'ANDROID_DATA' in os.environ
 
 if is_local:  # running from source
@@ -80,25 +80,25 @@ if not is_android:
 
 sys._ELECTRUM_RUNNING_VIA_RUNELECTRUM = True  # used by logging.py
 
-from electrum.logging import get_logger, configure_logging  # import logging submodule first
-from electrum import util
-from electrum import constants
-from electrum import SimpleConfig
-from electrum.wallet_db import WalletDB
-from electrum.wallet import Wallet
-from electrum.storage import WalletStorage
-from electrum.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
-from electrum.util import InvalidPassword, BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
-from electrum.commands import get_parser, known_commands, Commands, config_variables
-from electrum import daemon
-from electrum import keystore
-from electrum.util import create_and_start_event_loop
-from electrum.i18n import set_language
+from electrum_vtc.logging import get_logger, configure_logging  # import logging submodule first
+from electrum_vtc import util
+from electrum_vtc import constants
+from electrum_vtc import SimpleConfig
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.wallet import Wallet
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
+from electrum_vtc.util import InvalidPassword, BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
+from electrum_vtc.commands import get_parser, known_commands, Commands, config_variables
+from electrum_vtc import daemon
+from electrum_vtc import keystore
+from electrum_vtc.util import create_and_start_event_loop
+from electrum_vtc.i18n import set_language
 
 if TYPE_CHECKING:
     import threading
 
-    from electrum.plugin import Plugins
+    from electrum_vtc.plugin import Plugins
 
 _logger = get_logger(__name__)
 
@@ -131,7 +131,7 @@ def init_cmdline(config_options, wallet_path, server, *, config: 'SimpleConfig')
 
     if cmd.requires_wallet and not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'electrum-vtc create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys_exit(1)
 
     # important warning
@@ -255,7 +255,7 @@ async def run_offline_command(config, config_options, plugins: 'Plugins'):
 
 
 def init_plugins(config, gui_name):
-    from electrum.plugin import Plugins
+    from electrum_vtc.plugin import Plugins
     return Plugins(config, gui_name)
 
 
@@ -313,7 +313,7 @@ def main():
     # config is an object passed to the various constructors (wallet, interface, gui)
     if is_android:
         from jnius import autoclass
-        build_config = autoclass("org.electrum.electrum.BuildConfig")
+        build_config = autoclass("org.electrum_vtc.electrum_vtc.BuildConfig")
         config_options = {
             'verbosity': '*' if build_config.DEBUG else '',
             'cmd': 'gui',
@@ -334,7 +334,7 @@ def main():
         config_options['portable'] = True
 
     if config_options.get('portable'):
-        config_options['electrum_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'electrum_data')
+        config_options['electrum_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'electrum-vtc_data')
 
     if not config_options.get('verbosity'):
         warnings.simplefilter('ignore', DeprecationWarning)
@@ -442,7 +442,7 @@ def handle_cmd(*, cmdname: str, config: 'SimpleConfig', config_options: dict):
             try:
                 result = daemon.request(config, 'run_cmdline', (config_options,), timeout)
             except daemon.DaemonNotRunning:
-                print_msg("Daemon not running; try 'electrum daemon -d'")
+                print_msg("Daemon not running; try 'electrum-vtc daemon -d'")
                 if not cmd.requires_network:
                     print_msg("To run this command without a daemon, use --offline")
                 sys_exit(1)

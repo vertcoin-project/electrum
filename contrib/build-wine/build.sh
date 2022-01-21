@@ -29,7 +29,7 @@ sudo docker build \
 # maybe do fresh clone
 if [ ! -z "$ELECBUILD_COMMIT" ] ; then
     info "ELECBUILD_COMMIT=$ELECBUILD_COMMIT. doing fresh clone and git checkout."
-    FRESH_CLONE="$CONTRIB_WINE/fresh_clone/electrum" && \
+    FRESH_CLONE="$CONTRIB_WINE/fresh_clone/electrum-vtc" && \
         sudo rm -rf "$FRESH_CLONE" && \
         umask 0022 && \
         git clone "$PROJECT_ROOT" "$FRESH_CLONE" && \
@@ -43,9 +43,9 @@ fi
 info "building binary..."
 sudo docker run -it \
     --name electrum-wine-builder-cont \
-    -v "$PROJECT_ROOT_OR_FRESHCLONE_ROOT":/opt/wine64/drive_c/electrum \
+    -v "$PROJECT_ROOT_OR_FRESHCLONE_ROOT":/opt/wine64/drive_c/electrum-vtc \
     --rm \
-    --workdir /opt/wine64/drive_c/electrum/contrib/build-wine \
+    --workdir /opt/wine64/drive_c/electrum-vtc/contrib/build-wine \
     electrum-wine-builder-img \
     ./make_win.sh
 

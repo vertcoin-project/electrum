@@ -10,7 +10,7 @@ for i, x in enumerate(sys.argv):
 else:
     raise Exception('no name')
 
-home = 'C:\\electrum\\'
+home = 'C:\\electrum-vtc\\'
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
 hiddenimports = []
@@ -35,13 +35,13 @@ binaries += [('C:/tmp/libusb-1.0.dll', '.')]
 binaries += [('C:/tmp/libzbar-0.dll', '.')]
 
 datas = [
-    (home+'electrum/*.json', 'electrum'),
-    (home+'electrum/lnwire/*.csv', 'electrum/lnwire'),
-    (home+'electrum/wordlist/english.txt', 'electrum/wordlist'),
-    (home+'electrum/wordlist/slip39.txt', 'electrum/wordlist'),
-    (home+'electrum/locale', 'electrum/locale'),
-    (home+'electrum/plugins', 'electrum/plugins'),
-    (home+'electrum/gui/icons', 'electrum/gui/icons'),
+    (home+'electrum_vtc/*.json', 'electrum_vtc'),
+    (home+'electrum_vtc/lnwire/*.csv', 'electrum_vtc/lnwire'),
+    (home+'electrum_vtc/wordlist/english.txt', 'electrum_vtc/wordlist'),
+    (home+'electrum_vtc/wordlist/slip39.txt', 'electrum_vtc/wordlist'),
+    (home+'electrum_vtc/locale', 'electrum_vtc/locale'),
+    (home+'electrum_vtc/plugins', 'electrum_vtc/plugins'),
+    (home+'electrum_vtc/gui/icons', 'electrum_vtc/gui/icons'),
 ]
 datas += collect_data_files('trezorlib')
 datas += collect_data_files('safetlib')
@@ -52,23 +52,23 @@ datas += collect_data_files('bitbox02')
 
 # We don't put these files in to actually include them in the script but to make the Analysis method scan them for imports
 a = Analysis([home+'run_electrum',
-              home+'electrum/gui/qt/main_window.py',
-              home+'electrum/gui/qt/qrreader/qtmultimedia/camera_dialog.py',
-              home+'electrum/gui/text.py',
-              home+'electrum/util.py',
-              home+'electrum/wallet.py',
-              home+'electrum/simple_config.py',
-              home+'electrum/bitcoin.py',
-              home+'electrum/dnssec.py',
-              home+'electrum/commands.py',
-              home+'electrum/plugins/cosigner_pool/qt.py',
-              home+'electrum/plugins/email_requests/qt.py',
-              home+'electrum/plugins/trezor/qt.py',
-              home+'electrum/plugins/safe_t/client.py',
-              home+'electrum/plugins/safe_t/qt.py',
-              home+'electrum/plugins/keepkey/qt.py',
-              home+'electrum/plugins/ledger/qt.py',
-              home+'electrum/plugins/coldcard/qt.py',
+              home+'electrum_vtc/gui/qt/main_window.py',
+              home+'electrum_vtc/gui/qt/qrreader/qtmultimedia/camera_dialog.py',
+              home+'electrum_vtc/gui/text.py',
+              home+'electrum_vtc/util.py',
+              home+'electrum_vtc/wallet.py',
+              home+'electrum_vtc/simple_config.py',
+              home+'electrum_vtc/bitcoin.py',
+              home+'electrum_vtc/dnssec.py',
+              home+'electrum_vtc/commands.py',
+              home+'electrum_vtc/plugins/cosigner_pool/qt.py',
+              home+'electrum_vtc/plugins/email_requests/qt.py',
+              home+'electrum_vtc/plugins/trezor/qt.py',
+              home+'electrum_vtc/plugins/safe_t/client.py',
+              home+'electrum_vtc/plugins/safe_t/qt.py',
+              home+'electrum_vtc/plugins/keepkey/qt.py',
+              home+'electrum_vtc/plugins/ledger/qt.py',
+              home+'electrum_vtc/plugins/coldcard/qt.py',
               #home+'packages/requests/utils.py'
               ],
              binaries=binaries,
@@ -116,11 +116,11 @@ exe_standalone = EXE(
     a.scripts,
     a.binaries,
     a.datas,
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name + ".exe"),
+    name=os.path.join('build\\pyi.win32\\electrum-vtc', cmdline_name + ".exe"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrum_vtc/gui/icons/electrum-vtc.ico',
     console=False)
     # console=True makes an annoying black box pop up, but it does make Electrum output command line commands, with this turned off no output will be given but commands can still be used
 
@@ -129,11 +129,11 @@ exe_portable = EXE(
     a.scripts,
     a.binaries,
     a.datas + [('is_portable', 'README.md', 'DATA')],
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name + "-portable.exe"),
+    name=os.path.join('build\\pyi.win32\\electrum-vtc', cmdline_name + "-portable.exe"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrum_vtc/gui/icons/electrum-vtc.ico',
     console=False)
 
 #####
@@ -143,22 +143,22 @@ exe_inside_setup_noconsole = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name),
+    name=os.path.join('build\\pyi.win32\\electrum-vtc', cmdline_name),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrum_vtc/gui/icons/electrum-vtc.ico',
     console=False)
 
 exe_inside_setup_console = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name+"-debug"),
+    name=os.path.join('build\\pyi.win32\\electrum-vtc', cmdline_name+"-debug"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrum_vtc/gui/icons/electrum-vtc.ico',
     console=True)
 
 coll = COLLECT(
@@ -170,6 +170,6 @@ coll = COLLECT(
     strip=None,
     upx=True,
     debug=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrum_vtc/gui/icons/electrum-vtc.ico',
     console=False,
-    name=os.path.join('dist', 'electrum'))
+    name=os.path.join('dist', 'electrum-vtc'))

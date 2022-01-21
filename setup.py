@@ -26,7 +26,7 @@ with open('contrib/requirements/requirements-hw.txt') as f:
     requirements_hw = f.read().splitlines()
 
 # load version.py; needlessly complicated alternative to "imp.load_source":
-version_spec = importlib.util.spec_from_file_location('version', 'electrum/version.py')
+version_spec = importlib.util.spec_from_file_location('version', 'electrum_vtc/version.py')
 version_module = version = importlib.util.module_from_spec(version_spec)
 version_spec.loader.exec_module(version_module)
 
@@ -46,8 +46,8 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum.desktop']),
-        (os.path.join(usr_share, icons_dirname), ['electrum/gui/icons/electrum.png']),
+        (os.path.join(usr_share, 'applications/'), ['electrum-vtc.desktop']),
+        (os.path.join(usr_share, icons_dirname), ['electrum_vtc/gui/icons/electrum-vtc.png']),
     ]
 
 extras_require = {
@@ -71,27 +71,27 @@ setup(
     install_requires=requirements,
     extras_require=extras_require,
     packages=[
-        'electrum',
-        'electrum.qrreader',
-        'electrum.gui',
-        'electrum.gui.qt',
-        'electrum.gui.qt.qrreader',
-        'electrum.gui.qt.qrreader.qtmultimedia',
-        'electrum.plugins',
-    ] + [('electrum.plugins.'+pkg) for pkg in find_packages('electrum/plugins')],
+        'electrum_vtc',
+        'electrum_vtc.qrreader',
+        'electrum_vtc.gui',
+        'electrum_vtc.gui.qt',
+        'electrum_vtc.gui.qt.qrreader',
+        'electrum_vtc.gui.qt.qrreader.qtmultimedia',
+        'electrum_vtc.plugins',
+    ] + [('electrum_vtc.plugins.'+pkg) for pkg in find_packages('electrum_vtc/plugins')],
     package_dir={
-        'electrum': 'electrum'
+        'electrum_vtc': 'electrum_vtc'
     },
     # Note: MANIFEST.in lists what gets included in the tar.gz, and the
     # package_data kwarg lists what gets put in site-packages when pip installing the tar.gz.
     # By specifying include_package_data=True, MANIFEST.in becomes responsible for both.
     include_package_data=True,
-    scripts=['electrum/electrum'],
+    scripts=['electrum_vtc/electrum-vtc'],
     data_files=data_files,
-    description="Lightweight Bitcoin Wallet",
-    author="Thomas Voegtlin",
-    author_email="thomasv@electrum.org",
+    description="Lightweight Vertcoin Wallet",
+    author="vertion",
+    author_email="vertion@protonmail.com",
     license="MIT Licence",
-    url="https://electrum.org",
-    long_description="""Lightweight Bitcoin Wallet""",
+    url="https://github.com/vertcoin-project/electrum-vtc",
+    long_description="""Lightweight Vertcoin Wallet""",
 )

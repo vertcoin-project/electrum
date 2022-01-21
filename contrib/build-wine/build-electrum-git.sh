@@ -10,7 +10,7 @@ set -e
 
 . "$CONTRIB"/build_tools_util.sh
 
-pushd $WINEPREFIX/drive_c/electrum
+pushd $WINEPREFIX/drive_c/electrum-vtc
 
 VERSION=`git describe --tags --dirty --always`
 info "Last commit: $VERSION"
@@ -23,9 +23,9 @@ if ! which msgfmt > /dev/null 2>&1; then
     fail "Please install gettext"
 fi
 # we want the binary to have only compiled (.mo) locale files; not source (.po) files
-rm -rf "$WINEPREFIX/drive_c/electrum/electrum/locale/"
+rm -rf "$WINEPREFIX/drive_c/electrum-vtc/electrum_vtc/locale/"
 for i in ./locale/*; do
-    dir="$WINEPREFIX/drive_c/electrum/electrum/$i/LC_MESSAGES"
+    dir="$WINEPREFIX/drive_c/electrum-vtc/electrum_vtc/$i/LC_MESSAGES"
     mkdir -p $dir
     msgfmt --output-file="$dir/electrum.mo" "$i/electrum.po" || true
 done
@@ -45,7 +45,7 @@ $WINE_PYTHON -m pip install --no-dependencies --no-warn-script-location \
 $WINE_PYTHON -m pip install --no-dependencies --no-warn-script-location \
     --cache-dir "$WINE_PIP_CACHE_DIR" -r "$CONTRIB"/deterministic-build/requirements-hw.txt
 
-pushd $WINEPREFIX/drive_c/electrum
+pushd $WINEPREFIX/drive_c/electrum-vtc
 # see https://github.com/pypa/pip/issues/2195 -- pip makes a copy of the entire directory
 info "Pip installing Electrum. This might take a long time if the project folder is large."
 $WINE_PYTHON -m pip install --no-dependencies --no-warn-script-location .
