@@ -1,36 +1,34 @@
 Electrum - Lightweight Vertcoin client
 =====================================
 
-.. image:: https://api.cirrus-ci.com/github/spesmilo/electrum.svg?branch=master
-    :target: https://cirrus-ci.com/github/spesmilo/electrum
-    :alt: Upstream Build Status
-.. image:: https://coveralls.io/repos/github/spesmilo/electrum/badge.svg?branch=master
-    :target: https://coveralls.io/github/spesmilo/electrum?branch=master
-    :alt: Upstream Test coverage statistics
-.. image:: https://d322cqt584bo4o.cloudfront.net/electrum/localized.svg
-    :target: https://crowdin.com/project/electrum
-    :alt: Help translate Electrum online
+Electrum-VTC is a rebase of `upstream Electrum`_ and pulls in updates regularly.
 
-Getting started
-===============
-Electrum-VTC is a rebase of [upstream Electrum](https://github.com/spesmilo/electrum/) and pulls in updates regularly.
-Donate VTC to support this work: [VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV](https://bitinfocharts.com/vertcoin/address/VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV)
+Donate VTC to support this work: `VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV`_
 
-This program uses the verthash datafile to verify block headers.  It expects verthash.dat to be in the same directory that the program is run from.  Run `create-verthash-datafile`, copy `verthash.dat` from Vertcoin-Core or [build from source](https://github.com/vertcoin-project/vertcoinhash-python#building-verthashdat).
-
-If you use the setup installer, verthash.dat must be inside `C:\Program Files (x86)\Electrum-VTC`.  Otherwise, verthash.dat must be in the same directory you run Electrum-VTC from or the data directory.
+This program uses the verthash datafile to verify block headers and expects :code:`verthash.dat` to be in the data directory or the directory that the program is run from.  Obtain the verthash datafile by running :code:`create-verthash-datafile`.  You may also copy :code:`verthash.dat` from Vertcoin-Core or `build from source`_.
 
 Windows Data Directory
- - `%APPDATA%\Electrum-VTC`
+ - :code:`%APPDATA%\Electrum-VTC`
 Linux Data Directory
- - `~/.electrum-vtc`
+ - :code:`~/.electrum-vtc`
+
+If you would like hardware wallet support, see `this`_.
+
+.. _upstream Electrum: https://github.com/spesmilo/electrum
+.. _VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV: https://bitinfocharts.com/vertcoin/address/VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV
+.. _build from source: https://github.com/vertcoin-project/vertcoinhash-python#building-verthashdat
 
 How to verify GPG signatures
 ============================
 
 GPG signatures are a proof that distributed files have been signed by the owner of the signing key. For example, if this website was compromised and the original Electrum files had been replaced, signature verification would fail, because the attacker would not be able to create valid signatures. (Note that an attacker would be able to create valid hashes, this is why we do not publish hashes of our binaries here, it does not bring any security).
 
-In order to be able to verify GPG signatures, you need to import the public key of the signer. Electrum binaries are signed with vertion's [public key](https://keys.openpgp.org/vks/v1/by-fingerprint/28E72909F1717FE9607754F8A7BEB2621678D37D). On Linux, you can import that key using the following command: gpg --import 28E72909F1717FE9607754F8A7BEB2621678D37D.asc. Here are tutorials for [Windows](https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-windows/) and [MacOS](https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-mac/).
+In order to be able to verify GPG signatures, you need to import the public key of the signer. Electrum binaries are signed with `vertion's`_ `public key`_. On Linux, you can import that key using the following command: :code:`gpg --import 28E72909F1717FE9607754F8A7BEB2621678D37D.asc`. Here are tutorials for `Windows`_ and `MacOS`_.
+
+.. _vertion's: https://github.com/vertiond
+.. _public key: https://keys.openpgp.org/search?q=vertion@protonmail.com
+.. _Windows: https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-windows/
+.. _MacOS: https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-mac/
 
 Notes for Windows users
 =======================
