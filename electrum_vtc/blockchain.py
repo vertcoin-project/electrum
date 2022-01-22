@@ -45,25 +45,46 @@ import verthash
 import tkinter as tk
 from tkinter import messagebox
 
+config = SimpleConfig()
+electrum_dir = config.electrum_path()
+
+verthash_data_dir = None
+verthash_data_file = None
 verthash_data = None
-while verthash_data is None:
-    try:
-        if not os.path.isfile('verthash.dat'):
-            err = tk.Tk()
-            err.withdraw()
-            messagebox.showerror("Run create-verthash-datafile", "Verthash datafile must be in the program folder")
-            err.update()
-            sys.exit(1)
-        with open('verthash.dat', 'rb') as f:
+
+error_title = None
+error_message = None
+
+possible_data_dirs = [electrum_dir, os.getcwd()]
+for check_dir in possible_data_dirs:
+    check_file = os.path.join(check_dir, 'verthash.dat')
+    if os.path.isfile(check_file):
+        verthash_data_dir = check_dir
+        verthash_data_file = check_file
+        with open(check_file, 'rb') as f:
             verthash_data = f.read()
-            verthash_sum = hashlib.sha256(verthash_data).hexdigest()
-            assert verthash_sum == 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48', "Verthash datafile mismatch"
-    except AssertionError:
-        err = tk.Tk()
-        err.withdraw()
-        messagebox.showerror("Bad verthash datafile", "Delete verthash.dat and run create-verthash-datafile")
-        err.update()
-        sys.exit(1)
+        verthash_sum = hashlib.sha256(verthash_data).hexdigest()
+        if verthash_sum != 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48':
+            error_title = "Bad verthash datafile"
+            error_message = "Delete verthash.dat at {} and run create-verthash-datafile".format(verthash_data_file)
+        break
+
+if verthash_data_file is None:
+    error_title = "Electrum-VTC requires verthash.dat"
+    error_message = "Run create-verthash-datafile or copy verthash.dat to {}".format(electrum_dir)
+
+if verthash_data_dir == os.getcwd():
+    err = tk.Tk()
+    err.withdraw()
+    messagebox.showinfo("Electrum-VTC", "It is recommended to move verthash.dat to {}".format(electrum_dir))
+    err.update()
+
+if error_title is not None:
+    err = tk.Tk()
+    err.withdraw()
+    messagebox.showerror(error_title, error_message)
+    err.update()
+    sys.exit(1)
 
 def verthash_hash(dat):
     return verthash.getPoWHash(dat, verthash_data)
