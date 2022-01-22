@@ -13,7 +13,8 @@ Electrum - Lightweight Vertcoin client
 
 Getting started
 ===============
-Electrum-VTC is a rebase of [upstream Electrum](https://github.com/spesmilo/electrum/) and pulls in updates regularly
+Electrum-VTC is a rebase of [upstream Electrum](https://github.com/spesmilo/electrum/) and pulls in updates regularly.
+Donate VTC to support this work: [VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV](https://bitinfocharts.com/vertcoin/address/VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV)
 
 This program uses the verthash datafile to verify block headers.  It expects verthash.dat to be in the same directory that the program is run from.  Run `create-verthash-datafile`, copy `verthash.dat` from Vertcoin-Core or [build from source](https://github.com/vertcoin-project/vertcoinhash-python#building-verthashdat).
 
