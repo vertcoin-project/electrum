@@ -409,7 +409,7 @@ class PayServer(Logger):
         if not request:
             return web.HTTPNotFound()
         pr = make_request(self.config, request)
-        return web.Response(body=pr.SerializeToString(), content_type='application/bitcoin-paymentrequest')
+        return web.Response(body=pr.SerializeToString(), content_type='application/vertcoin-paymentrequest')
 
     async def get_status(self, request):
         ws = web.WebSocketResponse()
@@ -616,7 +616,7 @@ class Daemon(Logger):
             gui_name = 'qt'
         self.logger.info(f'launching GUI: {gui_name}')
         try:
-            gui = __import__('electrum_vtc.gui.' + gui_name, fromlist=['electrum'])
+            gui = __import__('electrum_vtc.gui.' + gui_name, fromlist=['electrum_vtc'])
             self.gui_object = gui.ElectrumGui(config=config, daemon=self, plugins=plugins)
             if not self._stop_entered:
                 self.gui_object.main()

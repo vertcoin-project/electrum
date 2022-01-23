@@ -15,7 +15,7 @@ from electrum_vtc.util import create_and_start_event_loop, log_exceptions
 
 loop, stopping_fut, loop_thread = create_and_start_event_loop()
 
-config = SimpleConfig({"testnet": True})  # to use ~/.electrum/testnet as datadir
+config = SimpleConfig({"testnet": False})  # to use ~/.electrum/testnet as datadir
 constants.set_testnet()  # to set testnet magic bytes
 daemon = Daemon(config, listen_jsonrpc=False)
 network = daemon.network
