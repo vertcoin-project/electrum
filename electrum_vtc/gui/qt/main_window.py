@@ -298,7 +298,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.fetch_alias()
 
         # If the option hasn't been set yet
-        if config.get('check_updates') is None:
+        if config.get('check_updates') is True:
             choice = self.question(title="Electrum-VTC - " + _("Enable update check"),
                                    msg=_("For security reasons we advise that you always use the latest version of Electrum.") + " " +
                                        _("Would you like to be notified when there is a newer version of Electrum available?"))
@@ -772,7 +772,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
         help_menu = menubar.addMenu(_("&Help"))
         help_menu.addAction(_("&About"), self.show_about)
-        help_menu.addAction(_("&Check for updates"), self.show_update_check)
+        # help_menu.addAction(_("&Check for updates"), self.show_update_check)
         help_menu.addAction(_("&Official website"), lambda: webopen("https://vertcoin.org"))
         help_menu.addSeparator()
         help_menu.addAction(_("&Documentation"), lambda: webopen("http://docs.electrum.org/")).setShortcut(QKeySequence.HelpContents)
