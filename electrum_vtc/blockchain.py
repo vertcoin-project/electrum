@@ -71,7 +71,7 @@ for check_dir in possible_data_dirs:
 
 if verthash_data_file is None:
     error_title = "Electrum-VTC requires verthash.dat"
-    error_message = "Run create-verthash-datafile or copy verthash.dat to {}".format(electrum_dir)
+    error_message = "Run create-verthash-datafile and move verthash.dat to {}".format(electrum_dir)
 
 if verthash_data_dir == os.getcwd():
     err = tk.Tk()

@@ -7,7 +7,7 @@ import sys, os
 PACKAGE='Electrum-VTC'
 PYPKG='electrum_vtc'
 MAIN_SCRIPT='run_electrum'
-ICONS_FILE=PYPKG + '/gui/icons/electrum.icns'
+ICONS_FILE=PYPKG + '/gui/icons/electrum-vtc.icns'
 
 
 for i, x in enumerate(sys.argv):
