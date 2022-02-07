@@ -7,7 +7,7 @@
 ;Variables
 
   !define PRODUCT_NAME "Electrum-VTC"
-  !define PRODUCT_WEB_SITE "https://github.com/vertcoin-project/electrum-vtc"
+  !define PRODUCT_WEB_SITE "https://github.com/vertcoin-project/electrum"
   !define PRODUCT_PUBLISHER "Vertcoin Developers"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 

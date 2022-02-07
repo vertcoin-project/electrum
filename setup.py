@@ -92,6 +92,6 @@ setup(
     author="vertion",
     author_email="vertion@protonmail.com",
     license="MIT Licence",
-    url="https://github.com/vertcoin-project/electrum-vtc",
+    url="https://github.com/vertcoin-project/electrum",
     long_description="""Lightweight Vertcoin Wallet""",
 )
