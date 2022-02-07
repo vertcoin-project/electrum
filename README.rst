@@ -18,17 +18,6 @@ If you would like hardware wallet support, see `this`_.
 .. _VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV: https://bitinfocharts.com/vertcoin/address/VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV
 .. _build from source: https://github.com/vertcoin-project/vertcoinhash-python#building-verthashdat
 
-How to verify GPG signatures
-============================
-
-GPG signatures are a proof that distributed files have been signed by the owner of the signing key. For example, if this website was compromised and the original Electrum files had been replaced, signature verification would fail, because the attacker would not be able to create valid signatures. (Note that an attacker would be able to create valid hashes, this is why we do not publish hashes of our binaries here, it does not bring any security).
-
-In order to be able to verify GPG signatures, you need to import the public key of the signer. Electrum binaries are signed with `vertion's`_ `public key`_. On Linux, you can import that key using the following command: :code:`gpg --import 28E72909F1717FE9607754F8A7BEB2621678D37D.asc`. Here are tutorials for `Windows`_ and `MacOS`_.
-
-.. _vertion's: https://github.com/vertiond
-.. _public key: https://keys.openpgp.org/search?q=vertion@protonmail.com
-.. _Windows: https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-windows/
-.. _MacOS: https://bitzuma.com/posts/how-to-verify-an-electrum-download-on-mac/
 
 Notes for Windows users
 =======================
@@ -104,8 +93,8 @@ Development version (git clone)
 
 Check out the code from GitHub::
 
-    git clone git://github.com/vertcoin-project/electrum.git
-    cd electrum
+    git clone https://github.com/vertcoin-project/electrum electrum-vtc
+    cd electrum-vtc
     git submodule update --init
 
 Run install (this should install dependencies)::
