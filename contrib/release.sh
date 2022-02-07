@@ -95,6 +95,10 @@ if test -f "dist/$appimage"; then
     info "file exists: $appimage"
 else
     ./contrib/build-linux/appimage/build.sh
+    cd ../vertcoinhash-python && git checkout electrum-executables
+    make clean && make all
+    mv create-verthash-datafile ../electrum-vtc/dist
+    cd ../electrum-vtc
 fi
 
 
@@ -107,7 +111,10 @@ if test -f "dist/$win1"; then
 else
     pushd .
     ./contrib/build-wine/build.sh
-    cd contrib/build-wine/
+    cd ../vertcoinhash-python && git checkout electrum-executables
+    ./build-windows.sh
+    mv create-verthash-datafile.exe ../electrum-vtc/contrib/build-wine/dist
+    cd ../electrum-vtc/contrib/build-wine/
     if [ ! -z "$RELEASEMANAGER" ] ; then
         ./sign.sh
         cp ./signed/*.exe "$PROJECT_ROOT/dist/"
@@ -213,7 +220,7 @@ rm -rf "$PROJECT_ROOT/dist/sigs/"
 mkdir --parents "$PROJECT_ROOT/dist/sigs/"
 cd $PROJECT_ROOT/dist
 for fname in "$tarball" "$appimage" "$win1" "$win2" "$win3"; do
-    signame="$fname.$GPGUSER.asc"
+    signame="$fname.asc"
     gpg --sign --armor --detach $PUBKEY --output "$PROJECT_ROOT/dist/sigs/$signame" "$fname"
 done
     # upload sigs
