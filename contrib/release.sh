@@ -71,6 +71,7 @@ info "REV: $REV"
 COMMIT=$(git rev-parse HEAD)
 
 export ELECBUILD_COMMIT="${COMMIT}^{commit}"
+export ELECBUILD_NOCACHE=1
 
 
 git_status=$(git status --porcelain)
