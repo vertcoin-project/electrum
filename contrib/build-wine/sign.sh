@@ -4,7 +4,7 @@ here=$(dirname "$0")
 test -n "$here" -a -d "$here" || exit
 cd $here
 
-CERT_FILE=${CERT_FILE:-~/codesigning/cert.pem}
+CERT_FILE=${CERT_FILE:-~/codesigning/cert.crt}
 KEY_FILE=${KEY_FILE:-~/codesigning/key.pem}
 if [[ ! -f "$CERT_FILE" ]]; then
     ls $CERT_FILE
@@ -26,8 +26,8 @@ for f in $(ls *.exe); do
       -h sha256 \
       -certs "$CERT_FILE" \
       -key "$KEY_FILE" \
-      -n "Electrum" \
-      -i "https://electrum.org/" \
+      -n "Electrum-VTC" \
+      -i "https://vertcoin.org/" \
       -t "http://timestamp.digicert.com/" \
       -in "$f" \
       -out "../signed/$f"

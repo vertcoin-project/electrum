@@ -52,3 +52,10 @@ electrum/*.so.0
 electrum/*.dll
 electrum/*.dylib
 contrib/osx/*.dylib
+
+contrib/build-wine/sign.sh/
+contrib/release.sh/
+build*
+create-verthash-datafile*
+newenv/
+*.dat

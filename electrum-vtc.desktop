@@ -6,7 +6,7 @@ Comment=Lightweight Vertcoin Client
 Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\"; electrum-vtc %u"
 GenericName[en_US]=Vertcoin Wallet
 GenericName=Vertcoin Wallet
-Icon=electrum
+Icon=electrum-vtc
 Name[en_US]=Electrum Vertcoin Wallet
 Name=Electrum Vertcoin Wallet
 Categories=Finance;Network;
