@@ -12,12 +12,7 @@ similar system.
 
 1. Install Docker
 
-    ```
-    $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    $ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    $ sudo apt-get update
-    $ sudo apt-get install -y docker-ce
-    ```
+    See `contrib/docker_notes.md`.
 
 2. Build binaries (Note that this only works for debug builds! Otherwise the security model of Android does not let you access the internal storage of an app without root)
 

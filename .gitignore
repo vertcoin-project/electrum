@@ -12,6 +12,8 @@ electrum_vtc/locale/
 packages
 env/
 .buildozer/
+.buildozer_kivy/
+.buildozer_qml/
 bin/
 /app.fil
 .idea
