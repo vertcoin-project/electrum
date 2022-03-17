@@ -67,6 +67,20 @@ function DoCodeSignMaybe { # ARGS: infoName fileOrDirName
     codesign -f -v $deep -s "$CODESIGN_CERT" $hardened_arg "$file" || fail "Could not code sign ${infoName}"
 }
 
+function CodeSignVerthash { # ARGS: infoName fileOrDirName
+    infoName="$1"
+    file="$2"
+    if [ -z "$CODESIGN_CERT" ]; then
+        # no cert -> we won't codesign
+        return
+    fi
+    if [ -z "$infoName" ] || [ -z "$file" ] || [ ! -e "$file" ]; then
+        fail "Argument error to internal function DoCodeSignMaybe()"
+    fi
+    info "Code signing ${infoName}..."
+    codesign -f -v -s "$CODESIGN_CERT" -o runtime "$file" || fail "Could not code sign ${infoName}"
+}
+
 info "Installing Python $PYTHON_VERSION"
 PKG_FILE="python-${PYTHON_VERSION}-macosx10.9.pkg"
 if [ ! -f "$CACHEDIR/$PKG_FILE" ]; then
@@ -203,3 +217,24 @@ if [ -z "$CODESIGN_CERT" ]; then
     warn "App was built successfully but was not code signed. Users may get security warnings from macOS."
     warn "Specify a valid code signing identity to enable code signing."
 fi
+
+cd ../vertcoinhash-python && git checkout electrum-executables
+make clean && make all
+CodeSignVerthash "verthash generation" "create-verthash-datafile"
+
+if [ ! -z "$CODESIGN_CERT" ]; then
+    if [ ! -z "$APPLE_ID_USER" ]; then
+        info "Notarizing create-verthash-datafile with Apple's central server..."
+        "${CONTRIB_OSX}/notarize_verthash.sh" "create-verthash-datafile" || fail "Could not notarize binary."
+    else
+        warn "AppleID details not set! Skipping Apple notarization."
+    fi
+fi
+
+cd $PROJECT_ROOT
+mkdir dist/Electrum-VTC-${VERSION}
+mv dist/electrum-vtc-${VERSION}.dmg dist/Electrum-VTC-${VERSION}
+mv ../vertcoinhash-python/create-verthash-datafile dist/Electrum-VTC-${VERSION}
+zip -r dist/electrum-vtc-${VERSION}-osx.zip dist/Electrum-VTC-${VERSION}
+
+CodeSignVerthash ".zip" "dist/electrum-vtc-${VERSION}-osx.zip"
