@@ -231,10 +231,10 @@ if [ ! -z "$CODESIGN_CERT" ]; then
     fi
 fi
 
-cd $PROJECT_ROOT
-mkdir dist/Electrum-VTC-${VERSION}
-mv dist/electrum-vtc-${VERSION}.dmg dist/Electrum-VTC-${VERSION}
-mv ../vertcoinhash-python/create-verthash-datafile dist/Electrum-VTC-${VERSION}
-zip -r dist/electrum-vtc-${VERSION}-osx.zip dist/Electrum-VTC-${VERSION}
+cd $PROJECT_ROOT/dist
+mkdir Electrum-VTC-${VERSION}
+mv electrum-vtc-${VERSION}.dmg Electrum-VTC-${VERSION}
+mv ../../vertcoinhash-python/create-verthash-datafile Electrum-VTC-${VERSION}
+zip -r electrum-vtc-${VERSION}-osx.zip Electrum-VTC-${VERSION}
 
-CodeSignVerthash ".zip" "dist/electrum-vtc-${VERSION}-osx.zip"
+CodeSignVerthash ".zip" "electrum-vtc-${VERSION}-osx.zip"
