@@ -69,7 +69,7 @@ do
 done
 
 # Staple the notary ticket
-xcrun stapler staple "verthash generation"
+xcrun stapler staple "create-verthash-datafile.zip"
 
 # rm zip
 rm create-verthash-datafile.zip
