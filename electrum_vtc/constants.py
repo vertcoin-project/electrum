@@ -40,8 +40,8 @@ def read_json(filename, default):
     return r
 
 
-GIT_REPO_URL = "https://github.com/spesmilo/electrum"
-GIT_REPO_ISSUES_URL = "https://github.com/spesmilo/electrum/issues"
+GIT_REPO_URL = "https://github.com/vertcoin-project/electrum"
+GIT_REPO_ISSUES_URL = "https://github.com/vertcoin-project/electrum/issues"
 BIP39_WALLET_FORMATS = read_json('bip39_wallet_formats.json', [])
 
 
@@ -73,12 +73,12 @@ class BitcoinMainnet(AbstractNet):
     NET_NAME = "mainnet"
     TESTNET = False
     WIF_PREFIX = 0x80
-    ADDRTYPE_P2PKH = 0
+    ADDRTYPE_P2PKH = 71
     ADDRTYPE_P2SH = 5
-    SEGWIT_HRP = "bc"
+    SEGWIT_HRP = "vtc"
     BOLT11_HRP = SEGWIT_HRP
-    GENESIS = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
-    DEFAULT_PORTS = {'t': '50001', 's': '50002'}
+    GENESIS = "4d96a915f49d40b1e5c2844d1ee2dccb90013a990ccea12c492d22110489f0c4"
+    DEFAULT_PORTS = {'t': '55001', 's': '55002'}
     DEFAULT_SERVERS = read_json('servers.json', {})
     CHECKPOINTS = read_json('checkpoints.json', [])
     BLOCK_HEIGHT_FIRST_LIGHTNING_CHANNELS = 497000
@@ -99,7 +99,7 @@ class BitcoinMainnet(AbstractNet):
         'p2wsh':       0x02aa7ed3,  # Zpub
     }
     XPUB_HEADERS_INV = inv_dict(XPUB_HEADERS)
-    BIP44_COIN_TYPE = 0
+    BIP44_COIN_TYPE = 28
     LN_REALM_BYTE = 0
     LN_DNS_SEEDS = [
         'nodes.lightning.directory.',
@@ -113,11 +113,11 @@ class BitcoinTestnet(AbstractNet):
     NET_NAME = "testnet"
     TESTNET = True
     WIF_PREFIX = 0xef
-    ADDRTYPE_P2PKH = 111
+    ADDRTYPE_P2PKH = 74
     ADDRTYPE_P2SH = 196
-    SEGWIT_HRP = "tb"
+    SEGWIT_HRP = "tvtc"
     BOLT11_HRP = SEGWIT_HRP
-    GENESIS = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
+    GENESIS = "cee8f24feb7a64c8f07916976aa4855decac79b6741a8ec2e32e2747497ad2c9"
     DEFAULT_PORTS = {'t': '51001', 's': '51002'}
     DEFAULT_SERVERS = read_json('servers_testnet.json', {})
     CHECKPOINTS = read_json('checkpoints_testnet.json', [])
@@ -138,7 +138,7 @@ class BitcoinTestnet(AbstractNet):
         'p2wsh':       0x02575483,  # Vpub
     }
     XPUB_HEADERS_INV = inv_dict(XPUB_HEADERS)
-    BIP44_COIN_TYPE = 1
+    BIP44_COIN_TYPE = 28
     LN_REALM_BYTE = 1
     LN_DNS_SEEDS = [  # TODO investigate this again
         #'test.nodes.lightning.directory.',  # times out.
@@ -149,9 +149,9 @@ class BitcoinTestnet(AbstractNet):
 class BitcoinRegtest(BitcoinTestnet):
 
     NET_NAME = "regtest"
-    SEGWIT_HRP = "bcrt"
+    SEGWIT_HRP = "vtcr"
     BOLT11_HRP = SEGWIT_HRP
-    GENESIS = "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
+    GENESIS = "2399c0b047ebbbd1650d66867206c97317027b1a1932bc6fc17ce833dc4a85ce"
     DEFAULT_SERVERS = read_json('servers_regtest.json', {})
     CHECKPOINTS = []
     LN_DNS_SEEDS = []
@@ -186,13 +186,13 @@ NETS_LIST = tuple(all_subclasses(AbstractNet))
 # don't import net directly, import the module instead (so that net is singleton)
 net = BitcoinMainnet
 
-def set_signet():
-    global net
-    net = BitcoinSignet
-
-def set_simnet():
-    global net
-    net = BitcoinSimnet
+# def set_signet():
+#     global net
+#     net = BitcoinSignet
+#
+# def set_simnet():
+#     global net
+#     net = BitcoinSimnet
 
 def set_mainnet():
     global net
