@@ -15,7 +15,7 @@ from . import util
 from . import constants
 from .util import base_units, base_unit_name_to_decimal_point, decimal_point_to_base_unit_name, UnknownBaseUnit, DECIMAL_POINT_DEFAULT
 from .util import format_satoshis, format_fee_satoshis
-from .util import user_dir, make_dir, NoDynamicFeeEstimates, quantize_feerate
+from .util import vertcoin_dir, ocm_dir, user_dir, make_dir, NoDynamicFeeEstimates, quantize_feerate
 from .i18n import _
 from .logging import get_logger, Logger
 
@@ -75,6 +75,9 @@ class SimpleConfig(Logger):
         self.fee_estimates = {}  # type: Dict[int, int]
         self.last_time_fee_estimates_requested = 0  # zero ensures immediate fees
 
+        self.vertcoin_dir = vertcoin_dir
+        self.ocm_dir = ocm_dir
+
         # The following two functions are there for dependency injection when
         # testing.
         if read_user_config_function is None:
@@ -118,6 +121,23 @@ class SimpleConfig(Logger):
         self.num_zeros = int(self.get('num_zeros', 0))
         self.amt_precision_post_satoshi = int(self.get('amt_precision_post_satoshi', 0))
         self.amt_add_thousands_sep = bool(self.get('amt_add_thousands_sep', False))
+
+
+    def vertcoin_path(self):
+        # Read vertcoin_path from command line
+        # Otherwise use the user's default data directory.
+        path = self.get('vertcoin_path')
+        if path is None:
+            path = self.vertcoin_dir()
+        return path
+
+    def ocm_path(self):
+        # Read ocm_path from command line
+        # Otherwise use the user's default data directory.
+        path = self.get('ocm_path')
+        if path is None:
+            path = self.ocm_dir()
+        return path
 
     def electrum_path(self):
         # Read electrum_path from command line

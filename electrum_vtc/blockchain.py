@@ -20,7 +20,11 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import hashlib
 import os
+import platform
+import subprocess
+import sys
 import threading
 import time
 from typing import Optional, Dict, Mapping, Sequence
@@ -33,8 +37,130 @@ from .util import bfh, bh2u, with_lock
 from .simple_config import SimpleConfig
 from .logging import get_logger, Logger
 
+import lyra2re_hash
+import lyra2re2_hash
+import lyra2re3_hash
+import vtc_scrypt_new
+
+import verthash
+
+import tkinter as tk
+from tkinter import messagebox
+
+# Script paths and execution
+SCRIPT_FILE = os.path.abspath(os.path.realpath(__file__))
+SCRIPT_FNAME = os.path.basename(SCRIPT_FILE)
+SCRIPT_NAME, SCRIPT_EXT = os.path.splitext(SCRIPT_FNAME)
+SCRIPT_DIR = os.path.dirname(SCRIPT_FILE)
+
+verthash_exe_fname = 'create-verthash-datafile.exe' if platform.system() == 'Windows' else 'create-verthash-datafile'
+create_verthash_exe = os.path.join(SCRIPT_DIR, verthash_exe_fname)
+
+config = SimpleConfig()
+electrum_dir = config.electrum_path()
+default_verthash_datafile = os.path.join(electrum_dir, 'verthash.dat')
+vertcoin_dir = config.vertcoin_path()
+ocm_dir = config.ocm_path()
+
+verthash_datafile_dir = None
+verthash_datafile = None
+verthash_data = None
 
 _logger = get_logger(__name__)
+
+def create_verthash_datafile(create_verthash_exe, output_file=default_verthash_datafile, overwrite=False):
+    if os.path.isfile(output_file):
+        if overwrite:
+            os.remove(output_file)
+        else:
+            _logger.info("In call to create_verthash_datafile, output file already exists: {}".format(output_file))
+            return output_file
+    cmd_args = [create_verthash_exe]
+    cmd_args.extend(['-o', default_verthash_datafile])
+    print(cmd_args)
+
+    root = tk.Tk()
+    width = 620
+    height = 30
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+    root.resizable(False, False)
+    root.title("Electrum-VTC")
+
+    l = tk.Label(root, text="Creating Verthash Datafile - may take several minutes".format(electrum_dir))
+    l.config(font=("Roboto", 12))
+    l.pack()
+
+    try:
+        root.update()
+        subprocess.call(cmd_args)
+        root.destroy()
+    except KeyboardInterrupt:
+        os.remove(output_file)
+        sys.exit(0)
+    return output_file
+
+existing_verthash_datafile = None
+
+possible_data_dirs = [os.getcwd(), vertcoin_dir, ocm_dir, electrum_dir]
+for verthash_datafile_dir in possible_data_dirs:
+    verthash_datafile = os.path.join(verthash_datafile_dir, 'verthash.dat')
+    if os.path.isfile(verthash_datafile):
+        _logger.info("Checking verthash.dat: {}".format(verthash_datafile_dir))
+        with open(verthash_datafile, 'rb') as f:
+            verthash_data = f.read()
+        verthash_sum = hashlib.sha256(verthash_data).hexdigest()
+        _logger.info("sha256sum verthash.dat {}".format(verthash_sum))
+        if verthash_sum == 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48':
+            _logger.info("Good checksum")
+            existing_verthash_datafile = verthash_datafile
+            break
+        else:
+            _logger.warning("Bad checksum: {}".format(verthash_datafile))
+            if verthash_datafile_dir == electrum_dir:
+                _logger.info("Bad sha256sum")
+                err = tk.Tk()
+                err.withdraw()
+                messagebox.showwarning("Electrum-VTC", "Bad verthash datafile: {}".format(verthash_datafile_dir))
+                err.update()
+
+if existing_verthash_datafile is not None:
+    verthash_datafile = existing_verthash_datafile
+else:
+    if os.path.isfile(create_verthash_exe):
+        verthash_datafile = default_verthash_datafile
+        verthash_datafile_dir = os.path.dirname(verthash_datafile)
+        err = tk.Tk()
+        err.withdraw()
+        messagebox.showinfo("Electrum-VTC", "Click OK to create verthash.dat to {}".format(verthash_datafile_dir))
+        err.update()
+        _logger.info("Creating verthash.dat: {}".format(verthash_datafile_dir))
+        create_verthash_datafile(create_verthash_exe, output_file=verthash_datafile, overwrite=True)
+        with open(verthash_datafile, 'rb') as f:
+            verthash_data = f.read()
+        verthash_sum = hashlib.sha256(verthash_data).hexdigest()
+        _logger.info("sha256sum verthash.dat {}".format(verthash_sum))
+        if verthash_sum != 'a55531e843cd56b010114aaf6325b0d529ecf88f8ad47639b6ededafd721aa48':
+            _logger.info("Bad checksum - Restart Electrum-VTC".format(verthash_sum))
+            err = tk.Tk()
+            err.withdraw()
+            messagebox.showwarning("Bad verthash datafile", "Restart Electrum-VTC".format(verthash_datafile_dir))
+            err.update()
+            sys.exit(1)
+        else:
+            _logger.info("Good checksum")
+    else:
+        print("create-verthash-datafile executable needed")
+        print("Run ./contrib/make_verthash-dat.sh")
+        sys.exit(0)
+
+verthash_datafile_dir = os.path.dirname(verthash_datafile)
+
+def verthash_hash(dat):
+    return verthash.getPoWHash(dat, verthash_data)
 
 HEADER_SIZE = 80  # bytes
 
@@ -85,6 +211,19 @@ def hash_header(header: dict) -> str:
 def hash_raw_header(header: str) -> str:
     return hash_encode(sha256d(bfh(header)))
 
+def pow_hash_header(header):
+    height = header.get('block_height')
+    header_bytes = bfh(serialize_header(header))
+    if height >= 1500000:
+        return hash_encode(verthash_hash(header_bytes))
+    if height > 1080000:
+        return hash_encode(lyra2re3_hash.getPoWHash(header_bytes))
+    elif height >= 347000:
+        return hash_encode(lyra2re2_hash.getPoWHash(header_bytes))
+    elif height >= 208301:
+        return hash_encode(lyra2re_hash.getPoWHash(header_bytes))
+    else:
+        return hash_encode(vtc_scrypt_new.getPoWHash(header_bytes))
 
 # key: blockhash hex at forkpoint
 # the chain at some key is the best chain that includes the given hash
