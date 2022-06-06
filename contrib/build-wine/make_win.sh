@@ -27,6 +27,7 @@ export CACHEDIR="$here/.cache/$WIN_ARCH"
 export PIP_CACHE_DIR="$CACHEDIR/wine_pip_cache"
 export WINE_PIP_CACHE_DIR="c:/electrum/contrib/build-wine/.cache/$WIN_ARCH/wine_pip_cache"
 export DLL_TARGET_DIR="$CACHEDIR/dlls"
+export SOURCE="../$CONTRIB"
 
 export WINEPREFIX="/opt/wine64"
 export WINEDEBUG=-all
@@ -40,6 +41,12 @@ rm "$here"/build/* -rf
 rm "$here"/dist/* -rf
 
 mkdir -p "$CACHEDIR" "$DLL_TARGET_DIR" "$PIP_CACHE_DIR"
+
+if [ -f "$CACHEDIR/create-verthash-datafile.exe" ]; then
+    info "verthash already built, skipping"
+else
+    "$CONTRIB"/make_verthash-dat.sh || fail "Could not build verthash"
+fi
 
 if [ -f "$DLL_TARGET_DIR/libsecp256k1-0.dll" ]; then
     info "libsecp256k1 already built, skipping"

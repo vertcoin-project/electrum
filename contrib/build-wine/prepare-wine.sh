@@ -61,6 +61,8 @@ download_if_not_exist "$CACHEDIR/$NSIS_FILENAME" "$NSIS_URL"
 verify_hash "$CACHEDIR/$NSIS_FILENAME" "$NSIS_SHA256"
 wine "$CACHEDIR/$NSIS_FILENAME" /S
 
+# copy already built binary
+cp "$CACHEDIR/create-verthash-datafile.exe" $WINEPREFIX/drive_c/tmp/ || fail "Could not copy verthash to its destination"
 
 # copy already built DLLs
 cp "$DLL_TARGET_DIR/libsecp256k1-0.dll" $WINEPREFIX/drive_c/tmp/ || fail "Could not copy libsecp to its destination"

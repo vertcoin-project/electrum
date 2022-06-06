@@ -23,6 +23,8 @@ python3 -m pip install --upgrade pip
 
 git submodule update --init
 
+"$CONTRIB"/make_verthash-dat.sh || fail "verthash failed"
+
 (
     cd "$CONTRIB/deterministic-build/electrum-locale/"
     if ! which msgfmt > /dev/null 2>&1; then

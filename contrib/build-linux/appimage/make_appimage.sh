@@ -67,6 +67,9 @@ tar xf "$CACHEDIR/Python-$PYTHON_VERSION.tar.xz" -C "$BUILDDIR"
 )
 
 
+"$CONTRIB"/make_verthash-dat.sh || fail "Could not build verthash"
+cp -f "$PROJECT_ROOT/electrum/create-verthash-datafile" "$APPDIR/usr/bin/create-verthash-datafile" || fail "Could not copy verthash-dat to its destination"
+
 "$CONTRIB"/make_libsecp256k1.sh || fail "Could not build libsecp"
 cp -f "$PROJECT_ROOT/electrum/libsecp256k1.so.0" "$APPDIR/usr/lib/libsecp256k1.so.0" || fail "Could not copy libsecp to its destination"
 

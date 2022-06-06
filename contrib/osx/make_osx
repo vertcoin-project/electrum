@@ -171,6 +171,14 @@ info "generating locale"
 ) || fail "failed generating locale"
 
 
+if [ ! -f "$PROJECT_ROOT"/electrum/create-verthash-datafile ]; then
+    info "Building create-verthash-datafile binary..."
+    "$CONTRIB"/make_verthash-dat.sh || fail "Could not build verthash"
+else
+    info "Skipping verthash build: reusing already built binary."
+fi
+cp "$PROJECT_ROOT"/electrum/create-verthash-datafile "$CONTRIB"/osx
+
 if [ ! -f "$PROJECT_ROOT"/electrum/libsecp256k1.0.dylib ]; then
     info "Building libsecp256k1 dylib..."
     "$CONTRIB"/make_libsecp256k1.sh || fail "Could not build libsecp"
