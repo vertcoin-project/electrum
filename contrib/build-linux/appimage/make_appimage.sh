@@ -55,6 +55,8 @@ tar xf "$CACHEDIR/Python-$PYTHON_VERSION.tar.xz" -C "$BUILDDIR"
       --prefix="$APPDIR/usr" \
       --enable-ipv6 \
       --enable-shared \
+      --with-tcltk-includes='-I/usr/include/tcl8.6' \
+      --with-tcltk-libs='/usr/lib/x86_64-linux-gnu/libtcl8.6.so /usr/lib/x86_64-linux-gnu/libtk8.6.so' \
       -q
     make -j4 -s || fail "Could not build Python"
     make -s install > /dev/null || fail "Could not install Python"
@@ -172,6 +174,8 @@ info "Copying additional libraries"
     cp -f /usr/lib/x86_64-linux-gnu/libxkbcommon-x11.so.0 "$APPDIR"/usr/lib/x86_64-linux-gnu || fail "Could not copy libxkbcommon-x11"
     # some distros lack some libxcb libraries (see https://github.com/Electron-Cash/Electron-Cash/issues/2196)
     cp -f /usr/lib/x86_64-linux-gnu/libxcb-* "$APPDIR"/usr/lib/x86_64-linux-gnu || fail "Could not copy libxcb"
+    cp -r /usr/share/tcltk/tcl8.6 "$APPDIR"/usr/lib || fail "Could not copy tcl"
+    cp -r /usr/share/tcltk/tk8.6 "$APPDIR"/usr/lib || fail "Could not copy tk"
 )
 
 info "stripping binaries from debug symbols."

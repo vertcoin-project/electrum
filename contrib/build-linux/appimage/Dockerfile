@@ -52,6 +52,14 @@ RUN apt-get update -q && \
         libc6-dev=2.27-3ubuntu1.5 \
         libc6=2.27-3ubuntu1.5 \
         libc-dev-bin=2.27-3ubuntu1.5 \
+        libxcb1=1.13-2~ubuntu18.04 \
+        libxcb1-dev=1.13-2~ubuntu18.04 \
+        libx11-dev \
+        libxt-dev \
+        libxss-dev \
+        libxext-dev \
+        libxft-dev=2.3.2-1 \
+        tk8.6-dev=8.6.8-4 \
         && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove -y && \
