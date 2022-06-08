@@ -36,10 +36,10 @@ git submodule update --init
     # (also see MANIFEST.in)
     rm -rf "$LOCALE"
     for i in ./locale/*; do
-        dir="$PROJECT_ROOT/electrum/$i/LC_MESSAGES"
+        dir="$PROJECT_ROOT/electrum_vtc/$i/LC_MESSAGES"
         mkdir -p "$dir"
         msgfmt --output-file="$dir/electrum.mo" "$i/electrum.po" || true
-        cp $i/electrum.po "$PROJECT_ROOT/electrum/$i/electrum.po"
+        cp $i/electrum.po "$PROJECT_ROOT/electrum_vtc/$i/electrum.po"
     done
 )
 

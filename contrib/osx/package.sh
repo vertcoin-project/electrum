@@ -24,7 +24,7 @@ export PATH=$PATH:~/bin
 
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 Electrum.app"
+    echo "Usage: $0 Electrum-VTC.app"
     exit -127
 fi
 
@@ -80,16 +80,16 @@ ${genisoimage} \
     -D \
     -l \
     -probe \
-    -V "Electrum" \
+    -V "Electrum-VTC" \
     -no-pad \
     -r \
     -dir-mode 0755 \
     -apple \
-    -o Electrum_uncompressed.dmg \
+    -o Electrum-VTC_uncompressed.dmg \
     /tmp/electrum-macos/image || fail "Unable to create uncompressed dmg"
 
-dmg dmg Electrum_uncompressed.dmg electrum-$VERSION.dmg || fail "Unable to create compressed dmg"
-rm Electrum_uncompressed.dmg
+dmg dmg Electrum-VTC_uncompressed.dmg electrum-vtc-$VERSION-osx.dmg || fail "Unable to create compressed dmg"
+rm Electrum-VTC_uncompressed.dmg
 
 echo "Done."
-sha256sum electrum-$VERSION.dmg
+sha256sum electrum-vtc-$VERSION-osx.dmg

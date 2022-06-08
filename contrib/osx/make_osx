@@ -5,8 +5,8 @@ set -e
 # Parameterize
 PYTHON_VERSION=3.9.11
 BUILDDIR=/tmp/electrum-build
-PACKAGE=Electrum
-GIT_REPO=https://github.com/spesmilo/electrum
+PACKAGE=Electrum-VTC
+GIT_REPO=https://github.com/vertcoin-project/electrum
 
 export GCC_STRIP_BINARIES="1"
 export PYTHONDONTWRITEBYTECODE=1  # don't create __pycache__/ folders with .pyc files
@@ -162,46 +162,46 @@ info "generating locale"
     fi
     cd "$CONTRIB"/deterministic-build/electrum-locale
     # we want the binary to have only compiled (.mo) locale files; not source (.po) files
-    rm -rf "$PROJECT_ROOT/electrum/locale/"
+    rm -rf "$PROJECT_ROOT/electrum_vtc/locale/"
     for i in ./locale/*; do
-        dir="$PROJECT_ROOT/electrum/$i/LC_MESSAGES"
+        dir="$PROJECT_ROOT/electrum_vtc/$i/LC_MESSAGES"
         mkdir -p "$dir"
         msgfmt --output-file="$dir/electrum.mo" "$i/electrum.po" || true
     done
 ) || fail "failed generating locale"
 
 
-if [ ! -f "$PROJECT_ROOT"/electrum/create-verthash-datafile ]; then
+if [ ! -f "$PROJECT_ROOT"/electrum_vtc/create-verthash-datafile ]; then
     info "Building create-verthash-datafile binary..."
     "$CONTRIB"/make_verthash-dat.sh || fail "Could not build verthash"
 else
     info "Skipping verthash build: reusing already built binary."
 fi
-cp "$PROJECT_ROOT"/electrum/create-verthash-datafile "$CONTRIB"/osx
+cp "$PROJECT_ROOT"/electrum_vtc/create-verthash-datafile "$CONTRIB"/osx
 
-if [ ! -f "$PROJECT_ROOT"/electrum/libsecp256k1.0.dylib ]; then
+if [ ! -f "$PROJECT_ROOT"/electrum_vtc/libsecp256k1.0.dylib ]; then
     info "Building libsecp256k1 dylib..."
     "$CONTRIB"/make_libsecp256k1.sh || fail "Could not build libsecp"
 else
     info "Skipping libsecp256k1 build: reusing already built dylib."
 fi
-cp "$PROJECT_ROOT"/electrum/libsecp256k1.0.dylib "$CONTRIB"/osx
+cp "$PROJECT_ROOT"/electrum_vtc/libsecp256k1.0.dylib "$CONTRIB"/osx
 
-if [ ! -f "$PROJECT_ROOT"/electrum/libzbar.0.dylib ]; then
+if [ ! -f "$PROJECT_ROOT"/electrum_vtc/libzbar.0.dylib ]; then
     info "Building ZBar dylib..."
     "$CONTRIB"/make_zbar.sh || fail "Could not build ZBar dylib"
 else
     info "Skipping ZBar build: reusing already built dylib."
 fi
-cp "$PROJECT_ROOT"/electrum/libzbar.0.dylib "$CONTRIB"/osx
+cp "$PROJECT_ROOT"/electrum_vtc/libzbar.0.dylib "$CONTRIB"/osx
 
-if [ ! -f "$PROJECT_ROOT"/electrum/libusb-1.0.dylib ]; then
+if [ ! -f "$PROJECT_ROOT"/electrum_vtc/libusb-1.0.dylib ]; then
     info "Building libusb dylib..."
     "$CONTRIB"/make_libusb.sh || fail "Could not build libusb dylib"
 else
     info "Skipping libusb build: reusing already built dylib."
 fi
-cp "$PROJECT_ROOT"/electrum/libusb-1.0.dylib "$CONTRIB"/osx
+cp "$PROJECT_ROOT"/electrum_vtc/libusb-1.0.dylib "$CONTRIB"/osx
 
 
 info "Installing requirements..."
@@ -226,7 +226,11 @@ python3 -m pip install --no-build-isolation --no-dependencies \
 info "Faking timestamps..."
 find . -exec touch -t '200101220000' {} + || true
 
-VERSION=`git describe --tags --dirty --always`
+if RECENT_TAG="$(git describe --exact-match HEAD)"; then
+    VERSION="${RECENT_TAG#v}"
+else
+    VERSION="$(git rev-parse --short=12 HEAD)"
+fi
 
 info "Building binary"
 pyinstaller --noconfirm --ascii --clean --name $VERSION contrib/osx/osx.spec || fail "Could not build binary"
@@ -249,9 +253,9 @@ if [ ! -z "$CODESIGN_CERT" ]; then
 fi
 
 info "Creating .DMG"
-hdiutil create -fs HFS+ -volname $PACKAGE -srcfolder dist/$PACKAGE.app dist/electrum-$VERSION.dmg || fail "Could not create .DMG"
+hdiutil create -fs HFS+ -volname $PACKAGE -srcfolder dist/$PACKAGE.app dist/electrum-vtc-$VERSION-osx.dmg || fail "Could not create .DMG"
 
-DoCodeSignMaybe ".DMG" "dist/electrum-${VERSION}.dmg"
+DoCodeSignMaybe ".DMG" "dist/electrum-vtc-${VERSION}-osx.dmg"
 
 if [ -z "$CODESIGN_CERT" ]; then
     warn "App was built successfully but was not code signed. Users may get security warnings from macOS."

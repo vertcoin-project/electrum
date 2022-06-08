@@ -4,8 +4,8 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules, coll
 
 import sys, os
 
-PACKAGE='Electrum'
-PYPKG='electrum'
+PACKAGE='Electrum-VTC'
+PYPKG='electrum_vtc'
 MAIN_SCRIPT='run_electrum'
 ICONS_FILE=PYPKG + '/gui/icons/electrum-vtc.icns'
 
@@ -49,7 +49,7 @@ datas += collect_data_files('ckcc')
 datas += collect_data_files('bitbox02')
 
 # Add libusb so Trezor and Safe-T mini will work
-binaries = [(electrum + "contrib/osx/create-verthash-datafile", "electrum")]
+binaries = [(electrum + "contrib/osx/create-verthash-datafile", "electrum_vtc")]
 binaries += [(electrum + "contrib/osx/libusb-1.0.dylib", ".")]
 binaries += [(electrum + "contrib/osx/libsecp256k1.0.dylib", ".")]
 binaries += [(electrum + "contrib/osx/libzbar.0.dylib", ".")]
@@ -59,23 +59,23 @@ binaries += [b for b in collect_dynamic_libs('PyQt5') if 'macstyle' in b[0]]
 
 # We don't put these files in to actually include them in the script but to make the Analysis method scan them for imports
 a = Analysis([electrum+ MAIN_SCRIPT,
-              electrum+'electrum/gui/qt/main_window.py',
-              electrum+'electrum/gui/qt/qrreader/qtmultimedia/camera_dialog.py',
-              electrum+'electrum/gui/text.py',
-              electrum+'electrum/util.py',
-              electrum+'electrum/wallet.py',
-              electrum+'electrum/simple_config.py',
-              electrum+'electrum/bitcoin.py',
-              electrum+'electrum/dnssec.py',
-              electrum+'electrum/commands.py',
-              electrum+'electrum/plugins/cosigner_pool/qt.py',
-              electrum+'electrum/plugins/email_requests/qt.py',
-              electrum+'electrum/plugins/trezor/qt.py',
-              electrum+'electrum/plugins/safe_t/client.py',
-              electrum+'electrum/plugins/safe_t/qt.py',
-              electrum+'electrum/plugins/keepkey/qt.py',
-              electrum+'electrum/plugins/ledger/qt.py',
-              electrum+'electrum/plugins/coldcard/qt.py',
+              electrum+'electrum_vtc/gui/qt/main_window.py',
+              electrum+'electrum_vtc/gui/qt/qrreader/qtmultimedia/camera_dialog.py',
+              electrum+'electrum_vtc/gui/text.py',
+              electrum+'electrum_vtc/util.py',
+              electrum+'electrum_vtc/wallet.py',
+              electrum+'electrum_vtc/simple_config.py',
+              electrum+'electrum_vtc/bitcoin.py',
+              electrum+'electrum_vtc/dnssec.py',
+              electrum+'electrum_vtc/commands.py',
+              electrum+'electrum_vtc/plugins/cosigner_pool/qt.py',
+              electrum+'electrum_vtc/plugins/email_requests/qt.py',
+              electrum+'electrum_vtc/plugins/trezor/qt.py',
+              electrum+'electrum_vtc/plugins/safe_t/client.py',
+              electrum+'electrum_vtc/plugins/safe_t/qt.py',
+              electrum+'electrum_vtc/plugins/keepkey/qt.py',
+              electrum+'electrum_vtc/plugins/ledger/qt.py',
+              electrum+'electrum_vtc/plugins/coldcard/qt.py',
               ],
              binaries=binaries,
              datas=datas,

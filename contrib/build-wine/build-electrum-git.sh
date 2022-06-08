@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME_ROOT=electrum
+NAME_ROOT=electrum-vtc
 
 export PYTHONDONTWRITEBYTECODE=1  # don't create __pycache__/ folders with .pyc files
 
@@ -12,7 +12,12 @@ set -e
 
 pushd $WINEPREFIX/drive_c/electrum
 
-VERSION=`git describe --tags --dirty --always`
+if RECENT_TAG="$(git describe --exact-match HEAD)"; then
+    VERSION="${RECENT_TAG#v}"
+else
+    VERSION="$(git rev-parse --short=12 HEAD)"
+fi
+
 info "Last commit: $VERSION"
 
 # Load electrum-locale for this release
@@ -23,9 +28,9 @@ if ! which msgfmt > /dev/null 2>&1; then
     fail "Please install gettext"
 fi
 # we want the binary to have only compiled (.mo) locale files; not source (.po) files
-rm -rf "$WINEPREFIX/drive_c/electrum/electrum/locale/"
+rm -rf "$WINEPREFIX/drive_c/electrum/electrum_vtc/locale/"
 for i in ./locale/*; do
-    dir="$WINEPREFIX/drive_c/electrum/electrum/$i/LC_MESSAGES"
+    dir="$WINEPREFIX/drive_c/electrum/electrum_vtc/$i/LC_MESSAGES"
     mkdir -p $dir
     msgfmt --output-file="$dir/electrum.mo" "$i/electrum.po" || true
 done
@@ -68,7 +73,7 @@ info "building NSIS installer"
 wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
 
 cd dist
-mv electrum-setup.exe $NAME_ROOT-$VERSION-setup.exe
+mv electrum-vtc-setup.exe $NAME_ROOT-$VERSION-win64-setup.exe
 cd ..
 
 info "Padding binaries to 8-byte boundaries, and fixing COFF image checksum in PE header"
@@ -113,4 +118,4 @@ EOF
     done
 )
 
-sha256sum dist/electrum*.exe
+sha256sum dist/electrum-vtc*.exe

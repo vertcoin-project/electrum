@@ -18,8 +18,12 @@ PYTHON_VERSION=3.9.11
 PKG2APPIMAGE_COMMIT="a9c85b7e61a3a883f4a35c41c5decb5af88b6b5d"
 
 
-VERSION=`git describe --tags --dirty --always`
-APPIMAGE="$DISTDIR/electrum-$VERSION-x86_64.AppImage"
+if RECENT_TAG="$(git describe --exact-match HEAD)"; then
+    VERSION="${RECENT_TAG#v}"
+else
+    VERSION="$(git rev-parse --short=12 HEAD)"
+fi
+APPIMAGE="$DISTDIR/electrum-vtc-$VERSION-x86_64-linux-gnu.AppImage"
 
 . "$CONTRIB"/build_tools_util.sh
 
@@ -70,10 +74,10 @@ tar xf "$CACHEDIR/Python-$PYTHON_VERSION.tar.xz" -C "$BUILDDIR"
 
 
 "$CONTRIB"/make_verthash-dat.sh || fail "Could not build verthash"
-cp -f "$PROJECT_ROOT/electrum/create-verthash-datafile" "$APPDIR/usr/bin/create-verthash-datafile" || fail "Could not copy verthash-dat to its destination"
+cp -f "$PROJECT_ROOT/electrum_vtc/create-verthash-datafile" "$APPDIR/usr/bin/create-verthash-datafile" || fail "Could not copy verthash-dat to its destination"
 
 "$CONTRIB"/make_libsecp256k1.sh || fail "Could not build libsecp"
-cp -f "$PROJECT_ROOT/electrum/libsecp256k1.so.0" "$APPDIR/usr/lib/libsecp256k1.so.0" || fail "Could not copy libsecp to its destination"
+cp -f "$PROJECT_ROOT/electrum_vtc/libsecp256k1.so.0" "$APPDIR/usr/lib/libsecp256k1.so.0" || fail "Could not copy libsecp to its destination"
 
 
 appdir_python() {
@@ -102,9 +106,9 @@ info "preparing electrum-locale."
         fail "Please install gettext"
     fi
     # we want the binary to have only compiled (.mo) locale files; not source (.po) files
-    rm -rf "$PROJECT_ROOT/electrum/locale/"
+    rm -rf "$PROJECT_ROOT/electrum_vtc/locale/"
     for i in ./locale/*; do
-        dir="$PROJECT_ROOT/electrum/$i/LC_MESSAGES"
+        dir="$PROJECT_ROOT/electrum_vtc/$i/LC_MESSAGES"
         mkdir -p $dir
         msgfmt --output-file="$dir/electrum.mo" "$i/electrum.po" || true
     done
@@ -142,8 +146,8 @@ cp "/usr/lib/x86_64-linux-gnu/libzbar.so.0" "$APPDIR/usr/lib/libzbar.so.0"
 
 
 info "desktop integration."
-cp "$PROJECT_ROOT/electrum.desktop" "$APPDIR/electrum.desktop"
-cp "$PROJECT_ROOT/electrum/gui/icons/electrum-vtc.png" "$APPDIR/electrum-vtc.png"
+cp "$PROJECT_ROOT/electrum-vtc.desktop" "$APPDIR/electrum-vtc.desktop"
+cp "$PROJECT_ROOT/electrum_vtc/gui/icons/electrum-vtc.png" "$APPDIR/electrum-vtc.png"
 
 
 # add launcher
