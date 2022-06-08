@@ -16,21 +16,21 @@ import sys
 import time
 import copy
 
-from electrum.crypto import sha256d, EncodeAES_base64, EncodeAES_bytes, DecodeAES_bytes, hmac_oneshot
-from electrum.bitcoin import public_key_to_p2pkh
-from electrum.bip32 import BIP32Node, convert_bip32_intpath_to_strpath, is_all_public_derivation
-from electrum import ecc
-from electrum.ecc import msg_magic
-from electrum.wallet import Standard_Wallet
-from electrum import constants
-from electrum.transaction import Transaction, PartialTransaction, PartialTxInput
-from electrum.i18n import _
-from electrum.keystore import Hardware_KeyStore
-from electrum.util import to_string, UserCancelled, UserFacingException, bfh
-from electrum.base_wizard import ScriptTypeNotSupported, HWD_SETUP_NEW_WALLET
-from electrum.network import Network
-from electrum.logging import get_logger
-from electrum.plugin import runs_in_hwd_thread, run_in_hwd_thread
+from electrum_vtc.crypto import sha256d, EncodeAES_base64, EncodeAES_bytes, DecodeAES_bytes, hmac_oneshot
+from electrum_vtc.bitcoin import public_key_to_p2pkh
+from electrum_vtc.bip32 import BIP32Node, convert_bip32_intpath_to_strpath, is_all_public_derivation
+from electrum_vtc import ecc
+from electrum_vtc.ecc import msg_magic
+from electrum_vtc.wallet import Standard_Wallet
+from electrum_vtc import constants
+from electrum_vtc.transaction import Transaction, PartialTransaction, PartialTxInput
+from electrum_vtc.i18n import _
+from electrum_vtc.keystore import Hardware_KeyStore
+from electrum_vtc.util import to_string, UserCancelled, UserFacingException, bfh
+from electrum_vtc.base_wizard import ScriptTypeNotSupported, HWD_SETUP_NEW_WALLET
+from electrum_vtc.network import Network
+from electrum_vtc.logging import get_logger
+from electrum_vtc.plugin import runs_in_hwd_thread, run_in_hwd_thread
 
 from ..hw_wallet import HW_PluginBase, HardwareClientBase
 

@@ -30,11 +30,11 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QMenu, QAbstractItemView
 from PyQt5.QtCore import Qt, QItemSelectionModel, QModelIndex
 
-from electrum.i18n import _
-from electrum.util import format_time
-from electrum.invoices import PR_TYPE_ONCHAIN, PR_TYPE_LN, LNInvoice, OnchainInvoice
-from electrum.plugin import run_hook
-from electrum.invoices import Invoice
+from electrum_vtc.i18n import _
+from electrum_vtc.util import format_time
+from electrum_vtc.invoices import PR_TYPE_ONCHAIN, PR_TYPE_LN, LNInvoice, OnchainInvoice
+from electrum_vtc.plugin import run_hook
+from electrum_vtc.invoices import Invoice
 
 from .util import MyTreeView, pr_icons, read_QIcon, webopen, MySortModel
 

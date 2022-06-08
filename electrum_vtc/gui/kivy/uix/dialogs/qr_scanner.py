@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.factory import Factory
 from kivy.lang import Builder
 
-Factory.register('QRScanner', module='electrum.gui.kivy.qr_scanner')
+Factory.register('QRScanner', module='electrum_vtc.gui.kivy.qr_scanner')
 
 class QrScannerDialog(Factory.AnimatedPopup):
 
@@ -21,7 +21,7 @@ class QrScannerDialog(Factory.AnimatedPopup):
 
 
 Builder.load_string('''
-#:import KIVY_GUI_PATH electrum.gui.kivy.KIVY_GUI_PATH
+#:import KIVY_GUI_PATH electrum_vtc.gui.kivy.KIVY_GUI_PATH
 
 <QrScannerDialog>
     title:

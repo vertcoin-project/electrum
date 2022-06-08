@@ -5,14 +5,14 @@ from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 
-from electrum.util import base_units_list
-from electrum.i18n import languages
-from electrum.gui.kivy.i18n import _
-from electrum.plugin import run_hook
-from electrum import coinchooser
+from electrum_vtc.util import base_units_list
+from electrum_vtc.i18n import languages
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.plugin import run_hook
+from electrum_vtc import coinchooser
 
-from electrum.gui import messages
-from electrum.gui.kivy import KIVY_GUI_PATH
+from electrum_vtc.gui import messages
+from electrum_vtc.gui.kivy import KIVY_GUI_PATH
 
 from .choice_dialog import ChoiceDialog
 
@@ -22,8 +22,8 @@ if TYPE_CHECKING:
 
 Builder.load_string('''
 #:import partial functools.partial
-#:import _ electrum.gui.kivy.i18n._
-#:import messages electrum.gui.messages
+#:import _ electrum_vtc.gui.kivy.i18n._
+#:import messages electrum_vtc.gui.messages
 
 <SettingsDialog@Popup>
     id: settings

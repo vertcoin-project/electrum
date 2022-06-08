@@ -8,22 +8,22 @@ import getpass
 import logging
 from typing import TYPE_CHECKING
 
-import electrum
-from electrum.gui import BaseElectrumGui
-from electrum import util
-from electrum.util import format_satoshis
-from electrum.bitcoin import is_address, COIN
-from electrum.transaction import PartialTxOutput
-from electrum.wallet import Wallet
-from electrum.wallet_db import WalletDB
-from electrum.storage import WalletStorage
-from electrum.network import NetworkParameters, TxBroadcastError, BestEffortRequestFailed
-from electrum.interface import ServerAddr
+import electrum_vtc as electrum
+from electrum_vtc.gui import BaseElectrumGui
+from electrum_vtc import util
+from electrum_vtc.util import format_satoshis
+from electrum_vtc.bitcoin import is_address, COIN
+from electrum_vtc.transaction import PartialTxOutput
+from electrum_vtc.wallet import Wallet
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc.network import NetworkParameters, TxBroadcastError, BestEffortRequestFailed
+from electrum_vtc.interface import ServerAddr
 
 if TYPE_CHECKING:
-    from electrum.daemon import Daemon
-    from electrum.simple_config import SimpleConfig
-    from electrum.plugin import Plugins
+    from electrum_vtc.daemon import Daemon
+    from electrum_vtc.simple_config import SimpleConfig
+    from electrum_vtc.plugin import Plugins
 
 
 _ = lambda x:x  # i18n
@@ -428,7 +428,7 @@ class ElectrumGui(BaseElectrumGui):
                         self.show_message("Error:" + server_str + "\nIn doubt, type \"auto-connect\"")
                         return False
             if out.get('server') or out.get('proxy'):
-                proxy = electrum.network.deserialize_proxy(out.get('proxy')) if out.get('proxy') else proxy_config
+                proxy = electrum_vtc.network.deserialize_proxy(out.get('proxy')) if out.get('proxy') else proxy_config
                 net_params = NetworkParameters(server=server_addr,
                                                proxy=proxy,
                                                auto_connect=auto_connect)

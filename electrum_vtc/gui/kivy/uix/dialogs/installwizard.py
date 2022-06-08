@@ -17,8 +17,8 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.utils import platform
 
-from electrum.base_wizard import BaseWizard
-from electrum.util import is_valid_email
+from electrum_vtc.base_wizard import BaseWizard
+from electrum_vtc.util import is_valid_email
 
 
 from . import EventsDialog
@@ -26,15 +26,15 @@ from ...i18n import _
 from .password_dialog import PasswordDialog
 
 if TYPE_CHECKING:
-    from electrum.gui.kivy.main_window import ElectrumWindow
+    from electrum_vtc.gui.kivy.main_window import ElectrumWindow
 
 
 # global Variables
 
 Builder.load_string('''
 #:import Window kivy.core.window.Window
-#:import _ electrum.gui.kivy.i18n._
-#:import KIVY_GUI_PATH electrum.gui.kivy.KIVY_GUI_PATH
+#:import _ electrum_vtc.gui.kivy.i18n._
+#:import KIVY_GUI_PATH electrum_vtc.gui.kivy.KIVY_GUI_PATH
 
 
 <WizardTextInput@TextInput>
@@ -874,8 +874,8 @@ class RestoreSeedDialog(WizardDialog):
     def __init__(self, wizard, **kwargs):
         super(RestoreSeedDialog, self).__init__(wizard, **kwargs)
         self._test = kwargs['test']
-        from electrum.mnemonic import Mnemonic
-        from electrum.old_mnemonic import wordlist as old_wordlist
+        from electrum_vtc.mnemonic import Mnemonic
+        from electrum_vtc.old_mnemonic import wordlist as old_wordlist
         self.words = set(Mnemonic('en').wordlist).union(set(old_wordlist))
         self.ids.text_input_seed.text = ''
         self.message = _('Please type your seed phrase using the virtual keyboard.')
@@ -900,7 +900,7 @@ class RestoreSeedDialog(WizardDialog):
                 yield w
 
     def update_next_button(self):
-        from electrum.keystore import bip39_is_checksum_valid
+        from electrum_vtc.keystore import bip39_is_checksum_valid
         text = self.get_text()
         if self.is_bip39:
             is_seed, is_wordlist = bip39_is_checksum_valid(text)

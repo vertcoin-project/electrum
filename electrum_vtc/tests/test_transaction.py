@@ -1,14 +1,14 @@
 from typing import NamedTuple, Union
 
-from electrum import transaction, bitcoin
-from electrum.transaction import (convert_raw_tx_to_hex, tx_from_any, Transaction,
+from electrum_vtc import transaction, bitcoin
+from electrum_vtc.transaction import (convert_raw_tx_to_hex, tx_from_any, Transaction,
                                   PartialTransaction, TxOutpoint, PartialTxInput,
                                   PartialTxOutput, Sighash, match_script_against_template,
                                   SCRIPTPUBKEY_TEMPLATE_ANYSEGWIT)
-from electrum.util import bh2u, bfh
-from electrum.bitcoin import (deserialize_privkey, opcodes,
+from electrum_vtc.util import bh2u, bfh
+from electrum_vtc.bitcoin import (deserialize_privkey, opcodes,
                               construct_script, construct_witness)
-from electrum.ecc import ECPrivkey
+from electrum_vtc.ecc import ECPrivkey
 from .test_bitcoin import disable_ecdsa_r_value_grinding
 
 from . import ElectrumTestCase, TestCaseForTestnet

@@ -2,12 +2,12 @@ import asyncio
 import tempfile
 import unittest
 
-from electrum import constants
-from electrum.simple_config import SimpleConfig
-from electrum import blockchain
-from electrum.interface import Interface, ServerAddr
-from electrum.crypto import sha256
-from electrum.util import bh2u
+from electrum_vtc import constants
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc import blockchain
+from electrum_vtc.interface import Interface, ServerAddr
+from electrum_vtc.crypto import sha256
+from electrum_vtc.util import bh2u
 
 from . import ElectrumTestCase
 

@@ -29,12 +29,12 @@ from typing import TYPE_CHECKING, Optional, Union
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QGridLayout, QPushButton, QLineEdit
 
-from electrum.i18n import _
-from electrum.util import NotEnoughFunds, NoDynamicFeeEstimates
-from electrum.plugin import run_hook
-from electrum.transaction import Transaction, PartialTransaction
-from electrum.simple_config import FEERATE_WARNING_HIGH_FEE, FEE_RATIO_HIGH_WARNING
-from electrum.wallet import InternalAddressCorruption
+from electrum_vtc.i18n import _
+from electrum_vtc.util import NotEnoughFunds, NoDynamicFeeEstimates
+from electrum_vtc.plugin import run_hook
+from electrum_vtc.transaction import Transaction, PartialTransaction
+from electrum_vtc.simple_config import FEERATE_WARNING_HIGH_FEE, FEE_RATIO_HIGH_WARNING
+from electrum_vtc.wallet import InternalAddressCorruption
 
 from .util import (WindowModalDialog, ColorScheme, HelpLabel, Buttons, CancelButton,
                    BlockingWaitingDialog, PasswordLineEdit)

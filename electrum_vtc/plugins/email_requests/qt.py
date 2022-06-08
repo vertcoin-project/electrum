@@ -43,16 +43,16 @@ from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QGridLayout, QLineEdit,
                              QInputDialog)
 import certifi
 
-from electrum.gui.qt.util import (EnterButton, Buttons, CloseButton, OkButton,
+from electrum_vtc.gui.qt.util import (EnterButton, Buttons, CloseButton, OkButton,
                                   WindowModalDialog)
-from electrum.gui.qt.main_window import ElectrumWindow
+from electrum_vtc.gui.qt.main_window import ElectrumWindow
 
-from electrum.plugin import BasePlugin, hook
-from electrum.paymentrequest import PaymentRequest
-from electrum.i18n import _
-from electrum.logging import Logger
-from electrum.wallet import Abstract_Wallet
-from electrum.invoices import OnchainInvoice
+from electrum_vtc.plugin import BasePlugin, hook
+from electrum_vtc.paymentrequest import PaymentRequest
+from electrum_vtc.i18n import _
+from electrum_vtc.logging import Logger
+from electrum_vtc.wallet import Abstract_Wallet
+from electrum_vtc.invoices import OnchainInvoice
 
 
 ca_path = certifi.where()
@@ -185,7 +185,7 @@ class Plugin(BasePlugin):
         menu.addAction(_("Send via e-mail"), lambda: self.send(window, addr))
 
     def send(self, window: ElectrumWindow, addr):
-        from electrum import paymentrequest
+        from electrum_vtc import paymentrequest
         req = window.wallet.receive_requests.get(addr)
         if not isinstance(req, OnchainInvoice):
             window.show_error("Only on-chain requests are supported.")

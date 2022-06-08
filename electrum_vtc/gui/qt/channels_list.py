@@ -11,14 +11,14 @@ from PyQt5.QtWidgets import (QMenu, QHBoxLayout, QLabel, QVBoxLayout, QGridLayou
                              QToolTip)
 from PyQt5.QtGui import QFont, QStandardItem, QBrush, QPainter, QIcon, QHelpEvent
 
-from electrum.util import bh2u, NotEnoughFunds, NoDynamicFeeEstimates
-from electrum.i18n import _
-from electrum.lnchannel import AbstractChannel, PeerState, ChannelBackup, Channel, ChannelState
-from electrum.wallet import Abstract_Wallet
-from electrum.lnutil import LOCAL, REMOTE, format_short_channel_id, LN_MAX_FUNDING_SAT
-from electrum.lnworker import LNWallet
-from electrum import ecc
-from electrum.gui import messages
+from electrum_vtc.util import bh2u, NotEnoughFunds, NoDynamicFeeEstimates
+from electrum_vtc.i18n import _
+from electrum_vtc.lnchannel import AbstractChannel, PeerState, ChannelBackup, Channel, ChannelState
+from electrum_vtc.wallet import Abstract_Wallet
+from electrum_vtc.lnutil import LOCAL, REMOTE, format_short_channel_id, LN_MAX_FUNDING_SAT
+from electrum_vtc.lnworker import LNWallet
+from electrum_vtc import ecc
+from electrum_vtc.gui import messages
 
 from .util import (MyTreeView, WindowModalDialog, Buttons, OkButton, CancelButton,
                    EnterButton, WaitingDialog, MONOSPACE_FONT, ColorScheme)
@@ -404,7 +404,7 @@ class ChannelsList(MyTreeView):
                 remote_nodeid.repaint()  # macOS hack for #6269
             suggest_button.clicked.connect(on_suggest)
         else:
-            from electrum.lnworker import hardcoded_trampoline_nodes
+            from electrum_vtc.lnworker import hardcoded_trampoline_nodes
             vbox.addWidget(QLabel(_('Choose a trampoline node to open a channel with')))
             trampolines = hardcoded_trampoline_nodes()
             trampoline_names = list(trampolines.keys())

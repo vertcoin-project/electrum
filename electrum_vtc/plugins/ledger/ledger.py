@@ -4,19 +4,19 @@ import sys
 import traceback
 from typing import Optional, Tuple
 
-from electrum import ecc
-from electrum import bip32
-from electrum.crypto import hash_160
-from electrum.bitcoin import int_to_hex, var_int, is_segwit_script_type, is_b58_address
-from electrum.bip32 import BIP32Node, convert_bip32_intpath_to_strpath
-from electrum.i18n import _
-from electrum.keystore import Hardware_KeyStore
-from electrum.transaction import Transaction, PartialTransaction, PartialTxInput, PartialTxOutput
-from electrum.wallet import Standard_Wallet
-from electrum.util import bfh, bh2u, versiontuple, UserFacingException
-from electrum.base_wizard import ScriptTypeNotSupported
-from electrum.logging import get_logger
-from electrum.plugin import runs_in_hwd_thread, Device
+from electrum_vtc import ecc
+from electrum_vtc import bip32
+from electrum_vtc.crypto import hash_160
+from electrum_vtc.bitcoin import int_to_hex, var_int, is_segwit_script_type, is_b58_address
+from electrum_vtc.bip32 import BIP32Node, convert_bip32_intpath_to_strpath
+from electrum_vtc.i18n import _
+from electrum_vtc.keystore import Hardware_KeyStore
+from electrum_vtc.transaction import Transaction, PartialTransaction, PartialTxInput, PartialTxOutput
+from electrum_vtc.wallet import Standard_Wallet
+from electrum_vtc.util import bfh, bh2u, versiontuple, UserFacingException
+from electrum_vtc.base_wizard import ScriptTypeNotSupported
+from electrum_vtc.logging import get_logger
+from electrum_vtc.plugin import runs_in_hwd_thread, Device
 
 from ..hw_wallet import HW_PluginBase, HardwareClientBase
 from ..hw_wallet.plugin import is_any_tx_output_on_change_branch, validate_op_return_output, LibraryFoundButUnusable

@@ -8,20 +8,20 @@ from kivy.lang import Builder
 from decimal import Decimal
 from kivy.clock import Clock
 
-from electrum.util import InvalidPassword
-from electrum.wallet import WalletStorage, Wallet
-from electrum.gui.kivy.i18n import _
-from electrum.wallet_db import WalletDB
+from electrum_vtc.util import InvalidPassword
+from electrum_vtc.wallet import WalletStorage, Wallet
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.wallet_db import WalletDB
 
 from .wallets import WalletDialog
 
 if TYPE_CHECKING:
     from ...main_window import ElectrumWindow
-    from electrum.wallet import Abstract_Wallet
-    from electrum.storage import WalletStorage
+    from electrum_vtc.wallet import Abstract_Wallet
+    from electrum_vtc.storage import WalletStorage
 
 Builder.load_string('''
-#:import KIVY_GUI_PATH electrum.gui.kivy.KIVY_GUI_PATH
+#:import KIVY_GUI_PATH electrum_vtc.gui.kivy.KIVY_GUI_PATH
 
 <PasswordDialog@Popup>
     id: popup

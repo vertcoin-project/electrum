@@ -12,32 +12,32 @@ from typing import Iterable, NamedTuple, Tuple, List, Dict
 
 from aiorpcx import timeout_after, TaskTimeout
 
-import electrum
-import electrum.trampoline
-from electrum import bitcoin
-from electrum import constants
-from electrum.network import Network
-from electrum.ecc import ECPrivkey
-from electrum import simple_config, lnutil
-from electrum.lnaddr import lnencode, LnAddr, lndecode
-from electrum.bitcoin import COIN, sha256
-from electrum.util import bh2u, create_and_start_event_loop, NetworkRetryManager, bfh, OldTaskGroup
-from electrum.lnpeer import Peer
-from electrum.lnutil import LNPeerAddr, Keypair, privkey_to_pubkey
-from electrum.lnutil import PaymentFailure, LnFeatures, HTLCOwner
-from electrum.lnchannel import ChannelState, PeerState, Channel
-from electrum.lnrouter import LNPathFinder, PathEdge, LNPathInconsistent
-from electrum.channel_db import ChannelDB
-from electrum.lnworker import LNWallet, NoPathFound
-from electrum.lnmsg import encode_msg, decode_msg
-from electrum import lnmsg
-from electrum.logging import console_stderr_handler, Logger
-from electrum.lnworker import PaymentInfo, RECEIVED
-from electrum.lnonion import OnionFailureCode
-from electrum.lnutil import derive_payment_secret_from_payment_preimage, UpdateAddHtlc
-from electrum.lnutil import LOCAL, REMOTE
-from electrum.invoices import PR_PAID, PR_UNPAID
-from electrum.interface import GracefulDisconnect
+import electrum_vtc as electrum
+import electrum_vtc.trampoline
+from electrum_vtc import bitcoin
+from electrum_vtc import constants
+from electrum_vtc.network import Network
+from electrum_vtc.ecc import ECPrivkey
+from electrum_vtc import simple_config, lnutil
+from electrum_vtc.lnaddr import lnencode, LnAddr, lndecode
+from electrum_vtc.bitcoin import COIN, sha256
+from electrum_vtc.util import bh2u, create_and_start_event_loop, NetworkRetryManager, bfh, OldTaskGroup
+from electrum_vtc.lnpeer import Peer
+from electrum_vtc.lnutil import LNPeerAddr, Keypair, privkey_to_pubkey
+from electrum_vtc.lnutil import PaymentFailure, LnFeatures, HTLCOwner
+from electrum_vtc.lnchannel import ChannelState, PeerState, Channel
+from electrum_vtc.lnrouter import LNPathFinder, PathEdge, LNPathInconsistent
+from electrum_vtc.channel_db import ChannelDB
+from electrum_vtc.lnworker import LNWallet, NoPathFound
+from electrum_vtc.lnmsg import encode_msg, decode_msg
+from electrum_vtc import lnmsg
+from electrum_vtc.logging import console_stderr_handler, Logger
+from electrum_vtc.lnworker import PaymentInfo, RECEIVED
+from electrum_vtc.lnonion import OnionFailureCode
+from electrum_vtc.lnutil import derive_payment_secret_from_payment_preimage, UpdateAddHtlc
+from electrum_vtc.lnutil import LOCAL, REMOTE
+from electrum_vtc.invoices import PR_PAID, PR_UNPAID
+from electrum_vtc.interface import GracefulDisconnect
 
 from .test_lnchannel import create_test_channels
 from .test_bitcoin import needs_test_with_all_chacha20_implementations
@@ -562,7 +562,7 @@ class TestPeer(TestCaseForTestnet):
         gath = asyncio.gather(reestablish(), p1._message_loop(), p2._message_loop(), p1.htlc_switch(), p2.htlc_switch())
         async def f():
             await gath
-        with self.assertRaises(electrum.lnutil.RemoteMisbehaving):
+        with self.assertRaises(electrum_vtc.lnutil.RemoteMisbehaving):
             run(f())
         self.assertEqual(alice_channel_0.peer_state, PeerState.BAD)
         self.assertEqual(bob_channel._state, ChannelState.FORCE_CLOSING)
@@ -1109,7 +1109,7 @@ class TestPeer(TestCaseForTestnet):
                 graph.workers['dave'].features = graph.workers['dave'].features ^ LnFeatures.OPTION_TRAMPOLINE_ROUTING_OPT
 
             # declare routing nodes as trampoline nodes
-            electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+            electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
                 graph.workers['bob'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['bob'].node_keypair.pubkey),
                 graph.workers['carol'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['carol'].node_keypair.pubkey),
             }
@@ -1120,7 +1120,7 @@ class TestPeer(TestCaseForTestnet):
     @needs_test_with_all_chacha20_implementations
     def test_payment_multipart_trampoline_e2e(self):
         graph = self.prepare_chans_and_peers_in_graph(GRAPH_DEFINITIONS['square_graph'])
-        electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+        electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
             graph.workers['bob'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['bob'].node_keypair.pubkey),
             graph.workers['carol'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['carol'].node_keypair.pubkey),
         }
@@ -1134,12 +1134,12 @@ class TestPeer(TestCaseForTestnet):
                 fail_kwargs={'alice_uses_trampoline': True, 'attempts': 1},
                 success_kwargs={'alice_uses_trampoline': True, 'attempts': 30})
         finally:
-            electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
+            electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
 
     @needs_test_with_all_chacha20_implementations
     def test_payment_multipart_trampoline_legacy(self):
         graph = self.prepare_chans_and_peers_in_graph(GRAPH_DEFINITIONS['square_graph'])
-        electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+        electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
             graph.workers['bob'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['bob'].node_keypair.pubkey),
             graph.workers['carol'].name: LNPeerAddr(host="127.0.0.1", port=9735, pubkey=graph.workers['carol'].node_keypair.pubkey),
         }
@@ -1150,7 +1150,7 @@ class TestPeer(TestCaseForTestnet):
                 fail_kwargs={'alice_uses_trampoline': True, 'attempts': 30, 'disable_trampoline_receiving': True},
                 success_kwargs={})
         finally:
-            electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
+            electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {}
 
     @needs_test_with_all_chacha20_implementations
     def test_fail_pending_htlcs_on_shutdown(self):

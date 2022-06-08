@@ -6,20 +6,20 @@ from typing import Sequence
 import asyncio
 import copy
 
-from electrum import storage, bitcoin, keystore, bip32, slip39, wallet
-from electrum import Transaction
-from electrum import SimpleConfig
-from electrum.address_synchronizer import TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_UNCONF_PARENT
-from electrum.wallet import (sweep, Multisig_Wallet, Standard_Wallet, Imported_Wallet,
+from electrum_vtc import storage, bitcoin, keystore, bip32, slip39, wallet
+from electrum_vtc import Transaction
+from electrum_vtc import SimpleConfig
+from electrum_vtc.address_synchronizer import TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_UNCONF_PARENT
+from electrum_vtc.wallet import (sweep, Multisig_Wallet, Standard_Wallet, Imported_Wallet,
                              restore_wallet_from_text, Abstract_Wallet, BumpFeeStrategy)
-from electrum.util import (
+from electrum_vtc.util import (
     bfh, bh2u, create_and_start_event_loop, NotEnoughFunds, UnrelatedTransactionException,
     UserFacingException)
-from electrum.transaction import (TxOutput, Transaction, PartialTransaction, PartialTxOutput,
+from electrum_vtc.transaction import (TxOutput, Transaction, PartialTransaction, PartialTxOutput,
                                   PartialTxInput, tx_from_any, TxOutpoint)
-from electrum.mnemonic import seed_type
+from electrum_vtc.mnemonic import seed_type
 
-from electrum.plugins.trustedcoin import trustedcoin
+from electrum_vtc.plugins.trustedcoin import trustedcoin
 
 from . import TestCaseForTestnet
 from . import ElectrumTestCase

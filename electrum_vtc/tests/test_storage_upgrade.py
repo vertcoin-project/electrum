@@ -5,11 +5,11 @@ import json
 from typing import Optional
 import asyncio
 
-import electrum
-from electrum.wallet_db import WalletDB
-from electrum.wallet import Wallet
-from electrum import constants
-from electrum import util
+import electrum_vtc as electrum
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.wallet import Wallet
+from electrum_vtc import constants
+from electrum_vtc import util
 
 from .test_wallet import WalletTestCase
 
@@ -313,13 +313,13 @@ class TestStorageUpgrade(WalletTestCase):
 
 ##########
 
-    plugins: 'electrum.plugin.Plugins'
+    plugins: 'electrum_vtc.plugin.Plugins'
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        from electrum.plugin import Plugins
-        from electrum.simple_config import SimpleConfig
+        from electrum_vtc.plugin import Plugins
+        from electrum_vtc.simple_config import SimpleConfig
 
         cls.__electrum_path = tempfile.mkdtemp()
         config = SimpleConfig({'electrum_path': cls.__electrum_path})

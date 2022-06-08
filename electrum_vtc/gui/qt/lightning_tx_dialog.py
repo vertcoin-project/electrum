@@ -30,8 +30,8 @@ import datetime
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QGridLayout
 
-from electrum.i18n import _
-from electrum.invoices import LNInvoice
+from electrum_vtc.i18n import _
+from electrum_vtc.invoices import LNInvoice
 
 from .util import WindowModalDialog, ButtonsLineEdit, ColorScheme, Buttons, CloseButton, MONOSPACE_FONT
 from .qrtextedit import ShowQRTextEdit

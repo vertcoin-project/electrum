@@ -7,14 +7,14 @@ from typing import Union, TYPE_CHECKING
 
 import base64
 
-from electrum.plugin import BasePlugin, hook
-from electrum.crypto import aes_encrypt_with_iv, aes_decrypt_with_iv
-from electrum.i18n import _
-from electrum.util import log_exceptions, ignore_exceptions, make_aiohttp_session
-from electrum.network import Network
+from electrum_vtc.plugin import BasePlugin, hook
+from electrum_vtc.crypto import aes_encrypt_with_iv, aes_decrypt_with_iv
+from electrum_vtc.i18n import _
+from electrum_vtc.util import log_exceptions, ignore_exceptions, make_aiohttp_session
+from electrum_vtc.network import Network
 
 if TYPE_CHECKING:
-    from electrum.wallet import Abstract_Wallet
+    from electrum_vtc.wallet import Abstract_Wallet
 
 
 class ErrorConnectingServer(Exception):

@@ -10,13 +10,13 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QProgressBar,
                              QHBoxLayout, QPushButton, QDialog)
 
-from electrum import version
-from electrum import constants
-from electrum import ecc
-from electrum.i18n import _
-from electrum.util import make_aiohttp_session
-from electrum.logging import Logger
-from electrum.network import Network
+from electrum_vtc import version
+from electrum_vtc import constants
+from electrum_vtc import ecc
+from electrum_vtc.i18n import _
+from electrum_vtc.util import make_aiohttp_session
+from electrum_vtc.logging import Logger
+from electrum_vtc.network import Network
 
 
 class UpdateCheck(QDialog, Logger):

@@ -1,4 +1,4 @@
-from electrum.plugin import hook
+from electrum_vtc.plugin import hook
 from .keepkey import KeepKeyPlugin
 from ..hw_wallet import CmdLineHandler
 

@@ -7,16 +7,16 @@ import traceback
 from typing import TYPE_CHECKING, Optional
 import struct
 
-from electrum import bip32
-from electrum.bip32 import BIP32Node, InvalidMasterKeyVersionBytes
-from electrum.i18n import _
-from electrum.plugin import Device, hook, runs_in_hwd_thread
-from electrum.keystore import Hardware_KeyStore, KeyStoreWithMPK
-from electrum.transaction import PartialTransaction
-from electrum.wallet import Standard_Wallet, Multisig_Wallet, Abstract_Wallet
-from electrum.util import bfh, bh2u, versiontuple, UserFacingException
-from electrum.base_wizard import ScriptTypeNotSupported
-from electrum.logging import get_logger
+from electrum_vtc import bip32
+from electrum_vtc.bip32 import BIP32Node, InvalidMasterKeyVersionBytes
+from electrum_vtc.i18n import _
+from electrum_vtc.plugin import Device, hook, runs_in_hwd_thread
+from electrum_vtc.keystore import Hardware_KeyStore, KeyStoreWithMPK
+from electrum_vtc.transaction import PartialTransaction
+from electrum_vtc.wallet import Standard_Wallet, Multisig_Wallet, Abstract_Wallet
+from electrum_vtc.util import bfh, bh2u, versiontuple, UserFacingException
+from electrum_vtc.base_wizard import ScriptTypeNotSupported
+from electrum_vtc.logging import get_logger
 
 from ..hw_wallet import HW_PluginBase, HardwareClientBase
 from ..hw_wallet.plugin import LibraryFoundButUnusable, only_hook_if_libraries_available
@@ -412,7 +412,7 @@ class Coldcard_KeyStore(Hardware_KeyStore):
 
     @staticmethod
     def _encode_txin_type(txin_type):
-        # Map from Electrum code names to our code numbers.
+        # Map from electrum_vtc code names to our code numbers.
         return {'standard': AF_CLASSIC, 'p2pkh': AF_CLASSIC,
                 'p2sh': AF_P2SH,
                 'p2wpkh-p2sh': AF_P2WPKH_P2SH,
@@ -562,7 +562,7 @@ class ColdcardPlugin(HW_PluginBase):
         # it is participating in. All involved Coldcards can share same file.
         assert isinstance(wallet, Multisig_Wallet)
 
-        print('# Exported from Electrum', file=fp)
+        print('# Exported from electrum_vtc', file=fp)
         print(f'Name: {name:.20s}', file=fp)
         print(f'Policy: {wallet.m} of {wallet.n}', file=fp)
         print(f'Format: {wallet.txin_type.upper()}', file=fp)

@@ -12,14 +12,14 @@ from kivy.uix.label import Label
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 
-from electrum.util import InvalidPassword
-from electrum.address_synchronizer import TX_HEIGHT_LOCAL
-from electrum.wallet import CannotBumpFee, CannotCPFP, CannotDoubleSpendTx
-from electrum.transaction import Transaction, PartialTransaction
-from electrum.network import NetworkException
+from electrum_vtc.util import InvalidPassword
+from electrum_vtc.address_synchronizer import TX_HEIGHT_LOCAL
+from electrum_vtc.wallet import CannotBumpFee, CannotCPFP, CannotDoubleSpendTx
+from electrum_vtc.transaction import Transaction, PartialTransaction
+from electrum_vtc.network import NetworkException
 
-from electrum.gui.kivy.i18n import _
-from electrum.gui.kivy.util import address_colors
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.gui.kivy.util import address_colors
 from ..actiondropdown import ActionDropdown, ActionButtonOption
 from .question import Question
 
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 
 Builder.load_string('''
-#:import KIVY_GUI_PATH electrum.gui.kivy.KIVY_GUI_PATH
+#:import KIVY_GUI_PATH electrum_vtc.gui.kivy.KIVY_GUI_PATH
 
 <TxDialog>
     id: popup

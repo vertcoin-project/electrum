@@ -3,9 +3,9 @@ import threading
 import tempfile
 import shutil
 
-import electrum
-import electrum.logging
-from electrum import constants
+import electrum_vtc as electrum
+import electrum_vtc.logging
+from electrum_vtc import constants
 
 
 # Set this locally to make the test suite run faster.
@@ -15,7 +15,7 @@ from electrum import constants
 FAST_TESTS = False
 
 
-electrum.logging._configure_stderr_logging()
+electrum_vtc.logging._configure_stderr_logging()
 
 
 # some unit tests are modifying globals...

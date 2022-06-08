@@ -5,15 +5,15 @@ from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.uix.popup import Popup
 
-from electrum.util import bh2u
-from electrum.logging import Logger
-from electrum.lnutil import LOCAL, REMOTE, format_short_channel_id
-from electrum.lnchannel import AbstractChannel, Channel, ChannelState
-from electrum.gui.kivy.i18n import _
-from electrum.transaction import PartialTxOutput, Transaction
-from electrum.util import NotEnoughFunds, NoDynamicFeeEstimates, format_fee_satoshis, quantize_feerate
-from electrum.lnutil import ln_dummy_address
-from electrum.gui import messages
+from electrum_vtc.util import bh2u
+from electrum_vtc.logging import Logger
+from electrum_vtc.lnutil import LOCAL, REMOTE, format_short_channel_id
+from electrum_vtc.lnchannel import AbstractChannel, Channel, ChannelState
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.transaction import PartialTxOutput, Transaction
+from electrum_vtc.util import NotEnoughFunds, NoDynamicFeeEstimates, format_fee_satoshis, quantize_feerate
+from electrum_vtc.lnutil import ln_dummy_address
+from electrum_vtc.gui import messages
 
 from ..actiondropdown import ActionButtonOption, ActionDropdown
 from .fee_dialog import FeeDialog
@@ -23,7 +23,7 @@ from .choice_dialog import ChoiceDialog
 
 if TYPE_CHECKING:
     from ...main_window import ElectrumWindow
-    from electrum import SimpleConfig
+    from electrum_vtc import SimpleConfig
 
 
 Builder.load_string(r'''

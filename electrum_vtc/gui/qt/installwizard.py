@@ -16,12 +16,12 @@ from PyQt5.QtWidgets import (QWidget, QDialog, QLabel, QHBoxLayout, QMessageBox,
                              QVBoxLayout, QLineEdit, QFileDialog, QPushButton,
                              QGridLayout, QSlider, QScrollArea, QApplication)
 
-from electrum.wallet import Wallet, Abstract_Wallet
-from electrum.storage import WalletStorage, StorageReadWriteError
-from electrum.util import UserCancelled, InvalidPassword, WalletFileException, get_new_wallet_name
-from electrum.base_wizard import BaseWizard, HWD_SETUP_DECRYPT_WALLET, GoBack, ReRunDialog
-from electrum.network import Network
-from electrum.i18n import _
+from electrum_vtc.wallet import Wallet, Abstract_Wallet
+from electrum_vtc.storage import WalletStorage, StorageReadWriteError
+from electrum_vtc.util import UserCancelled, InvalidPassword, WalletFileException, get_new_wallet_name
+from electrum_vtc.base_wizard import BaseWizard, HWD_SETUP_DECRYPT_WALLET, GoBack, ReRunDialog
+from electrum_vtc.network import Network
+from electrum_vtc.i18n import _
 
 from .seed_dialog import SeedLayout, KeysLayout
 from .network_dialog import NetworkChoiceLayout
@@ -29,11 +29,11 @@ from .util import (MessageBoxMixin, Buttons, icon_path, ChoicesLayout, WWLabel,
                    InfoButton, char_width_in_lineedit, PasswordLineEdit)
 from .password_dialog import PasswordLayout, PasswordLayoutForHW, PW_NEW
 from .bip39_recovery_dialog import Bip39RecoveryDialog
-from electrum.plugin import run_hook, Plugins
+from electrum_vtc.plugin import run_hook, Plugins
 
 if TYPE_CHECKING:
-    from electrum.simple_config import SimpleConfig
-    from electrum.wallet_db import WalletDB
+    from electrum_vtc.simple_config import SimpleConfig
+    from electrum_vtc.wallet_db import WalletDB
     from . import ElectrumGui
 
 

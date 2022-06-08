@@ -10,24 +10,24 @@ from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.uix.recycleview import RecycleView
 
-from electrum.invoices import (PR_TYPE_ONCHAIN, PR_TYPE_LN, PR_DEFAULT_EXPIRATION_WHEN_CREATING,
+from electrum_vtc.invoices import (PR_TYPE_ONCHAIN, PR_TYPE_LN, PR_DEFAULT_EXPIRATION_WHEN_CREATING,
                                PR_PAID, PR_UNKNOWN, PR_EXPIRED, PR_INFLIGHT,
                                LNInvoice, pr_expiration_values, Invoice, OnchainInvoice)
-from electrum import bitcoin, constants
-from electrum.transaction import tx_from_any, PartialTxOutput
-from electrum.util import (parse_URI, InvalidBitcoinURI, TxMinedInfo, maybe_extract_bolt11_invoice,
+from electrum_vtc import bitcoin, constants
+from electrum_vtc.transaction import tx_from_any, PartialTxOutput
+from electrum_vtc.util import (parse_URI, InvalidBitcoinURI, TxMinedInfo, maybe_extract_bolt11_invoice,
                            InvoiceError, format_time, parse_max_spend)
-from electrum.lnaddr import lndecode, LnInvoiceException
-from electrum.logging import Logger
+from electrum_vtc.lnaddr import lndecode, LnInvoiceException
+from electrum_vtc.logging import Logger
 
 from .dialogs.confirm_tx_dialog import ConfirmTxDialog
 
-from electrum.gui.kivy import KIVY_GUI_PATH
-from electrum.gui.kivy.i18n import _
+from electrum_vtc.gui.kivy import KIVY_GUI_PATH
+from electrum_vtc.gui.kivy.i18n import _
 
 if TYPE_CHECKING:
-    from electrum.gui.kivy.main_window import ElectrumWindow
-    from electrum.paymentrequest import PaymentRequest
+    from electrum_vtc.gui.kivy.main_window import ElectrumWindow
+    from electrum_vtc.paymentrequest import PaymentRequest
 
 
 class HistoryRecycleView(RecycleView):
@@ -428,7 +428,7 @@ class ReceiveScreen(CScreen):
             self.status = _('Payment received') if status == PR_PAID else ''
 
     def get_URI(self):
-        from electrum.util import create_bip21_uri
+        from electrum_vtc.util import create_bip21_uri
         amount = self.app.get_amount(self.amount)
         return create_bip21_uri(self.address, amount, self.message)
 

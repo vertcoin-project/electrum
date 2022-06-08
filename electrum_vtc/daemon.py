@@ -53,7 +53,7 @@ from .exchange_rate import FxThread
 from .logging import get_logger, Logger
 
 if TYPE_CHECKING:
-    from electrum import gui
+    from electrum_vtc import gui
 
 
 _logger = get_logger(__name__)
@@ -622,7 +622,7 @@ class Daemon(Logger):
             gui_name = 'qt'
         self.logger.info(f'launching GUI: {gui_name}')
         try:
-            gui = __import__('electrum.gui.' + gui_name, fromlist=['electrum'])
+            gui = __import__('electrum_vtc.gui.' + gui_name, fromlist=['electrum-vtc'])
             self.gui_object = gui.ElectrumGui(config=config, daemon=self, plugins=plugins)
             if not self._stop_entered:
                 self.gui_object.main()

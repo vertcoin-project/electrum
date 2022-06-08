@@ -2,14 +2,14 @@ import time
 from struct import pack
 from typing import Optional
 
-from electrum import ecc
-from electrum.i18n import _
-from electrum.util import UserCancelled
-from electrum.keystore import bip39_normalize_passphrase
-from electrum.bip32 import BIP32Node, convert_bip32_path_to_list_of_uint32
-from electrum.logging import Logger
-from electrum.plugin import runs_in_hwd_thread
-from electrum.plugins.hw_wallet.plugin import HardwareClientBase, HardwareHandlerBase
+from electrum_vtc import ecc
+from electrum_vtc.i18n import _
+from electrum_vtc.util import UserCancelled
+from electrum_vtc.keystore import bip39_normalize_passphrase
+from electrum_vtc.bip32 import BIP32Node, convert_bip32_path_to_list_of_uint32
+from electrum_vtc.logging import Logger
+from electrum_vtc.plugin import runs_in_hwd_thread
+from electrum_vtc.plugins.hw_wallet.plugin import HardwareClientBase, HardwareHandlerBase
 
 
 class GuiMixin(object):

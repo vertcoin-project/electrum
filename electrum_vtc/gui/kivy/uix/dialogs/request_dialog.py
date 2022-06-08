@@ -6,16 +6,16 @@ from kivy.core.clipboard import Clipboard
 from kivy.app import App
 from kivy.clock import Clock
 
-from electrum.gui.kivy.i18n import _
-from electrum.invoices import pr_tooltips, pr_color
-from electrum.invoices import PR_UNKNOWN, PR_UNPAID, PR_FAILED, PR_TYPE_LN
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.invoices import pr_tooltips, pr_color
+from electrum_vtc.invoices import PR_UNKNOWN, PR_UNPAID, PR_FAILED, PR_TYPE_LN
 
 if TYPE_CHECKING:
     from ...main_window import ElectrumWindow
 
 
 Builder.load_string('''
-#:import KIVY_GUI_PATH electrum.gui.kivy.KIVY_GUI_PATH
+#:import KIVY_GUI_PATH electrum_vtc.gui.kivy.KIVY_GUI_PATH
 
 <RequestDialog@Popup>
     id: popup

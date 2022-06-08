@@ -12,8 +12,8 @@ from kivy.uix.label import Label
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 
-from electrum.gui.kivy.i18n import _
-from electrum.invoices import LNInvoice
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.invoices import LNInvoice
 
 
 if TYPE_CHECKING:

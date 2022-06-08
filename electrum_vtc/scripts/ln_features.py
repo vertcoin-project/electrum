@@ -9,13 +9,13 @@ import asyncio
 import os
 import time
 
-from electrum.logging import get_logger, configure_logging
-from electrum.simple_config import SimpleConfig
-from electrum import constants
-from electrum.daemon import Daemon
-from electrum.wallet import create_new_wallet
-from electrum.util import create_and_start_event_loop, log_exceptions, bh2u, bfh
-from electrum.lnutil import LnFeatures
+from electrum_vtc.logging import get_logger, configure_logging
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc import constants
+from electrum_vtc.daemon import Daemon
+from electrum_vtc.wallet import create_new_wallet
+from electrum_vtc.util import create_and_start_event_loop, log_exceptions, bh2u, bfh
+from electrum_vtc.lnutil import LnFeatures
 
 logger = get_logger(__name__)
 

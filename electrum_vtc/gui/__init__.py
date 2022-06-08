@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from . import qt
     from . import kivy
-    from electrum.simple_config import SimpleConfig
-    from electrum.daemon import Daemon
-    from electrum.plugin import Plugins
+    from electrum_vtc.simple_config import SimpleConfig
+    from electrum_vtc.daemon import Daemon
+    from electrum_vtc.plugin import Plugins
 
 
 class BaseElectrumGui:

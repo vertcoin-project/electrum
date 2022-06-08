@@ -30,12 +30,12 @@ from typing import NamedTuple, Sequence, Optional, List, TYPE_CHECKING
 
 from PyQt5.QtGui import QFontMetrics, QFont
 
-from electrum import bitcoin
-from electrum.util import bfh, maybe_extract_bolt11_invoice, BITCOIN_BIP21_URI_SCHEME, parse_max_spend
-from electrum.transaction import PartialTxOutput
-from electrum.bitcoin import opcodes, construct_script
-from electrum.logging import Logger
-from electrum.lnaddr import LnDecodeException
+from electrum_vtc import bitcoin
+from electrum_vtc.util import bfh, maybe_extract_bolt11_invoice, BITCOIN_BIP21_URI_SCHEME, parse_max_spend
+from electrum_vtc.transaction import PartialTxOutput
+from electrum_vtc.bitcoin import opcodes, construct_script
+from electrum_vtc.logging import Logger
+from electrum_vtc.lnaddr import LnDecodeException
 
 from .qrtextedit import ScanQRTextEdit
 from .completion_text_edit import CompletionTextEdit

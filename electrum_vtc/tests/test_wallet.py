@@ -8,16 +8,16 @@ import time
 from io import StringIO
 import asyncio
 
-from electrum.storage import WalletStorage
-from electrum.wallet_db import FINAL_SEED_VERSION
-from electrum.wallet import (Abstract_Wallet, Standard_Wallet, create_new_wallet,
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc.wallet_db import FINAL_SEED_VERSION
+from electrum_vtc.wallet import (Abstract_Wallet, Standard_Wallet, create_new_wallet,
                              restore_wallet_from_text, Imported_Wallet, Wallet)
-from electrum.exchange_rate import ExchangeBase, FxThread
-from electrum.util import TxMinedInfo, InvalidPassword
-from electrum.bitcoin import COIN
-from electrum.wallet_db import WalletDB
-from electrum.simple_config import SimpleConfig
-from electrum import util
+from electrum_vtc.exchange_rate import ExchangeBase, FxThread
+from electrum_vtc.util import TxMinedInfo, InvalidPassword
+from electrum_vtc.bitcoin import COIN
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc import util
 
 from . import ElectrumTestCase
 

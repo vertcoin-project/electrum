@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from electrum.util import (format_satoshis, format_fee_satoshis, parse_URI,
+from electrum_vtc.util import (format_satoshis, format_fee_satoshis, parse_URI,
                            is_hash256_str, chunks, is_ip_address, list_enabled_bits,
                            format_satoshis_plain, is_private_netaddress, is_hex_str,
                            is_integer, is_non_negative_integer, is_int_or_float,

@@ -34,12 +34,12 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushB
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QSize, QRect, Qt, pyqtSignal, PYQT_VERSION
 
-from electrum.simple_config import SimpleConfig
-from electrum.i18n import _
-from electrum.qrreader import get_qr_reader, QrCodeResult
-from electrum.logging import Logger
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.i18n import _
+from electrum_vtc.qrreader import get_qr_reader, QrCodeResult
+from electrum_vtc.logging import Logger
 
-from electrum.gui.qt.util import MessageBoxMixin, FixedAspectRatioLayout, ImageGraphicsEffect
+from electrum_vtc.gui.qt.util import MessageBoxMixin, FixedAspectRatioLayout, ImageGraphicsEffect
 
 from .video_widget import QrReaderVideoWidget
 from .video_overlay import QrReaderVideoOverlay

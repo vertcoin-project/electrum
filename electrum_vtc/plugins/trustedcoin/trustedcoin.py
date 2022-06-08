@@ -35,19 +35,19 @@ from urllib.parse import urljoin
 from urllib.parse import quote
 from aiohttp import ClientResponse
 
-from electrum import ecc, constants, keystore, version, bip32, bitcoin
-from electrum.bip32 import BIP32Node, xpub_type
-from electrum.crypto import sha256
-from electrum.transaction import PartialTxOutput, PartialTxInput, PartialTransaction, Transaction
-from electrum.mnemonic import Mnemonic, seed_type, is_any_2fa_seed_type
-from electrum.wallet import Multisig_Wallet, Deterministic_Wallet
-from electrum.i18n import _
-from electrum.plugin import BasePlugin, hook
-from electrum.util import NotEnoughFunds, UserFacingException
-from electrum.storage import StorageEncryptionVersion
-from electrum.network import Network
-from electrum.base_wizard import BaseWizard, WizardWalletPasswordSetting
-from electrum.logging import Logger
+from electrum_vtc import ecc, constants, keystore, version, bip32, bitcoin
+from electrum_vtc.bip32 import BIP32Node, xpub_type
+from electrum_vtc.crypto import sha256
+from electrum_vtc.transaction import PartialTxOutput, PartialTxInput, PartialTransaction, Transaction
+from electrum_vtc.mnemonic import Mnemonic, seed_type, is_any_2fa_seed_type
+from electrum_vtc.wallet import Multisig_Wallet, Deterministic_Wallet
+from electrum_vtc.i18n import _
+from electrum_vtc.plugin import BasePlugin, hook
+from electrum_vtc.util import NotEnoughFunds, UserFacingException
+from electrum_vtc.storage import StorageEncryptionVersion
+from electrum_vtc.network import Network
+from electrum_vtc.base_wizard import BaseWizard, WizardWalletPasswordSetting
+from electrum_vtc.logging import Logger
 
 
 def get_signing_xpub(xtype):

@@ -3,7 +3,7 @@ from typing import NamedTuple, Callable, Sequence
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 
-from electrum.gui.kivy.i18n import _
+from electrum_vtc.gui.kivy.i18n import _
 
 
 class ActionButtonOption(NamedTuple):

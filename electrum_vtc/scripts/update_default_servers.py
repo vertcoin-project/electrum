@@ -9,10 +9,10 @@ import asyncio
 import sys
 import json
 
-from electrum.network import Network
-from electrum.util import create_and_start_event_loop, log_exceptions
-from electrum.simple_config import SimpleConfig
-from electrum import constants
+from electrum_vtc.network import Network
+from electrum_vtc.util import create_and_start_event_loop, log_exceptions
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc import constants
 
 try:
     fname1 = sys.argv[1]

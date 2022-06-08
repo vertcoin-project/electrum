@@ -3,14 +3,14 @@ import getpass
 import datetime
 import logging
 
-from electrum.gui import BaseElectrumGui
-from electrum import util
-from electrum import WalletStorage, Wallet
-from electrum.wallet_db import WalletDB
-from electrum.util import format_satoshis
-from electrum.bitcoin import is_address, COIN
-from electrum.transaction import PartialTxOutput
-from electrum.network import TxBroadcastError, BestEffortRequestFailed
+from electrum_vtc.gui import BaseElectrumGui
+from electrum_vtc import util
+from electrum_vtc import WalletStorage, Wallet
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.util import format_satoshis
+from electrum_vtc.bitcoin import is_address, COIN
+from electrum_vtc.transaction import PartialTxOutput
+from electrum_vtc.network import TxBroadcastError, BestEffortRequestFailed
 
 _ = lambda x:x  # i18n
 

@@ -40,13 +40,13 @@ from PyQt5.QtWidgets import (QMenu, QHeaderView, QLabel, QMessageBox,
                              QPushButton, QComboBox, QVBoxLayout, QCalendarWidget,
                              QGridLayout)
 
-from electrum.gui import messages
-from electrum.address_synchronizer import TX_HEIGHT_LOCAL, TX_HEIGHT_FUTURE
-from electrum.i18n import _
-from electrum.util import (block_explorer_URL, profiler, TxMinedInfo,
+from electrum_vtc.gui import messages
+from electrum_vtc.address_synchronizer import TX_HEIGHT_LOCAL, TX_HEIGHT_FUTURE
+from electrum_vtc.i18n import _
+from electrum_vtc.util import (block_explorer_URL, profiler, TxMinedInfo,
                            OrderedDictWithIndex, timestamp_to_datetime,
                            Satoshis, Fiat, format_time)
-from electrum.logging import get_logger, Logger
+from electrum_vtc.logging import get_logger, Logger
 
 from .custom_model import CustomNode, CustomModel
 from .util import (read_QIcon, MONOSPACE_FONT, Buttons, CancelButton, OkButton,
@@ -54,7 +54,7 @@ from .util import (read_QIcon, MONOSPACE_FONT, Buttons, CancelButton, OkButton,
                    CloseButton, webopen, WWLabel)
 
 if TYPE_CHECKING:
-    from electrum.wallet import Abstract_Wallet
+    from electrum_vtc.wallet import Abstract_Wallet
     from .main_window import ElectrumWindow
 
 
@@ -62,9 +62,9 @@ _logger = get_logger(__name__)
 
 
 try:
-    from electrum.plot import plot_history, NothingToPlotException
+    from electrum_vtc.plot import plot_history, NothingToPlotException
 except:
-    _logger.info("could not import electrum.plot. This feature needs matplotlib to be installed.")
+    _logger.info("could not import electrum_vtc.plot. This feature needs matplotlib to be installed.")
     plot_history = None
 
 # note: this list needs to be kept in sync with another in kivy
@@ -837,7 +837,7 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
                 for line in lines:
                     transaction.writerow(line)
             else:
-                from electrum.util import json_encode
+                from electrum_vtc.util import json_encode
                 f.write(json_encode(txns))
 
     def get_text_from_coordinate(self, row, col):

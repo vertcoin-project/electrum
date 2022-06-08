@@ -2,13 +2,13 @@ import unittest
 from unittest import mock
 from decimal import Decimal
 
-from electrum.util import create_and_start_event_loop
-from electrum.commands import Commands, eval_bool
-from electrum import storage, wallet
-from electrum.wallet import restore_wallet_from_text
-from electrum.address_synchronizer import TX_HEIGHT_UNCONFIRMED
-from electrum.simple_config import SimpleConfig
-from electrum.transaction import Transaction, TxOutput, tx_from_any
+from electrum_vtc.util import create_and_start_event_loop
+from electrum_vtc.commands import Commands, eval_bool
+from electrum_vtc import storage, wallet
+from electrum_vtc.wallet import restore_wallet_from_text
+from electrum_vtc.address_synchronizer import TX_HEIGHT_UNCONFIRMED
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.transaction import Transaction, TxOutput, tx_from_any
 
 from . import TestCaseForTestnet, ElectrumTestCase
 from .test_wallet_vertical import WalletIntegrityHelper

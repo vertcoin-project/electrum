@@ -27,7 +27,7 @@ import os
 import gettext
 
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
-language = gettext.translation('electrum', LOCALE_DIR, fallback=True)
+language = gettext.translation('electrum_vtc', LOCALE_DIR, fallback=True)
 
 
 # note: f-strings cannot be translated! see https://stackoverflow.com/q/49797658
@@ -43,7 +43,7 @@ def _(x: str) -> str:
 def set_language(x):
     global language
     if x:
-        language = gettext.translation('electrum', LOCALE_DIR, fallback=True, languages=[x])
+        language = gettext.translation('electrum_vtc', LOCALE_DIR, fallback=True, languages=[x])
 
 
 languages = {

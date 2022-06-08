@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import asyncio
 
-from electrum.network import filter_protocol, Network
-from electrum.util import create_and_start_event_loop, log_exceptions
-from electrum.blockchain import hash_raw_header
-from electrum.simple_config import SimpleConfig
+from electrum_vtc.network import filter_protocol, Network
+from electrum_vtc.util import create_and_start_event_loop, log_exceptions
+from electrum_vtc.blockchain import hash_raw_header
+from electrum_vtc.simple_config import SimpleConfig
 
 
 config = SimpleConfig()

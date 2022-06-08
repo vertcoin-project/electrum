@@ -26,14 +26,14 @@ from PyQt5.QtWidgets import (QPushButton, QLabel, QMessageBox, QHBoxLayout,
                              QMenu, QStyleOptionViewItem, QLayout, QLayoutItem,
                              QGraphicsEffect, QGraphicsScene, QGraphicsPixmapItem)
 
-from electrum.i18n import _, languages
-from electrum.util import FileImportFailed, FileExportFailed, make_aiohttp_session, resource_path
-from electrum.invoices import PR_UNPAID, PR_PAID, PR_EXPIRED, PR_INFLIGHT, PR_UNKNOWN, PR_FAILED, PR_ROUTING, PR_UNCONFIRMED
+from electrum_vtc.i18n import _, languages
+from electrum_vtc.util import FileImportFailed, FileExportFailed, make_aiohttp_session, resource_path
+from electrum_vtc.invoices import PR_UNPAID, PR_PAID, PR_EXPIRED, PR_INFLIGHT, PR_UNKNOWN, PR_FAILED, PR_ROUTING, PR_UNCONFIRMED
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow
     from .installwizard import InstallWizard
-    from electrum.simple_config import SimpleConfig
+    from electrum_vtc.simple_config import SimpleConfig
 
 
 if platform.system() == 'Windows':

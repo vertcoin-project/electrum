@@ -31,8 +31,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QFont
 from PyQt5.QtWidgets import QAbstractItemView, QMenu, QLabel, QHBoxLayout
 
-from electrum.i18n import _
-from electrum.transaction import PartialTxInput
+from electrum_vtc.i18n import _
+from electrum_vtc.transaction import PartialTxInput
 
 from .util import MyTreeView, ColorScheme, MONOSPACE_FONT, EnterButton
 

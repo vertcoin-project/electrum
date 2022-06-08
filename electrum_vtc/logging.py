@@ -49,7 +49,7 @@ console_formatter = LogFormatterForConsole(fmt="%(levelname).1s | %(name)s | %(m
 def _shorten_name_of_logrecord(record: logging.LogRecord) -> logging.LogRecord:
     record = copy.copy(record)  # avoid mutating arg
     # strip the main module name from the logger name
-    if record.name.startswith("electrum."):
+    if record.name.startswith("electrum_vtc."):
         record.name = record.name[9:]
     # manual map to shorten common module names
     record.name = record.name.replace("interface.Interface", "interface", 1)
@@ -260,14 +260,14 @@ if getattr(sys, "_ELECTRUM_RUNNING_VIA_RUNELECTRUM", False):
     root_logger.addHandler(_inmemory_startup_logs)
 
 # creates a logger specifically for electrum library
-electrum_logger = logging.getLogger("electrum")
+electrum_logger = logging.getLogger("electrum_vtc")
 electrum_logger.setLevel(logging.DEBUG)
 
 
 # --- External API
 
 def get_logger(name: str) -> logging.Logger:
-    if name.startswith("electrum."):
+    if name.startswith("electrum_vtc."):
         name = name[9:]
     return electrum_logger.getChild(name)
 
@@ -315,7 +315,7 @@ def configure_logging(config):
     is_android = 'ANDROID_DATA' in os.environ
     if is_android:
         from jnius import autoclass
-        build_config = autoclass("org.electrum.electrum.BuildConfig")
+        build_config = autoclass("org.vertcoin.electrum-vtc.BuildConfig")
         log_to_file |= bool(build_config.DEBUG)
     if log_to_file:
         log_directory = pathlib.Path(config.path) / "logs"

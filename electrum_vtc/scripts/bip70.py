@@ -4,10 +4,10 @@
 
 import tlslite
 
-from electrum.transaction import Transaction
-from electrum import paymentrequest
-from electrum import paymentrequest_pb2 as pb2
-from electrum.bitcoin import address_to_script
+from electrum_vtc.transaction import Transaction
+from electrum_vtc import paymentrequest
+from electrum_vtc import paymentrequest_pb2 as pb2
+from electrum_vtc.bitcoin import address_to_script
 
 chain_file = 'mychain.pem'
 cert_file = 'mycert.pem'

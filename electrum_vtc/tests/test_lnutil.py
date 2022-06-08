@@ -1,18 +1,18 @@
 import unittest
 import json
 
-from electrum import bitcoin
-from electrum.json_db import StoredDict
-from electrum.lnutil import (RevocationStore, get_per_commitment_secret_from_seed, make_offered_htlc,
+from electrum_vtc import bitcoin
+from electrum_vtc.json_db import StoredDict
+from electrum_vtc.lnutil import (RevocationStore, get_per_commitment_secret_from_seed, make_offered_htlc,
                              make_received_htlc, make_commitment, make_htlc_tx_witness, make_htlc_tx_output,
                              make_htlc_tx_inputs, secret_to_pubkey, derive_blinded_pubkey, derive_privkey,
                              derive_pubkey, make_htlc_tx, extract_ctn_from_tx, UnableToDeriveSecret,
                              get_compressed_pubkey_from_bech32, split_host_port, ConnStringFormatError,
                              ScriptHtlc, extract_nodeid, calc_fees_for_commitment_tx, UpdateAddHtlc, LnFeatures,
                              ln_compare_features, IncompatibleLightningFeatures, ChannelType)
-from electrum.util import bh2u, bfh, MyEncoder
-from electrum.transaction import Transaction, PartialTransaction
-from electrum.lnworker import LNWallet
+from electrum_vtc.util import bh2u, bfh, MyEncoder
+from electrum_vtc.transaction import Transaction, PartialTransaction
+from electrum_vtc.lnworker import LNWallet
 
 from . import ElectrumTestCase
 

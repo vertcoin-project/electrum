@@ -3,14 +3,14 @@ import traceback
 import sys
 from typing import NamedTuple, Any, Optional, Dict, Union, List, Tuple, TYPE_CHECKING
 
-from electrum.util import bfh, bh2u, versiontuple, UserCancelled, UserFacingException
-from electrum.bip32 import BIP32Node
-from electrum import constants
-from electrum.i18n import _
-from electrum.plugin import Device, runs_in_hwd_thread
-from electrum.transaction import Transaction, PartialTransaction, PartialTxInput, PartialTxOutput
-from electrum.keystore import Hardware_KeyStore
-from electrum.base_wizard import ScriptTypeNotSupported
+from electrum_vtc.util import bfh, bh2u, versiontuple, UserCancelled, UserFacingException
+from electrum_vtc.bip32 import BIP32Node
+from electrum_vtc import constants
+from electrum_vtc.i18n import _
+from electrum_vtc.plugin import Device, runs_in_hwd_thread
+from electrum_vtc.transaction import Transaction, PartialTransaction, PartialTxInput, PartialTxOutput
+from electrum_vtc.keystore import Hardware_KeyStore
+from electrum_vtc.base_wizard import ScriptTypeNotSupported
 
 from ..hw_wallet import HW_PluginBase
 from ..hw_wallet.plugin import (is_any_tx_output_on_change_branch, trezor_validate_op_return_output_and_get_data,

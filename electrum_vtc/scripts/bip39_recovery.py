@@ -3,12 +3,12 @@
 import sys
 import asyncio
 
-from electrum.util import json_encode, print_msg, create_and_start_event_loop, log_exceptions
-from electrum.simple_config import SimpleConfig
-from electrum.network import Network
-from electrum.keystore import bip39_to_seed
-from electrum.bip32 import BIP32Node
-from electrum.bip39_recovery import account_discovery
+from electrum_vtc.util import json_encode, print_msg, create_and_start_event_loop, log_exceptions
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.network import Network
+from electrum_vtc.keystore import bip39_to_seed
+from electrum_vtc.bip32 import BIP32Node
+from electrum_vtc.bip39_recovery import account_discovery
 
 try:
     mnemonic = sys.argv[1]

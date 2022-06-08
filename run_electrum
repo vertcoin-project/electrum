@@ -84,20 +84,20 @@ if not is_android:
 
 sys._ELECTRUM_RUNNING_VIA_RUNELECTRUM = True  # used by logging.py
 
-from electrum.logging import get_logger, configure_logging  # import logging submodule first
-from electrum import util
-from electrum import constants
-from electrum import SimpleConfig
-from electrum.wallet_db import WalletDB
-from electrum.wallet import Wallet
-from electrum.storage import WalletStorage
-from electrum.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
-from electrum.util import InvalidPassword, BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
-from electrum.commands import get_parser, known_commands, Commands, config_variables
-from electrum import daemon
-from electrum import keystore
-from electrum.util import create_and_start_event_loop
-from electrum.i18n import set_language
+from electrum_vtc.logging import get_logger, configure_logging  # import logging submodule first
+from electrum_vtc import util
+from electrum_vtc import constants
+from electrum_vtc import SimpleConfig
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.wallet import Wallet
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
+from electrum_vtc.util import InvalidPassword, BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
+from electrum_vtc.commands import get_parser, known_commands, Commands, config_variables
+from electrum_vtc import daemon
+from electrum_vtc import keystore
+from electrum_vtc.util import create_and_start_event_loop
+from electrum_vtc.i18n import set_language
 
 if TYPE_CHECKING:
     import threading
@@ -259,7 +259,7 @@ async def run_offline_command(config, config_options, plugins: 'Plugins'):
 
 
 def init_plugins(config, gui_name):
-    from electrum.plugin import Plugins
+    from electrum_vtc.plugin import Plugins
     return Plugins(config, gui_name)
 
 

@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import (
     QFileDialog,
 )
 
-from electrum.i18n import _
-from electrum.simple_config import SimpleConfig
+from electrum_vtc.i18n import _
+from electrum_vtc.simple_config import SimpleConfig
 
 from .util import WindowModalDialog, WWLabel, getSaveFileName
 

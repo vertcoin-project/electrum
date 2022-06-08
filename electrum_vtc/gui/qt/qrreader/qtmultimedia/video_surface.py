@@ -30,8 +30,8 @@ from PyQt5.QtMultimedia import (QVideoFrame, QAbstractVideoBuffer, QAbstractVide
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from electrum.i18n import _
-from electrum.logging import get_logger
+from electrum_vtc.i18n import _
+from electrum_vtc.logging import get_logger
 
 
 _logger = get_logger(__name__)

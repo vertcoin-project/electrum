@@ -32,18 +32,18 @@ from PyQt5.QtWidgets import (QComboBox,  QTabWidget,
                              QVBoxLayout, QGridLayout, QLineEdit,
                              QPushButton, QWidget, QHBoxLayout)
 
-from electrum.i18n import _, languages
-from electrum import util, coinchooser, paymentrequest
-from electrum.util import base_units_list
+from electrum_vtc.i18n import _, languages
+from electrum_vtc import util, coinchooser, paymentrequest
+from electrum_vtc.util import base_units_list
 
-from electrum.gui import messages
+from electrum_vtc.gui import messages
 
 from .util import (ColorScheme, WindowModalDialog, HelpLabel, Buttons,
                    CloseButton)
 
 
 if TYPE_CHECKING:
-    from electrum.simple_config import SimpleConfig
+    from electrum_vtc.simple_config import SimpleConfig
     from .main_window import ElectrumWindow
 
 

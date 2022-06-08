@@ -35,17 +35,17 @@ from PyQt5.QtWidgets import (QTreeWidget, QTreeWidgetItem, QMenu, QGridLayout, Q
                              QTabWidget, QWidget, QLabel)
 from PyQt5.QtGui import QFontMetrics
 
-from electrum.i18n import _
-from electrum import constants, blockchain, util
-from electrum.interface import ServerAddr, PREFERRED_NETWORK_PROTOCOL
-from electrum.network import Network
-from electrum.logging import get_logger
+from electrum_vtc.i18n import _
+from electrum_vtc import constants, blockchain, util
+from electrum_vtc.interface import ServerAddr, PREFERRED_NETWORK_PROTOCOL
+from electrum_vtc.network import Network
+from electrum_vtc.logging import get_logger
 
 from .util import (Buttons, CloseButton, HelpButton, read_QIcon, char_width_in_lineedit,
                    PasswordLineEdit)
 
 if TYPE_CHECKING:
-    from electrum.simple_config import SimpleConfig
+    from electrum_vtc.simple_config import SimpleConfig
 
 
 _logger = get_logger(__name__)

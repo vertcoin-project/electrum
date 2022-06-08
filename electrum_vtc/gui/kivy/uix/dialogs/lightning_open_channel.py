@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 from kivy.lang import Builder
 from kivy.factory import Factory
 
-from electrum.gui import messages
-from electrum.gui.kivy.i18n import _
-from electrum.lnaddr import lndecode
-from electrum.util import bh2u
-from electrum.bitcoin import COIN
-import electrum.simple_config as config
-from electrum.logging import Logger
-from electrum.lnutil import ln_dummy_address, extract_nodeid, ConnStringFormatError
+from electrum_vtc.gui import messages
+from electrum_vtc.gui.kivy.i18n import _
+from electrum_vtc.lnaddr import lndecode
+from electrum_vtc.util import bh2u
+from electrum_vtc.bitcoin import COIN
+import electrum_vtc.simple_config as config
+from electrum_vtc.logging import Logger
+from electrum_vtc.lnutil import ln_dummy_address, extract_nodeid, ConnStringFormatError
 
 from .label_dialog import LabelDialog
 from .confirm_tx_dialog import ConfirmTxDialog
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 
 Builder.load_string('''
-#:import KIVY_GUI_PATH electrum.gui.kivy.KIVY_GUI_PATH
+#:import KIVY_GUI_PATH electrum_vtc.gui.kivy.KIVY_GUI_PATH
 
 <LightningOpenChannelDialog@Popup>
     use_gossip: False
@@ -137,7 +137,7 @@ class LightningOpenChannelDialog(Factory.Popup, Logger):
         self.msg = msg
         self.use_gossip = bool(self.app.network.channel_db)
         if not self.use_gossip:
-            from electrum.lnworker import hardcoded_trampoline_nodes
+            from electrum_vtc.lnworker import hardcoded_trampoline_nodes
             self.trampolines = hardcoded_trampoline_nodes()
             self.trampoline_names = list(self.trampolines.keys())
             self.trampoline_index = 0

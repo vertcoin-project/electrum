@@ -49,14 +49,14 @@ from PyQt5.QtWidgets import (QMessageBox, QComboBox, QSystemTrayIcon, QTabWidget
                              QWidget, QSizePolicy, QStatusBar, QToolTip, QDialog,
                              QMenu, QAction, QStackedWidget, QToolButton)
 
-import electrum
-from electrum.gui import messages
-from electrum import (keystore, ecc, constants, util, bitcoin, commands,
+import electrum_vtc as electrum
+from electrum_vtc.gui import messages
+from electrum_vtc import (keystore, ecc, constants, util, bitcoin, commands,
                       paymentrequest, lnutil)
-from electrum.bitcoin import COIN, is_address
-from electrum.plugin import run_hook, BasePlugin
-from electrum.i18n import _
-from electrum.util import (format_time,
+from electrum_vtc.bitcoin import COIN, is_address
+from electrum_vtc.plugin import run_hook, BasePlugin
+from electrum_vtc.i18n import _
+from electrum_vtc.util import (format_time,
                            UserCancelled, profiler,
                            bh2u, bfh, InvalidPassword,
                            UserFacingException,
@@ -65,21 +65,21 @@ from electrum.util import (format_time,
                            NoDynamicFeeEstimates,
                            AddTransactionException, BITCOIN_BIP21_URI_SCHEME,
                            InvoiceError, parse_max_spend)
-from electrum.invoices import PR_TYPE_ONCHAIN, PR_TYPE_LN, PR_DEFAULT_EXPIRATION_WHEN_CREATING, Invoice
-from electrum.invoices import PR_PAID, PR_FAILED, pr_expiration_values, LNInvoice, OnchainInvoice
-from electrum.transaction import (Transaction, PartialTxInput,
+from electrum_vtc.invoices import PR_TYPE_ONCHAIN, PR_TYPE_LN, PR_DEFAULT_EXPIRATION_WHEN_CREATING, Invoice
+from electrum_vtc.invoices import PR_PAID, PR_FAILED, pr_expiration_values, LNInvoice, OnchainInvoice
+from electrum_vtc.transaction import (Transaction, PartialTxInput,
                                   PartialTransaction, PartialTxOutput)
-from electrum.wallet import (Multisig_Wallet, CannotBumpFee, Abstract_Wallet,
+from electrum_vtc.wallet import (Multisig_Wallet, CannotBumpFee, Abstract_Wallet,
                              sweep_preparations, InternalAddressCorruption,
                              CannotDoubleSpendTx, CannotCPFP)
-from electrum.version import ELECTRUM_VERSION
-from electrum.network import (Network, TxBroadcastError, BestEffortRequestFailed,
+from electrum_vtc.version import ELECTRUM_VERSION
+from electrum_vtc.network import (Network, TxBroadcastError, BestEffortRequestFailed,
                               UntrustedServerReturnedError, NetworkException)
-from electrum.exchange_rate import FxThread
-from electrum.simple_config import SimpleConfig
-from electrum.logging import Logger
-from electrum.lnutil import ln_dummy_address, extract_nodeid, ConnStringFormatError
-from electrum.lnaddr import lndecode, LnInvoiceException
+from electrum_vtc.exchange_rate import FxThread
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.logging import Logger
+from electrum_vtc.lnutil import ln_dummy_address, extract_nodeid, ConnStringFormatError
+from electrum_vtc.lnaddr import lndecode, LnInvoiceException
 
 from .exception_window import Exception_Hook
 from .amountedit import AmountEdit, BTCAmountEdit, FreezableLineEdit, FeerateEdit, SizedFreezableLineEdit
@@ -2372,7 +2372,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.password_button.setVisible(self.wallet.may_have_password())
 
     def change_password_dialog(self):
-        from electrum.storage import StorageEncryptionVersion
+        from electrum_vtc.storage import StorageEncryptionVersion
         if self.wallet.get_available_storage_encryption_version() == StorageEncryptionVersion.XPUB_PASSWORD:
             from .password_dialog import ChangePasswordDialogForHW
             d = ChangePasswordDialogForHW(self, self.wallet)
@@ -2830,7 +2830,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         return d.run()
 
     def tx_from_text(self, data: Union[str, bytes]) -> Union[None, 'PartialTransaction', 'Transaction']:
-        from electrum.transaction import tx_from_any
+        from electrum_vtc.transaction import tx_from_any
         try:
             return tx_from_any(data)
         except BaseException as e:
@@ -2920,7 +2920,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             self.show_transaction(tx)
 
     def do_process_from_txid(self):
-        from electrum import transaction
+        from electrum_vtc import transaction
         txid, ok = QInputDialog.getText(self, _('Lookup transaction'), _('Transaction ID') + ':')
         if ok and txid:
             txid = str(txid).strip()

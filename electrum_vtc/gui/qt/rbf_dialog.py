@@ -12,9 +12,9 @@ from .fee_slider import FeeSlider, FeeComboBox
 from .util import (ColorScheme, WindowModalDialog, Buttons,
                    OkButton, WWLabel, CancelButton)
 
-from electrum.i18n import _
-from electrum.transaction import PartialTransaction
-from electrum.wallet import BumpFeeStrategy
+from electrum_vtc.i18n import _
+from electrum_vtc.transaction import PartialTransaction
+from electrum_vtc.wallet import BumpFeeStrategy
 
 if TYPE_CHECKING:
     from .main_window import ElectrumWindow

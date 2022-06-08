@@ -31,10 +31,10 @@ from PyQt5.QtWidgets import (QVBoxLayout, QCheckBox, QHBoxLayout, QLineEdit,
                              QLabel, QCompleter, QDialog, QStyledItemDelegate,
                              QScrollArea, QWidget, QPushButton)
 
-from electrum.i18n import _
-from electrum.mnemonic import Mnemonic, seed_type
-from electrum import old_mnemonic
-from electrum import slip39
+from electrum_vtc.i18n import _
+from electrum_vtc.mnemonic import Mnemonic, seed_type
+from electrum_vtc import old_mnemonic
+from electrum_vtc import slip39
 
 from .util import (Buttons, OkButton, WWLabel, ButtonsTextEdit, icon_path,
                    EnterButton, CloseButton, WindowModalDialog, ColorScheme,
@@ -43,7 +43,7 @@ from .qrtextedit import ShowQRTextEdit, ScanQRTextEdit
 from .completion_text_edit import CompletionTextEdit
 
 if TYPE_CHECKING:
-    from electrum.simple_config import SimpleConfig
+    from electrum_vtc.simple_config import SimpleConfig
 
 
 def seed_warning_msg(seed):
@@ -253,7 +253,7 @@ class SeedLayout(QVBoxLayout):
         s = ' '.join(self.get_seed_words())
         b = self.is_seed(s)
         if self.seed_type == 'bip39':
-            from electrum.keystore import bip39_is_checksum_valid
+            from electrum_vtc.keystore import bip39_is_checksum_valid
             is_checksum, is_wordlist = bip39_is_checksum_valid(s)
             status = ('checksum: ' + ('ok' if is_checksum else 'failed')) if is_wordlist else 'unknown wordlist'
             label = 'BIP39' + ' (%s)'%status

@@ -1,14 +1,14 @@
 import io
 
-from electrum.lnmsg import (read_bigsize_int, write_bigsize_int, FieldEncodingNotMinimal,
+from electrum_vtc.lnmsg import (read_bigsize_int, write_bigsize_int, FieldEncodingNotMinimal,
                             UnexpectedEndOfStream, LNSerializer, UnknownMandatoryTLVRecordType,
                             MalformedMsg, MsgTrailingGarbage, MsgInvalidFieldOrder, encode_msg,
                             decode_msg, UnexpectedFieldSizeForEncoder, OnionWireSerializer,
                             UnknownMsgType)
-from electrum.lnonion import OnionRoutingFailure
-from electrum.util import bfh
-from electrum.lnutil import ShortChannelID, LnFeatures
-from electrum import constants
+from electrum_vtc.lnonion import OnionRoutingFailure
+from electrum_vtc.util import bfh
+from electrum_vtc.lnutil import ShortChannelID, LnFeatures
+from electrum_vtc import constants
 
 from . import TestCaseForTestnet
 

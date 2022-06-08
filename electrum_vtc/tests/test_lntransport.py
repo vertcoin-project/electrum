@@ -1,9 +1,9 @@
 import asyncio
 
-from electrum.ecc import ECPrivkey
-from electrum.lnutil import LNPeerAddr
-from electrum.lntransport import LNResponderTransport, LNTransport
-from electrum.util import OldTaskGroup
+from electrum_vtc.ecc import ECPrivkey
+from electrum_vtc.lnutil import LNPeerAddr
+from electrum_vtc.lntransport import LNResponderTransport, LNTransport
+from electrum_vtc.util import OldTaskGroup
 
 from . import ElectrumTestCase
 from .test_bitcoin import needs_test_with_all_chacha20_implementations

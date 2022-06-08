@@ -43,13 +43,13 @@ except ImportError:
 # minimum required version for kivy
 kivy.require('1.8.0')
 
-from electrum.logging import Logger
-from electrum.gui import BaseElectrumGui
+from electrum_vtc.logging import Logger
+from electrum_vtc.gui import BaseElectrumGui
 
 if TYPE_CHECKING:
-    from electrum.simple_config import SimpleConfig
-    from electrum.daemon import Daemon
-    from electrum.plugin import Plugins
+    from electrum_vtc.simple_config import SimpleConfig
+    from electrum_vtc.daemon import Daemon
+    from electrum_vtc.plugin import Plugins
 
 
 class ElectrumGui(BaseElectrumGui, Logger):

@@ -50,15 +50,15 @@ try:
 except ImportError as e:
     pass  # failure is ok; it is an optional dependency.
 
-from electrum.i18n import _, set_language
-from electrum.plugin import run_hook
-from electrum.base_wizard import GoBack
-from electrum.util import (UserCancelled, profiler, send_exception_to_crash_reporter,
+from electrum_vtc.i18n import _, set_language
+from electrum_vtc.plugin import run_hook
+from electrum_vtc.base_wizard import GoBack
+from electrum_vtc.util import (UserCancelled, profiler, send_exception_to_crash_reporter,
                            WalletFileException, BitcoinException, get_new_wallet_name)
-from electrum.wallet import Wallet, Abstract_Wallet
-from electrum.wallet_db import WalletDB
-from electrum.logging import Logger
-from electrum.gui import BaseElectrumGui
+from electrum_vtc.wallet import Wallet, Abstract_Wallet
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.logging import Logger
+from electrum_vtc.gui import BaseElectrumGui
 
 from .installwizard import InstallWizard, WalletAlreadyOpenInMemory
 from .util import get_default_language, read_QIcon, ColorScheme, custom_message_box, MessageBoxMixin
@@ -70,9 +70,9 @@ from .watchtower_dialog import WatchtowerDialog
 from .exception_window import Exception_Hook
 
 if TYPE_CHECKING:
-    from electrum.daemon import Daemon
-    from electrum.simple_config import SimpleConfig
-    from electrum.plugin import Plugins
+    from electrum_vtc.daemon import Daemon
+    from electrum_vtc.simple_config import SimpleConfig
+    from electrum_vtc.plugin import Plugins
 
 
 class OpenFileEventFilter(QObject):
@@ -117,7 +117,7 @@ class ElectrumGui(BaseElectrumGui, Logger):
         if hasattr(QtCore.Qt, "AA_ShareOpenGLContexts"):
             QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         if hasattr(QGuiApplication, 'setDesktopFileName'):
-            QGuiApplication.setDesktopFileName('electrum.desktop')
+            QGuiApplication.setDesktopFileName('electrum-vtc.desktop')
         self.gui_thread = threading.current_thread()
         self.windows = []  # type: List[ElectrumWindow]
         self.efilter = OpenFileEventFilter(self.windows)

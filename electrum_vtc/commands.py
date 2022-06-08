@@ -495,7 +495,7 @@ class Commands:
     @command('')
     async def dumpprivkeys(self):
         """Deprecated."""
-        return "This command is deprecated. Use a pipe instead: 'electrum listaddresses | electrum getprivatekeys - '"
+        return "This command is deprecated. Use a pipe instead: 'electrum-vtc listaddresses | electrum-vtc getprivatekeys - '"
 
     @command('')
     async def validateaddress(self, address):

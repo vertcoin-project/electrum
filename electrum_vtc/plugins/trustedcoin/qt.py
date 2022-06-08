@@ -34,23 +34,23 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import (QTextEdit, QVBoxLayout, QLabel, QGridLayout, QHBoxLayout,
                              QRadioButton, QCheckBox, QLineEdit)
 
-from electrum.gui.qt.util import (read_QIcon, WindowModalDialog, WaitingDialog, OkButton,
+from electrum_vtc.gui.qt.util import (read_QIcon, WindowModalDialog, WaitingDialog, OkButton,
                                   CancelButton, Buttons, icon_path, WWLabel, CloseButton)
-from electrum.gui.qt.qrcodewidget import QRCodeWidget
-from electrum.gui.qt.amountedit import AmountEdit
-from electrum.gui.qt.main_window import StatusBarButton
-from electrum.gui.qt.installwizard import InstallWizard
-from electrum.i18n import _
-from electrum.plugin import hook
-from electrum.util import is_valid_email
-from electrum.logging import Logger
-from electrum.base_wizard import GoBack, UserCancelled
+from electrum_vtc.gui.qt.qrcodewidget import QRCodeWidget
+from electrum_vtc.gui.qt.amountedit import AmountEdit
+from electrum_vtc.gui.qt.main_window import StatusBarButton
+from electrum_vtc.gui.qt.installwizard import InstallWizard
+from electrum_vtc.i18n import _
+from electrum_vtc.plugin import hook
+from electrum_vtc.util import is_valid_email
+from electrum_vtc.logging import Logger
+from electrum_vtc.base_wizard import GoBack, UserCancelled
 
 from .trustedcoin import TrustedCoinPlugin, server
 
 if TYPE_CHECKING:
-    from electrum.gui.qt.main_window import ElectrumWindow
-    from electrum.wallet import Abstract_Wallet
+    from electrum_vtc.gui.qt.main_window import ElectrumWindow
+    from electrum_vtc.wallet import Abstract_Wallet
 
 
 class TOS(QTextEdit):
