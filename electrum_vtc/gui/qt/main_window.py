@@ -254,7 +254,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         if self.config.get("is_maximized"):
             self.showMaximized()
 
-        self.setWindowIcon(read_QIcon("electrum.png"))
+        self.setWindowIcon(read_QIcon("electrum-vtc.png"))
         self.init_menubar()
 
         wrtabs = weakref.proxy(tabs)
@@ -541,7 +541,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
     @classmethod
     def get_app_name_and_version_str(cls) -> str:
-        name = "Electrum"
+        name = "Electrum-VTC"
         if constants.net.TESTNET:
             name += " " + constants.net.NET_NAME.capitalize()
         return f"{name} {ELECTRUM_VERSION}"
@@ -563,8 +563,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         if self.wallet.is_watching_only():
             msg = ' '.join([
                 _("This wallet is watching-only."),
-                _("This means you will not be able to spend Bitcoins with it."),
-                _("Make sure you own the seed phrase or the private keys, before you request Bitcoins to be sent to this wallet.")
+                _("This means you will not be able to spend Vertcoins with it."),
+                _("Make sure you own the seed phrase or the private keys, before you request Vertcoins to be sent to this wallet.")
             ])
             self.show_warning(msg, title=_('Watch-only wallet'))
 
@@ -581,7 +581,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         msg = ''.join([
             _("You are in testnet mode."), ' ',
             _("Testnet coins are worthless."), '\n',
-            _("Testnet is separate from the main Bitcoin network. It is used for testing.")
+            _("Testnet is separate from the main Vertcoin network. It is used for testing.")
         ])
         cb = QCheckBox(_("Don't show this again."))
         cb_checked = False
@@ -641,7 +641,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         try:
             new_path = self.wallet.save_backup(backup_dir)
         except BaseException as reason:
-            self.show_critical(_("Electrum was unable to copy your wallet file to the specified location.") + "\n" + str(reason), title=_("Unable to create backup"))
+            self.show_critical(_("Electrum-VTC was unable to copy your wallet file to the specified location.") + "\n" + str(reason), title=_("Unable to create backup"))
             return
         msg = _("A copy of your wallet file was created in")+" '%s'" % str(new_path)
         self.show_message(msg, title=_("Wallet backup created"))
@@ -755,7 +755,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             # Hence, this menu item will be at a "uniform location re macOS processes"
             preferences_action.setMenuRole(QAction.PreferencesRole)  # make sure OS recognizes it as preferences
             # Add another preferences item, to also have a "uniform location for Electrum between different OSes"
-            tools_menu.addAction(_("Electrum preferences"), self.settings_dialog)
+            tools_menu.addAction(_("Electrum-VTC preferences"), self.settings_dialog)
 
         tools_menu.addAction(_("&Network"), self.gui_object.show_network_dialog).setEnabled(bool(self.network))
         if self.network and self.network.local_watchtower:
@@ -779,11 +779,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         help_menu = menubar.addMenu(_("&Help"))
         help_menu.addAction(_("&About"), self.show_about)
         help_menu.addAction(_("&Check for updates"), self.show_update_check)
-        help_menu.addAction(_("&Official website"), lambda: webopen("https://electrum.org"))
+        help_menu.addAction(_("&Official website"), lambda: webopen("https://vertcoin.org"))
         help_menu.addSeparator()
         help_menu.addAction(_("&Documentation"), lambda: webopen("http://docs.electrum.org/")).setShortcut(QKeySequence.HelpContents)
-        if not constants.net.TESTNET:
-            help_menu.addAction(_("&Bitcoin Paper"), self.show_bitcoin_paper)
+        # if not constants.net.TESTNET:
+        #     help_menu.addAction(_("&Bitcoin Paper"), self.show_bitcoin_paper)
         help_menu.addAction(_("&Report Bug"), self.show_report_bug)
         help_menu.addSeparator()
         help_menu.addAction(_("&Donate to server"), self.donate_to_server)
@@ -794,18 +794,18 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         d = self.network.get_donation_address()
         if d:
             host = self.network.get_parameters().server.host
-            self.pay_to_URI('bitcoin:%s?message=donation for %s'%(d, host))
+            self.pay_to_URI('vertcoin:%s?message=donation for %s'%(d, host))
         else:
             self.show_error(_('No donation address for this server'))
 
     def show_about(self):
-        QMessageBox.about(self, "Electrum",
+        QMessageBox.about(self, "Electrum-VTC",
                           (_("Version")+" %s" % ELECTRUM_VERSION + "\n\n" +
-                           _("Electrum's focus is speed, with low resource usage and simplifying Bitcoin.") + " " +
+                           _("Electrum-VTC's focus is speed, with low resource usage and simplifying Vertcoin.") + " " +
                            _("You do not need to perform regular backups, because your wallet can be "
                               "recovered from a secret phrase that you can memorize or write on paper.") + " " +
                            _("Startup times are instant because it operates in conjunction with high-performance "
-                              "servers that handle the most complicated parts of the Bitcoin system.") + "\n\n" +
+                              "servers that handle the most complicated parts of the Vertcoin system.") + "\n\n" +
                            _("Uses icons from the Icons8 icon pack (icons8.com).")))
 
     def show_bitcoin_paper(self):
@@ -827,10 +827,10 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         msg = ' '.join([
             _("Please report any bugs as issues on github:<br/>"),
             f'''<a href="{constants.GIT_REPO_ISSUES_URL}">{constants.GIT_REPO_ISSUES_URL}</a><br/><br/>''',
-            _("Before reporting a bug, upgrade to the most recent version of Electrum (latest release or git HEAD), and include the version number in your report."),
+            _("Before reporting a bug, upgrade to the most recent version of Electrum-VTC (latest release or git HEAD), and include the version number in your report."),
             _("Try to explain not only what the bug is, but how it occurs.")
          ])
-        self.show_message(msg, title="Electrum - " + _("Reporting Bugs"), rich_text=True)
+        self.show_message(msg, title="Electrum-VTC - " + _("Reporting Bugs"), rich_text=True)
 
     def notify_transactions(self):
         if self.tx_notification_queue.qsize() == 0:
@@ -870,9 +870,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         if self.tray:
             try:
                 # this requires Qt 5.9
-                self.tray.showMessage("Electrum", message, read_QIcon("electrum_dark_icon"), 20000)
+                self.tray.showMessage("Electrum-VTC", message, read_QIcon("electrum_dark_icon"), 20000)
             except TypeError:
-                self.tray.showMessage("Electrum", message, QSystemTrayIcon.Information, 20000)
+                self.tray.showMessage("Electrum-VTC", message, QSystemTrayIcon.Information, 20000)
 
     def timer_actions(self):
         self.request_list.refresh_all()
@@ -1115,8 +1115,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             _('This information is seen by the recipient if you send them a signed payment request.'),
             '\n\n',
             _('For on-chain requests, the address gets reserved until expiration. After that, it might get reused.'), ' ',
-            _('The bitcoin address never expires and will always be part of this electrum wallet.'), ' ',
-            _('You can reuse a bitcoin address any number of times but it is not good for your privacy.'),
+            _('The vertcoin address never expires and will always be part of this electrum wallet.'), ' ',
+            _('You can reuse a vertcoin address any number of times but it is not good for your privacy.'),
             '\n\n',
             _('For Lightning requests, payments will not be accepted after the expiration.'),
         ])
@@ -1131,7 +1131,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.clear_invoice_button = QPushButton(_('Clear'))
         self.clear_invoice_button.clicked.connect(self.clear_receive_tab)
         self.create_invoice_button = QPushButton(_('New Address'))
-        self.create_invoice_button.setIcon(read_QIcon("bitcoin.png"))
+        self.create_invoice_button.setIcon(read_QIcon("vertcoin.png"))
         self.create_invoice_button.setToolTip('Create on-chain request')
         self.create_invoice_button.clicked.connect(lambda: self.create_invoice(False))
         self.receive_buttons = buttons = QHBoxLayout()
@@ -1370,9 +1370,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.payto_e = PayToEdit(self)
         self.payto_e.addPasteButton(self.app)
         msg = (_("Recipient of the funds.") + "\n\n"
-               + _("You may enter a Bitcoin address, a label from your list of contacts "
+               + _("You may enter a Vertcoin address, a label from your list of contacts "
                    "(a list of completions will be proposed), "
-                   "or an alias (email-like address that forwards to a Bitcoin address)") + ". "
+                   "or an alias (email-like address that forwards to a Vertcoin address)") + ". "
                + _("Lightning invoices are also supported.") + "\n\n"
                + _("You can also pay to many outputs in a single transaction, "
                    "specifying one output per line.") + "\n" + _("Format: address, amount") + "\n"
@@ -1529,7 +1529,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
         for o in outputs:
             if o.scriptpubkey is None:
-                self.show_error(_('Bitcoin Address is None'))
+                self.show_error(_('Vertcoin Address is None'))
                 return True
             if o.value is None:
                 self.show_error(_('Invalid Amount'))
@@ -2506,7 +2506,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                 else:
                     msg = _("Your channels cannot be recovered from seed. "
                             "This means that you must save a backup of your wallet everytime you create a new channel.\n\n"
-                            "If you want to have recoverable channels, you must create a new wallet with an Electrum seed")
+                            "If you want to have recoverable channels, you must create a new wallet with an Electrum-VTC seed")
                 grid.addWidget(HelpButton(msg), 5, 3)
             grid.addWidget(WWLabel(_('Lightning Node ID:')), 7, 0)
             # TODO: ButtonsLineEdit should have a addQrButton method
@@ -2666,14 +2666,14 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                 "private key, and verifying with the corresponding public key. The "
                 "address you have entered does not have a unique public key, so these "
                 "operations cannot be performed.") + '\n\n' + \
-               _('The operation is undefined. Not just in Electrum, but in general.')
+               _('The operation is undefined. Not just in Electrum-VTC, but in general.')
 
     @protected
     def do_sign(self, address, message, signature, password):
         address  = address.text().strip()
         message = message.toPlainText().strip()
         if not bitcoin.is_address(address):
-            self.show_message(_('Invalid Bitcoin address.'))
+            self.show_message(_('Invalid Vertcoin address.'))
             return
         if self.wallet.is_watching_only():
             self.show_message(_('This is a watching-only wallet.'))
@@ -2701,7 +2701,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         address  = address.text().strip()
         message = message.toPlainText().strip().encode('utf-8')
         if not bitcoin.is_address(address):
-            self.show_message(_('Invalid Bitcoin address.'))
+            self.show_message(_('Invalid Vertcoin address.'))
             return
         try:
             # This can throw on invalid base64
@@ -2834,7 +2834,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         try:
             return tx_from_any(data)
         except BaseException as e:
-            self.show_critical(_("Electrum was unable to parse your transaction") + ":\n" + repr(e))
+            self.show_critical(_("Electrum-VTC was unable to parse your transaction") + ":\n" + repr(e))
             return
 
     def import_channel_backup(self, encrypted: str):
@@ -2882,7 +2882,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             with open(fileName, "rb") as f:
                 file_content = f.read()  # type: Union[str, bytes]
         except (ValueError, IOError, os.error) as reason:
-            self.show_critical(_("Electrum was unable to open your transaction file") + "\n" + str(reason),
+            self.show_critical(_("Electrum-VTC was unable to open your transaction file") + "\n" + str(reason),
                                title=_("Unable to read file or no transaction found"))
             return
         return self.tx_from_text(file_content)
@@ -2969,7 +2969,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         e.setReadOnly(True)
         vbox.addWidget(e)
 
-        defaultname = 'electrum-private-keys.csv'
+        defaultname = 'electrum-vtc-private-keys.csv'
         select_msg = _('Select file to export your private keys to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -3027,7 +3027,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             self.do_export_privkeys(filename, private_keys, csv_button.isChecked())
         except (IOError, os.error) as reason:
             txt = "\n".join([
-                _("Electrum was unable to produce a private key-export."),
+                _("Electrum-VTC was unable to produce a private key-export."),
                 str(reason)
             ])
             self.show_critical(txt, title=_("Unable to create csv"))
@@ -3209,7 +3209,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             self.fx.trigger_update()
         run_hook('close_settings_dialog')
         if d.need_restart:
-            self.show_warning(_('Please restart Electrum to activate the new GUI settings'), title=_('Success'))
+            self.show_warning(_('Please restart Electrum-VTC to activate the new GUI settings'), title=_('Success'))
 
     def closeEvent(self, event):
         # note that closeEvent is NOT called if the user quits with Ctrl-C
@@ -3243,7 +3243,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.gui_object.close_window(self)
 
     def plugins_dialog(self):
-        self.pluginsdialog = d = WindowModalDialog(self, _('Electrum Plugins'))
+        self.pluginsdialog = d = WindowModalDialog(self, _('Electrum-VTC Plugins'))
 
         plugins = self.gui_object.plugins
 
@@ -3461,6 +3461,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.showing_cert_mismatch_error = True
         self.show_critical(title=_("Certificate mismatch"),
                            msg=_("The SSL certificate provided by the main server did not match the fingerprint passed in with the --serverfingerprint option.") + "\n\n" +
-                               _("Electrum will now exit."))
+                               _("Electrum-VTC will now exit."))
         self.showing_cert_mismatch_error = False
         self.close()

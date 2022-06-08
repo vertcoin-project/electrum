@@ -579,7 +579,7 @@ class DeviceMgr(ThreadJob):
             _('Electrum cannot pair with your {}.\n\n'
               'Before you request bitcoins to be sent to addresses in this '
               'wallet, ensure you can pair with your device, or that you have '
-              'its seed (and passphrase, if any).  Otherwise all bitcoins you '
+              'its seed (and passphrase, if any).  Otherwise all vertcoins you '
               'receive will be unspendable.').format(plugin.device))
 
     def unpaired_device_infos(self, handler: Optional['HardwareHandlerBase'], plugin: 'HW_PluginBase',

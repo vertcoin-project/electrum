@@ -46,7 +46,7 @@ is_android = 'ANDROID_DATA' in os.environ
 is_appimage = 'APPIMAGE' in os.environ
 # is_local: unpacked tar.gz but not pip installed, or git clone
 is_local = (not is_pyinstaller and not is_android and not is_appimage
-            and os.path.exists(os.path.join(script_dir, "electrum.desktop")))
+            and os.path.exists(os.path.join(script_dir, "electrum-vtc.desktop")))
 is_git_clone = is_local and os.path.exists(os.path.join(script_dir, ".git"))
 
 if is_git_clone:
@@ -135,7 +135,7 @@ def init_cmdline(config_options, wallet_path, server, *, config: 'SimpleConfig')
 
     if cmd.requires_wallet and not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'electrum-vtc create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys_exit(1)
 
     # important warning
@@ -317,7 +317,7 @@ def main():
     # config is an object passed to the various constructors (wallet, interface, gui)
     if is_android:
         from jnius import autoclass
-        build_config = autoclass("org.electrum.electrum.BuildConfig")
+        build_config = autoclass("org.vertcoin.electrum-vtc.BuildConfig")
         config_options = {
             'verbosity': '*' if build_config.DEBUG else '',
             'cmd': 'gui',
@@ -457,7 +457,7 @@ def handle_cmd(*, cmdname: str, config: 'SimpleConfig', config_options: dict):
             try:
                 result = daemon.request(config, 'run_cmdline', (config_options,), timeout)
             except daemon.DaemonNotRunning:
-                print_msg("Daemon not running; try 'electrum daemon -d'")
+                print_msg("Daemon not running; try 'electrum-vtc daemon -d'")
                 if not cmd.requires_network:
                     print_msg("To run this command without a daemon, use --offline")
                 sys_exit(1)

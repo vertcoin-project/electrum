@@ -82,11 +82,11 @@ def all_subclasses(cls) -> Set:
 ca_path = certifi.where()
 
 
-base_units = {'BTC':8, 'mBTC':5, 'bits':2, 'sat':0}
+base_units = {'VTC':8, 'mVTC':5, 'bits':2, 'sat':0}
 base_units_inverse = inv_dict(base_units)
-base_units_list = ['BTC', 'mBTC', 'bits', 'sat']  # list(dict) does not guarantee order
+base_units_list = ['VTC', 'mVTC', 'bits', 'sat']  # list(dict) does not guarantee order
 
-DECIMAL_POINT_DEFAULT = 5  # mBTC
+DECIMAL_POINT_DEFAULT = 8  # mVTC
 
 
 class UnknownBaseUnit(Exception): pass
@@ -821,44 +821,20 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'Bitupper Explorer': ('https://bitupper.com/en/explorer/bitcoin/',
-                        {'tx': 'transactions/', 'addr': 'addresses/'}),
-    'Bitflyer.jp': ('https://chainflyer.bitflyer.jp/',
-                        {'tx': 'Transaction/', 'addr': 'Address/'}),
-    'Blockchain.info': ('https://blockchain.com/btc/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'blockchainbdgpzk.onion': ('https://blockchainbdgpzk.onion/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'Blockstream.info': ('https://blockstream.info/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'Bitaps.com': ('https://btc.bitaps.com/',
-                        {'tx': '', 'addr': ''}),
-    'BTC.com': ('https://btc.com/',
-                        {'tx': '', 'addr': ''}),
-    'Chain.so': ('https://www.chain.so/',
-                        {'tx': 'tx/BTC/', 'addr': 'address/BTC/'}),
-    'Insight.is': ('https://insight.bitpay.com/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'TradeBlock.com': ('https://tradeblock.com/blockchain/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'BlockCypher.com': ('https://live.blockcypher.com/btc/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'Blockchair.com': ('https://blockchair.com/bitcoin/',
-                        {'tx': 'transaction/', 'addr': 'address/'}),
-    'blockonomics.co': ('https://www.blockonomics.co/',
-                        {'tx': 'api/tx?txid=', 'addr': '#/search?q='}),
-    'mempool.space': ('https://mempool.space/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'mempool.emzy.de': ('https://mempool.emzy.de/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'OXT.me': ('https://oxt.me/',
-                        {'tx': 'transaction/', 'addr': 'address/'}),
-    'smartbit.com.au': ('https://www.smartbit.com.au/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'mynode.local': ('http://mynode.local:3002/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
+    'BitInfoCharts.com': ('https://bitinfocharts.com/vertcoin/',
+                          {'tx': 'tx/', 'addr': 'address/'}),
+    'trezor.io': ('https://vtc1.trezor.io/',
+                  {'tx': 'tx/', 'addr': 'address/'}),
+    'vertcoin.org': ('https://insight.vertcoin.org/',
+                     {'tx': 'tx/', 'addr': 'address/'}),
+    'vtcblocks.com': ('https://vtcblocks.com/',
+                      {'tx': 'tx/', 'addr': 'address/'}),
+    'CCore.online': ('https://vtc.ccore.online/',
+                     {'tx': 'transaction/', 'addr': 'address/'}),
+    'cryptoID.info': ('https://chainz.cryptoid.info/vtc/',
+                      {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
     'system default': ('blockchain:/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
+                       {'tx': 'tx/', 'addr': 'address/'}),
 }
 
 testnet_block_explorers = {
@@ -952,7 +928,7 @@ def block_explorer_URL(config: 'SimpleConfig', kind: str, item: str) -> Optional
 
 
 # note: when checking against these, use .lower() to support case-insensitivity
-BITCOIN_BIP21_URI_SCHEME = 'bitcoin'
+BITCOIN_BIP21_URI_SCHEME = 'vertcoin'
 LIGHTNING_URI_SCHEME = 'lightning'
 
 
@@ -970,12 +946,12 @@ def parse_URI(uri: str, on_pr: Callable = None, *, loop=None) -> dict:
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise InvalidBitcoinURI("Not a bitcoin address")
+            raise InvalidBitcoinURI("Not a vertcoin address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
     if u.scheme.lower() != BITCOIN_BIP21_URI_SCHEME:
-        raise InvalidBitcoinURI("Not a bitcoin URI")
+        raise InvalidBitcoinURI("Not a vertcoin URI")
     address = u.path
 
     # python for android fails to parse query
@@ -992,7 +968,7 @@ def parse_URI(uri: str, on_pr: Callable = None, *, loop=None) -> dict:
     out = {k: v[0] for k, v in pq.items()}
     if address:
         if not bitcoin.is_address(address):
-            raise InvalidBitcoinURI(f"Invalid bitcoin address: {address}")
+            raise InvalidBitcoinURI(f"Invalid vertcoin address: {address}")
         out['address'] = address
     if 'amount' in out:
         am = out['amount']

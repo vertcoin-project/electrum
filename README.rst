@@ -1,41 +1,42 @@
-Electrum - Lightweight Bitcoin client
+Electrum - Lightweight Vertcoin client
 =====================================
 
-::
+Electrum-VTC is a rebase of `upstream Electrum`_ and pulls in updates regularly.
 
-  Licence: MIT Licence
-  Author: Thomas Voegtlin
-  Language: Python (>= 3.8)
-  Homepage: https://electrum.org/
+Donate VTC to support this work: `VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV`_
 
+Windows Data Directory
+ - :code:`%APPDATA%\Electrum-VTC`
+Linux/macOS Data Directory
+ - :code:`~/.electrum-vtc`
 
-.. image:: https://api.cirrus-ci.com/github/spesmilo/electrum.svg?branch=master
-    :target: https://cirrus-ci.com/github/spesmilo/electrum
-    :alt: Build Status
-.. image:: https://coveralls.io/repos/github/spesmilo/electrum/badge.svg?branch=master
-    :target: https://coveralls.io/github/spesmilo/electrum?branch=master
-    :alt: Test coverage statistics
-.. image:: https://d322cqt584bo4o.cloudfront.net/electrum/localized.svg
-    :target: https://crowdin.com/project/electrum
-    :alt: Help translate Electrum online
+If you would like hardware wallet support, see `this`_.
+
+.. _upstream Electrum: https://github.com/spesmilo/electrum
+.. _VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV: https://bitinfocharts.com/vertcoin/address/VertionJAZJ7ZMauEdXaagRb4XP7cw6FXV
 
 
+Notes for Windows users
+=======================
+
+Electrum binaries are often flagged by various anti-virus software. There is nothing we can do about it, so please stop reporting that to us. Anti-virus software uses heuristics in order to determine if a program is malware, and that often results in false positives. If you trust the developers of the project, you can verify the GPG signature of Electrum binaries, and safely ignore any anti-virus warnings. If you do not trust the developers of the project, you should build the binaries yourself, or run the software from source. Finally, if you are really concerned about malware, you should not use an operating system that relies on anti-virus software.
+
+Old versions of Windows might need to install the KB2999226 Windows update.
 
 
-
-Getting started
-===============
-
-(*If you've come here looking to simply run Electrum,* `you may download it here`_.)
-
-.. _you may download it here: https://electrum.org/#download
-
+Running from source
+================
 Electrum itself is pure Python, and so are most of the required dependencies,
 but not everything. The following sections describe how to run from source, but here
 is a TL;DR::
 
-    sudo apt-get install libsecp256k1-0
-    python3 -m pip install --user .[gui,crypto]
+    git submodule update --init
+    cd contrib/vertcoinhash-python
+    python3 setup.py install
+    cd ../..
+    ./contrib/make_verthash-dat.sh
+    python3 -m pip install --user ".[gui,crypto]"
+    ./run_electrum
 
 
 Not pure-python dependencies
@@ -94,8 +95,8 @@ Development version (git clone)
 
 Check out the code from GitHub::
 
-    git clone git://github.com/spesmilo/electrum.git
-    cd electrum
+    git clone https://github.com/vertcoin-project/electrum electrum-vtc
+    cd electrum-vtc
     git submodule update --init
 
 Run install (this should install dependencies)::

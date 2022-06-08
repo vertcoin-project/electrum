@@ -1265,8 +1265,8 @@ def eval_bool(x: str) -> bool:
 
 param_descriptions = {
     'privkey': 'Private key. Type \'?\' to get a prompt.',
-    'destination': 'Bitcoin address, contact or alias',
-    'address': 'Bitcoin address',
+    'destination': 'Vertcoin address, contact or alias',
+    'address': 'Vertcoin address',
     'seed': 'Seed phrase',
     'txid': 'Transaction ID',
     'pos': 'Position',
@@ -1369,10 +1369,10 @@ config_variables = {
     'addrequest': {
         'ssl_privkey': 'Path to your SSL private key, needed to sign the request.',
         'ssl_chain': 'Chain of SSL certificates, needed for signed requests. Put your certificate at the top and the root CA at the end',
-        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of bitcoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum.org/\')\"',
+        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of vertcoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum.org/\')\"',
     },
     'listrequests':{
-        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of bitcoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum.org/\')\"',
+        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of vertcoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum.org/\')\"',
     }
 }
 
@@ -1463,7 +1463,7 @@ def get_parser():
     subparsers = parser.add_subparsers(dest='cmd', metavar='<command>')
     # gui
     parser_gui = subparsers.add_parser('gui', description="Run Electrum's Graphical User Interface.", help="Run GUI (default)")
-    parser_gui.add_argument("url", nargs='?', default=None, help="bitcoin URI (or bip70 file)")
+    parser_gui.add_argument("url", nargs='?', default=None, help="vertcoin URI (or bip70 file)")
     parser_gui.add_argument("-g", "--gui", dest="gui", help="select graphical user interface", choices=['qt', 'kivy', 'text', 'stdio'])
     parser_gui.add_argument("-m", action="store_true", dest="hide_gui", default=False, help="hide GUI on startup")
     parser_gui.add_argument("-L", "--lang", dest="language", default=None, help="default language used in GUI")

@@ -72,7 +72,7 @@
   !define MUI_ABORTWARNING
   !define MUI_ABORTWARNING_TEXT "Are you sure you wish to abort the installation of ${PRODUCT_NAME}?"
 
-  !define MUI_ICON "c:\electrum\electrum\gui\icons\electrum.ico"
+  !define MUI_ICON "c:\electrum\electrum\gui\icons\electrum-vtc.ico"
 
 ;--------------------------------
 ;Pages
@@ -111,7 +111,7 @@ Section
 
   ;Files to pack into the installer
   File /r "dist\electrum\*.*"
-  File "c:\electrum\electrum\gui\icons\electrum.ico"
+  File "c:\electrum\electrum\gui\icons\electrum-vtc.ico"
 
   ;Store installation folder
   WriteRegStr HKCU "Software\${PRODUCT_NAME}" "" $INSTDIR
@@ -135,11 +135,11 @@ Section
   ;Links bitcoin: and lightning: URIs to Electrum
   WriteRegStr HKCU "Software\Classes\bitcoin" "" "URL:bitcoin Protocol"
   WriteRegStr HKCU "Software\Classes\bitcoin" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\bitcoin" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
+  WriteRegStr HKCU "Software\Classes\bitcoin" "DefaultIcon" "$\"$INSTDIR\electrum-vtc.ico, 0$\""
   WriteRegStr HKCU "Software\Classes\bitcoin\shell\open\command" "" "$\"$INSTDIR\electrum-${PRODUCT_VERSION}.exe$\" $\"%1$\""
   WriteRegStr HKCU "Software\Classes\lightning" "" "URL:lightning Protocol"
   WriteRegStr HKCU "Software\Classes\lightning" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\lightning" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
+  WriteRegStr HKCU "Software\Classes\lightning" "DefaultIcon" "$\"$INSTDIR\electrum-vtc.ico, 0$\""
   WriteRegStr HKCU "Software\Classes\lightning\shell\open\command" "" "$\"$INSTDIR\electrum-${PRODUCT_VERSION}.exe$\" $\"%1$\""
 
   ;Adds an uninstaller possibility to Windows Uninstall or change a program section
@@ -148,7 +148,7 @@ Section
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
-  WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\electrum.ico"
+  WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\electrum-vtc.ico"
 
   ;Fixes Windows broken size estimates
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2

@@ -5,7 +5,7 @@
 build/
 dist/
 *.egg/
-Electrum.egg-info/
+Electrum_VTC.egg-info/
 electrum_vtc/locale/
 .devlocaltmp/
 *_trial_temp
@@ -54,3 +54,11 @@ electrum_vtc/*.so.0
 electrum_vtc/*.dll
 electrum_vtc/*.dylib
 contrib/osx/*.dylib
+
+electrum_vtc/create-verthash-datafile*
+contrib/vertcoinhash-python
+contrib/build-wine/sign.sh/
+contrib/release.sh/
+build*
+newenv/
+*.dat
