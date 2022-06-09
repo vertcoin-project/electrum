@@ -50,12 +50,12 @@ class BaseCrashReporter(Logger):
   <li>Locale: {locale}</li>
 </ul>
     """
-    CRASH_MESSAGE = _('Something went wrong while executing Electrum.')
+    CRASH_MESSAGE = _('Something went wrong while executing Electrum-VTC.')
     CRASH_TITLE = _('Sorry!')
     REQUEST_HELP_MESSAGE = _('To help us diagnose and fix the problem, you can send us a bug report that contains '
                              'useful debug information:')
     DESCRIBE_ERROR_MESSAGE = _("Please briefly describe what led to the error (optional):")
-    ASK_CONFIRM_SEND = _("Do you want to send this report?")
+    ASK_CONFIRM_SEND = _("Please copy the debug information and post an issue on GitHub.")
     USER_COMMENT_PLACEHOLDER = _("Do not enter sensitive/private information here. "
                                  "The report will be visible on the public issue tracker.")
 

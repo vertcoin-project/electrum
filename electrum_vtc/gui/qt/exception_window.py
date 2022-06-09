@@ -52,7 +52,7 @@ class Exception_Window(BaseCrashReporter, QWidget, MessageBoxMixin, Logger):
         self.config = config
 
         QWidget.__init__(self)
-        self.setWindowTitle('Electrum - ' + _('An Error Occurred'))
+        self.setWindowTitle('Electrum-VTC - ' + _('An Error Occurred'))
         self.setMinimumSize(600, 300)
 
         Logger.__init__(self)
@@ -73,29 +73,29 @@ class Exception_Window(BaseCrashReporter, QWidget, MessageBoxMixin, Logger):
 
         main_box.addWidget(collapse_info)
 
-        main_box.addWidget(QLabel(BaseCrashReporter.DESCRIBE_ERROR_MESSAGE))
+        # main_box.addWidget(QLabel(BaseCrashReporter.DESCRIBE_ERROR_MESSAGE))
 
         self.description_textfield = QTextEdit()
         self.description_textfield.setFixedHeight(50)
-        self.description_textfield.setPlaceholderText(self.USER_COMMENT_PLACEHOLDER)
-        main_box.addWidget(self.description_textfield)
+        # self.description_textfield.setPlaceholderText(self.USER_COMMENT_PLACEHOLDER)
+        # main_box.addWidget(self.description_textfield)
 
         main_box.addWidget(QLabel(BaseCrashReporter.ASK_CONFIRM_SEND))
 
         buttons = QHBoxLayout()
 
-        report_button = QPushButton(_('Send Bug Report'))
-        report_button.clicked.connect(self.send_report)
-        report_button.setIcon(read_QIcon("tab_send.png"))
-        buttons.addWidget(report_button)
-
-        never_button = QPushButton(_('Never'))
-        never_button.clicked.connect(self.show_never)
-        buttons.addWidget(never_button)
-
-        close_button = QPushButton(_('Not Now'))
-        close_button.clicked.connect(self.close)
-        buttons.addWidget(close_button)
+        # report_button = QPushButton(_('Send Bug Report'))
+        # report_button.clicked.connect(self.send_report)
+        # report_button.setIcon(read_QIcon("tab_send.png"))
+        # buttons.addWidget(report_button)
+        # 
+        # never_button = QPushButton(_('Never'))
+        # never_button.clicked.connect(self.show_never)
+        # buttons.addWidget(never_button)
+        # 
+        # close_button = QPushButton(_('Not Now'))
+        # close_button.clicked.connect(self.close)
+        # buttons.addWidget(close_button)
 
         main_box.addLayout(buttons)
 

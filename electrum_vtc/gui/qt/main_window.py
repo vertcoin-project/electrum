@@ -234,7 +234,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                 tabs.addTab(tab, icon, description.replace("&", ""))
 
         add_optional_tab(tabs, self.addresses_tab, read_QIcon("tab_addresses.png"), _("&Addresses"), "addresses")
-        add_optional_tab(tabs, self.channels_tab, read_QIcon("lightning.png"), _("Channels"), "channels")
+        # add_optional_tab(tabs, self.channels_tab, read_QIcon("lightning.png"), _("Channels"), "channels")
         add_optional_tab(tabs, self.utxo_tab, read_QIcon("tab_coins.png"), _("Co&ins"), "utxo")
         add_optional_tab(tabs, self.contacts_tab, read_QIcon("tab_contacts.png"), _("Con&tacts"), "contacts")
         add_optional_tab(tabs, self.console_tab, read_QIcon("tab_console.png"), _("Con&sole"), "console")
@@ -298,11 +298,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         self.fetch_alias()
 
         # If the option hasn't been set yet
-        if config.get('check_updates') is None:
-            choice = self.question(title="Electrum - " + _("Enable update check"),
-                                   msg=_("For security reasons we advise that you always use the latest version of Electrum.") + " " +
-                                       _("Would you like to be notified when there is a newer version of Electrum available?"))
-            config.set_key('check_updates', bool(choice), save=True)
+        # if config.get('check_updates') is None:
+        #     choice = self.question(title="Electrum - " + _("Enable update check"),
+        #                            msg=_("For security reasons we advise that you always use the latest version of Electrum.") + " " +
+        #                                _("Would you like to be notified when there is a newer version of Electrum available?"))
+        #     config.set_key('check_updates', bool(choice), save=True)
 
         self._update_check_thread = None
         if config.get('check_updates', False):
@@ -724,9 +724,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         contacts_menu.addAction(_("&New"), self.new_contact_dialog)
         contacts_menu.addAction(_("Import"), lambda: self.import_contacts())
         contacts_menu.addAction(_("Export"), lambda: self.export_contacts())
-        invoices_menu = wallet_menu.addMenu(_("Invoices"))
-        invoices_menu.addAction(_("Import"), lambda: self.import_invoices())
-        invoices_menu.addAction(_("Export"), lambda: self.export_invoices())
+        # invoices_menu = wallet_menu.addMenu(_("Invoices"))
+        # invoices_menu.addAction(_("Import"), lambda: self.import_invoices())
+        # invoices_menu.addAction(_("Export"), lambda: self.export_invoices())
         requests_menu = wallet_menu.addMenu(_("Requests"))
         requests_menu.addAction(_("Import"), lambda: self.import_requests())
         requests_menu.addAction(_("Export"), lambda: self.export_requests())
@@ -742,7 +742,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         view_menu = menubar.addMenu(_("&View"))
         add_toggle_action(view_menu, self.addresses_tab)
         add_toggle_action(view_menu, self.utxo_tab)
-        add_toggle_action(view_menu, self.channels_tab)
+        # add_toggle_action(view_menu, self.channels_tab)
         add_toggle_action(view_menu, self.contacts_tab)
         add_toggle_action(view_menu, self.console_tab)
 
@@ -778,7 +778,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
 
         help_menu = menubar.addMenu(_("&Help"))
         help_menu.addAction(_("&About"), self.show_about)
-        help_menu.addAction(_("&Check for updates"), self.show_update_check)
+        # help_menu.addAction(_("&Check for updates"), self.show_update_check)
         help_menu.addAction(_("&Official website"), lambda: webopen("https://vertcoin.org"))
         help_menu.addSeparator()
         help_menu.addAction(_("&Documentation"), lambda: webopen("http://docs.electrum.org/")).setShortcut(QKeySequence.HelpContents)
@@ -821,7 +821,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         webopen('file:///' + filename)
 
     def show_update_check(self, version=None):
-        self.gui_object._update_check = UpdateCheck(latest_version=version)
+        return False
 
     def show_report_bug(self):
         msg = ' '.join([
@@ -2526,7 +2526,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
                 grid.addWidget(button, 5, 3)
             else:
                 grid.addWidget(WWLabel(_("Not available for this wallet.")), 5, 1)
-                grid.addWidget(HelpButton(_("Lightning is currently restricted to HD wallets with p2wpkh addresses.")), 5, 2)
+                grid.addWidget(HelpButton(_("No BOLT compatible implementation has been ported for VTC, yet.")), 5, 2)
         vbox.addLayout(grid)
 
         labels_clayout = None
