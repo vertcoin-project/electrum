@@ -1,10 +1,18 @@
-# Release 4.2.2 - (April 20, 2022)
+# Release 4.2.2 - (June 10, 2022)
  * Binaries
    - verthash.dat is now created by Electrum-VTC using 'create-verthash-datafile',
-     an executable made by the vertcoinhash-python submodule located in /contrib
+     an executable made by vertcoinhash-python
    - ./contrib/make_verthash-dat.sh script builds 'create-verthash-datafile' to inner 'electrum_vtc' directory
    - Vertcoin-Core and Vertcoin-OCM data directories are checked for existing verthash.dat in lieu of creation
- * Merge upstream changes
+ * Hardware wallets:
+   - smarter pairing during sign_transaction (238619f1)
+   - keepkey: fix pairing with device using a workaround (#7779)
+ * fix AppImage failing to run on certain systems (#7784)
+ * fix "Automated BIP39 recovery" not scanning change paths (#7804)
+ * bypass network proxy for localhost electrum server (#3126)
+ * security fix: remove support of "file://" URIs from BIP70 payment
+   requests, which could be used to trigger "open()" on arbitrary files
+   (see https://github.com/spesmilo/electrum/security/advisories/GHSA-4fh4-hx35-r355)
 
 # Release 4.2.1 - (March 26, 2022)
  * Binaries:
