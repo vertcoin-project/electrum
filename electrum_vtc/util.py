@@ -86,7 +86,7 @@ base_units = {'VTC':8, 'mVTC':5, 'bits':2, 'sat':0}
 base_units_inverse = inv_dict(base_units)
 base_units_list = ['VTC', 'mVTC', 'bits', 'sat']  # list(dict) does not guarantee order
 
-DECIMAL_POINT_DEFAULT = 8  # mVTC
+DECIMAL_POINT_DEFAULT = 5  # mVTC
 
 
 class UnknownBaseUnit(Exception): pass
@@ -928,7 +928,7 @@ def block_explorer_URL(config: 'SimpleConfig', kind: str, item: str) -> Optional
 
 
 # note: when checking against these, use .lower() to support case-insensitivity
-BITCOIN_BIP21_URI_SCHEME = 'vertcoin'
+BITCOIN_BIP21_URI_SCHEME = 'bitcoin'
 LIGHTNING_URI_SCHEME = 'lightning'
 
 
