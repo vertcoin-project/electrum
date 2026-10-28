@@ -4,14 +4,14 @@
 
 import asyncio
 
-from electrum import blockchain, util
-from electrum.blockchain import Blockchain
-from electrum.fee_policy import FeeTimeEstimates, FEE_ETA_TARGETS
-from electrum.interface import Interface, ServerAddr
-from electrum.simple_config import SimpleConfig
-from electrum.transaction import Transaction
-from electrum.util import OldTaskGroup
-from electrum.wallet import Abstract_Wallet
+from electrum_vtc import blockchain, util
+from electrum_vtc.blockchain import Blockchain
+from electrum_vtc.fee_policy import FeeTimeEstimates, FEE_ETA_TARGETS
+from electrum_vtc.interface import Interface, ServerAddr
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.transaction import Transaction
+from electrum_vtc.util import OldTaskGroup
+from electrum_vtc.wallet import Abstract_Wallet
 
 from .toyserver import ToyServer
 

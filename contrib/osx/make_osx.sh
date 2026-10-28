@@ -155,7 +155,7 @@ else
     info "Building libsecp256k1 dylib..."
     "$CONTRIB"/make_libsecp256k1.sh || fail "Could not build libsecp"
 fi
-cp -f "$DLL_TARGET_DIR"/libsecp256k1.*.dylib "$PROJECT_ROOT/electrum" || fail "Could not copy libsecp256k1 dylib"
+cp -f "$DLL_TARGET_DIR"/libsecp256k1.*.dylib "$PROJECT_ROOT/electrum_vtc" || fail "Could not copy libsecp256k1 dylib"
 
 if [ ! -f "$DLL_TARGET_DIR/libZXing.dylib" ]; then
     info "Building zxing-cpp dylib..."
@@ -217,7 +217,7 @@ find "$VENV_DIR/lib/python$PY_VER_MAJOR/site-packages/" -type f -name '*.so' -pr
 info "Faking timestamps..."
 find . -exec touch -t '200101220000' {} + || true
 
-# note: no --dirty, as we have dirtied electrum/locale/ ourselves.
+# note: no --dirty, as we have dirtied electrum_vtc/locale/ ourselves.
 VERSION=$(git describe --tags --always)
 
 info "Building binary"

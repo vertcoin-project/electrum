@@ -1,20 +1,20 @@
 import os
 from unittest import mock
 
-from electrum import SimpleConfig
-from electrum.interface import ServerAddr
-from electrum.keystore import bip44_derivation, Hardware_KeyStore, KeyStore, BIP32_KeyStore
-from electrum.network import NetworkParameters, ProxySettings
-from electrum.plugin import Plugins, DeviceInfo, Device
-from electrum.wizard import ServerConnectWizard, NewWalletWizard, WizardViewState, KeystoreWizard
-from electrum.daemon import Daemon
-from electrum.wallet import Abstract_Wallet, Deterministic_Wallet, restore_wallet_from_text
-from electrum import util
-from electrum.util import InvalidPassword
-from electrum import slip39
-from electrum.bip32 import KeyOriginInfo
-from electrum import keystore
-from electrum.storage import WalletStorage
+from electrum_vtc import SimpleConfig
+from electrum_vtc.interface import ServerAddr
+from electrum_vtc.keystore import bip44_derivation, Hardware_KeyStore, KeyStore, BIP32_KeyStore
+from electrum_vtc.network import NetworkParameters, ProxySettings
+from electrum_vtc.plugin import Plugins, DeviceInfo, Device
+from electrum_vtc.wizard import ServerConnectWizard, NewWalletWizard, WizardViewState, KeystoreWizard
+from electrum_vtc.daemon import Daemon
+from electrum_vtc.wallet import Abstract_Wallet, Deterministic_Wallet, restore_wallet_from_text
+from electrum_vtc import util
+from electrum_vtc.util import InvalidPassword
+from electrum_vtc import slip39
+from electrum_vtc.bip32 import KeyOriginInfo
+from electrum_vtc import keystore
+from electrum_vtc.storage import WalletStorage
 
 from . import ElectrumTestCase
 from .test_wallet_vertical import UNICODE_HORROR, WalletIntegrityHelper

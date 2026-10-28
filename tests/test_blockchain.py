@@ -1,10 +1,10 @@
 from pathlib import Path
 import os
 
-from electrum import constants
-from electrum.simple_config import SimpleConfig
-from electrum.blockchain import Blockchain, deserialize_header, hash_header, InvalidHeader, BlockchainManager
-from electrum.util import bfh
+from electrum_vtc import constants
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.blockchain import Blockchain, deserialize_header, hash_header, InvalidHeader, BlockchainManager
+from electrum_vtc.util import bfh
 
 from . import ElectrumTestCase
 

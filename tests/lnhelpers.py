@@ -7,28 +7,28 @@ from decimal import Decimal
 from pprint import pformat
 from typing import NamedTuple, Tuple, Dict, Mapping, TYPE_CHECKING, Sequence
 
-import electrum
-import electrum.trampoline
-from electrum import (
+import electrum_vtc
+import electrum_vtc.trampoline
+from electrum_vtc import (
     bitcoin, lnpeer, lnchannel, lnutil, util,
 )
-from electrum.coinchooser import PRNG
-from electrum.network import ProxySettings
-from electrum.bitcoin import COIN, sha256
-from electrum.bolt11 import encode_bolt11_invoice, BOLT11Addr, decode_bolt11_invoice
-from electrum.invoices import PR_UNPAID, Invoice, LN_EXPIRY_NEVER
-from electrum.lnpeer import Peer
-from electrum.lnutil import (
+from electrum_vtc.coinchooser import PRNG
+from electrum_vtc.network import ProxySettings
+from electrum_vtc.bitcoin import COIN, sha256
+from electrum_vtc.bolt11 import encode_bolt11_invoice, BOLT11Addr, decode_bolt11_invoice
+from electrum_vtc.invoices import PR_UNPAID, Invoice, LN_EXPIRY_NEVER
+from electrum_vtc.lnpeer import Peer
+from electrum_vtc.lnutil import (
     LnFeatures, PaymentFeeBudget, LOCAL, REMOTE, ChannelType, ChannelConfig, ChannelKeys,
     RECEIVED,
 )
-from electrum.lnchannel import ChannelState, Channel
-from electrum.lnrouter import LNPathFinder
-from electrum.channel_db import ChannelDB
-from electrum.lnworker import LNWallet, PaySession, PaymentInfo
-from electrum.simple_config import SimpleConfig
-from electrum.fee_policy import FeeTimeEstimates, FEE_ETA_TARGETS
-from electrum.wallet import  Standard_Wallet
+from electrum_vtc.lnchannel import ChannelState, Channel
+from electrum_vtc.lnrouter import LNPathFinder
+from electrum_vtc.channel_db import ChannelDB
+from electrum_vtc.lnworker import LNWallet, PaySession, PaymentInfo
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.fee_policy import FeeTimeEstimates, FEE_ETA_TARGETS
+from electrum_vtc.wallet import  Standard_Wallet
 
 from . import restore_wallet_from_text__for_unittest
 
@@ -209,11 +209,11 @@ class MockLNGossip:
         return None, None, None
 
 
-class MockWalletFactory(electrum.wallet.Wallet):
+class MockWalletFactory(electrum_vtc.wallet.Wallet):
 
     @staticmethod
     def wallet_class(wallet_type):
-        real_wallet_class = electrum.wallet.Wallet.wallet_class(wallet_type)
+        real_wallet_class = electrum_vtc.wallet.Wallet.wallet_class(wallet_type)
         if real_wallet_class is Standard_Wallet:
             return MockStandardWallet
         return real_wallet_class

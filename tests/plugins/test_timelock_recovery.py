@@ -2,15 +2,15 @@ from io import StringIO
 import os
 import sys
 
-from electrum.bitcoin import address_to_script
-from electrum.fee_policy import FixedFeePolicy
-from electrum.simple_config import SimpleConfig
-from electrum.storage import WalletStorage
-from electrum.transaction import PartialTxOutput
-from electrum.wallet import Wallet
-from electrum.wallet_db import WalletDB
+from electrum_vtc.bitcoin import address_to_script
+from electrum_vtc.fee_policy import FixedFeePolicy
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc.transaction import PartialTxOutput
+from electrum_vtc.wallet import Wallet
+from electrum_vtc.wallet_db import WalletDB
 
-from electrum.plugins.timelock_recovery.timelock_recovery import TimelockRecoveryContext, TimelockRecoveryPlugin
+from electrum_vtc.plugins.timelock_recovery.timelock_recovery import TimelockRecoveryContext, TimelockRecoveryPlugin
 
 from .. import ElectrumTestCase
 

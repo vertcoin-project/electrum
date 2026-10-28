@@ -6,26 +6,26 @@ from typing import Sequence
 import asyncio
 import copy
 
-from electrum import bitcoin, keystore, bip32, slip39
-from electrum.wallet_db import WalletDB
-from electrum.storage import WalletStorage
-from electrum import SimpleConfig
-from electrum import util
-from electrum.address_synchronizer import TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_UNCONF_PARENT, TX_HEIGHT_LOCAL, TX_HEIGHT_FUTURE
-from electrum.wallet import (sweep, sweep_preparations, Multisig_Wallet, Standard_Wallet, Imported_Wallet,
+from electrum_vtc import bitcoin, keystore, bip32, slip39
+from electrum_vtc.wallet_db import WalletDB
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc import SimpleConfig
+from electrum_vtc import util
+from electrum_vtc.address_synchronizer import TX_HEIGHT_UNCONFIRMED, TX_HEIGHT_UNCONF_PARENT, TX_HEIGHT_LOCAL, TX_HEIGHT_FUTURE
+from electrum_vtc.wallet import (sweep, sweep_preparations, Multisig_Wallet, Standard_Wallet, Imported_Wallet,
                              Abstract_Wallet, CannotBumpFee, BumpFeeStrategy,
                              TransactionPotentiallyDangerousException,
                              TransactionDangerousException,
                              TxSighashRiskLevel, CannotDoubleSpendTx)
-from electrum.util import (
+from electrum_vtc.util import (
     bfh, NotEnoughFunds, UnrelatedTransactionException, UserFacingException, TxMinedInfo, InvalidTxSignature,
 )
-from electrum.fee_policy import FixedFeePolicy
-from electrum.transaction import Transaction, PartialTxOutput, tx_from_any, Sighash
-from electrum.mnemonic import calc_seed_type
-from electrum.network import Network
+from electrum_vtc.fee_policy import FixedFeePolicy
+from electrum_vtc.transaction import Transaction, PartialTxOutput, tx_from_any, Sighash
+from electrum_vtc.mnemonic import calc_seed_type
+from electrum_vtc.network import Network
 
-from electrum.plugins.trustedcoin import trustedcoin
+from electrum_vtc.plugins.trustedcoin import trustedcoin
 
 from . import ElectrumTestCase
 from . import restore_wallet_from_text__for_unittest
@@ -100,7 +100,7 @@ class WalletIntegrityHelper:
 
 def read_test_vector(filename: str):
     import os
-    from electrum.util import read_json_file
+    from electrum_vtc.util import read_json_file
     path = os.path.join(os.path.dirname(__file__), filename)
     data = read_json_file(path)
     return data

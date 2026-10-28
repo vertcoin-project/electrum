@@ -1,7 +1,7 @@
-[submodule "electrum/locale"]
-    path = electrum/locale
+[submodule "electrum_vtc/locale"]
+	path = electrum_vtc/locale
     url = https://github.com/spesmilo/electrum-locale
     ignore = dirty
-[submodule "electrum/plugins/keepkey/keepkeylib"]
-    path = electrum/plugins/keepkey/keepkeylib
+[submodule "electrum_vtc/plugins/keepkey/keepkeylib"]
+	path = electrum_vtc/plugins/keepkey/keepkeylib
     url = https://github.com/spesmilo/electrum-keepkeylib.git

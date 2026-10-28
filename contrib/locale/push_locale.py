@@ -51,7 +51,7 @@ if not os.path.exists(build_dir):
     os.mkdir(build_dir)
 
 # add .py files
-files_list = glob.glob("electrum/**/*.py", recursive=True)
+files_list = glob.glob("electrum_vtc/**/*.py", recursive=True)
 files_list = sorted(files_list)  # makes output deterministic across CI runs
 with open(f"{build_dir}/app.fil", "w", encoding="utf-8") as f:
     for item in files_list:
@@ -65,7 +65,7 @@ cmd = ["xgettext", "--from-code", "UTF-8", "--language", "Python", "--no-wrap", 
 subprocess.check_output(cmd)
 
 # add QML translations
-files_list = glob.glob("electrum/gui/qml/**/*.qml", recursive=True)
+files_list = glob.glob("electrum_vtc/gui/qml/**/*.qml", recursive=True)
 files_list = sorted(files_list)  # makes output deterministic across CI runs
 with open(f"{build_dir}/qml.lst", "w", encoding="utf-8") as f:
     for item in files_list:
@@ -83,7 +83,7 @@ subprocess.check_output(cmd)
 
 print("Fixing some paths in messages_qml.pot")
 #  sed from " ../../gui/qml/"
-#      to   " electrum/gui/qml/"
+#      to   " electrum_vtc/gui/qml/"
 cmd = ["sed", "-i", r"s/ ..\/..\/gui\/qml\// electrum\/gui\/qml\//g", f"{build_dir}/messages_qml.pot"]
 subprocess.check_output(cmd)
 

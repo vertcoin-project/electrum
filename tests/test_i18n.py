@@ -1,5 +1,5 @@
-from electrum import i18n
-from electrum.i18n import _ensure_translation_keeps_format_string_syntax_similar
+from electrum_vtc import i18n
+from electrum_vtc.i18n import _ensure_translation_keeps_format_string_syntax_similar
 
 from . import ElectrumTestCase
 

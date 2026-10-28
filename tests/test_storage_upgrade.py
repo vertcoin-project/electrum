@@ -6,15 +6,15 @@ from typing import Optional
 import asyncio
 import inspect
 
-import electrum
-from electrum.wallet_db import (WalletDBUpgrader, WalletDB, WalletRequiresUpgrade,
+import electrum_vtc
+from electrum_vtc.wallet_db import (WalletDBUpgrader, WalletDB, WalletRequiresUpgrade,
                                 WalletRequiresSplit, FINAL_SEED_VERSION)
-from electrum.bolt11 import BOLT11DecodeException
-from electrum.wallet import Wallet
-from electrum import constants
-from electrum import util
-from electrum.plugin import Plugins
-from electrum.simple_config import SimpleConfig
+from electrum_vtc.bolt11 import BOLT11DecodeException
+from electrum_vtc.wallet import Wallet
+from electrum_vtc import constants
+from electrum_vtc import util
+from electrum_vtc.plugin import Plugins
+from electrum_vtc.simple_config import SimpleConfig
 
 from . import as_testnet, as_regtest
 from .test_wallet import WalletTestCase
@@ -430,7 +430,7 @@ class TestStorageUpgrade(WalletTestCase):
 
 ##########
 
-    plugins: 'electrum.plugin.Plugins'
+    plugins: 'electrum_vtc.plugin.Plugins'
 
     def setUp(self):
         super().setUp()

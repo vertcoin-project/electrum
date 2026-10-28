@@ -1,4 +1,4 @@
-from electrum.fee_policy import FeeHistogram, FeePolicy
+from electrum_vtc.fee_policy import FeeHistogram, FeePolicy
 
 from . import ElectrumTestCase
 

@@ -8,13 +8,13 @@ import functools
 import inspect
 from typing import TYPE_CHECKING, Callable, List
 
-import electrum
-import electrum.logging
-from electrum import constants
-from electrum import util
-from electrum.util import OldTaskGroup
-from electrum.logging import Logger
-from electrum.wallet import restore_wallet_from_text
+import electrum_vtc
+import electrum_vtc.logging
+from electrum_vtc import constants
+from electrum_vtc import util
+from electrum_vtc.util import OldTaskGroup
+from electrum_vtc.logging import Logger
+from electrum_vtc.wallet import restore_wallet_from_text
 
 if TYPE_CHECKING:
     from .test_lnpeer import MockLNWallet
@@ -27,9 +27,9 @@ if TYPE_CHECKING:
 FAST_TESTS = False
 
 
-electrum.logging._configure_stderr_logging(verbosity="*")
+electrum_vtc.logging._configure_stderr_logging(verbosity="*")
 
-electrum.util.AS_LIB_USER_I_WANT_TO_MANAGE_MY_OWN_ASYNCIO_LOOP = True
+electrum_vtc.util.AS_LIB_USER_I_WANT_TO_MANAGE_MY_OWN_ASYNCIO_LOOP = True
 
 
 class ElectrumTestCase(unittest.IsolatedAsyncioTestCase, Logger):

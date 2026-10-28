@@ -27,25 +27,25 @@ source.exclude_dirs =
     env,
     tests,
     fastlane,
-    electrum/www,
-    electrum/scripts,
-    electrum/utils,
-    electrum/gui/qt,
-    electrum/plugins/audio_modem,
-    electrum/plugins/bitbox02,
-    electrum/plugins/coldcard,
-    electrum/plugins/digitalbitbox,
-    electrum/plugins/jade,
-    electrum/plugins/keepkey,
-    electrum/plugins/ledger,
-    electrum/plugins/nwc,
-    electrum/plugins/payserver,
-    electrum/plugins/revealer,
-    electrum/plugins/safe_t,
-    electrum/plugins/swapserver,
-    electrum/plugins/timelock_recovery,
-    electrum/plugins/trezor,
-    electrum/plugins/watchtower,
+    electrum_vtc/www,
+    electrum_vtc/scripts,
+    electrum_vtc/utils,
+    electrum_vtc/gui/qt,
+    electrum_vtc/plugins/audio_modem,
+    electrum_vtc/plugins/bitbox02,
+    electrum_vtc/plugins/coldcard,
+    electrum_vtc/plugins/digitalbitbox,
+    electrum_vtc/plugins/jade,
+    electrum_vtc/plugins/keepkey,
+    electrum_vtc/plugins/ledger,
+    electrum_vtc/plugins/nwc,
+    electrum_vtc/plugins/payserver,
+    electrum_vtc/plugins/revealer,
+    electrum_vtc/plugins/safe_t,
+    electrum_vtc/plugins/swapserver,
+    electrum_vtc/plugins/timelock_recovery,
+    electrum_vtc/plugins/trezor,
+    electrum_vtc/plugins/watchtower,
     packages/qdarkstyle,
     packages/qtpy,
     packages/bin,
@@ -56,7 +56,7 @@ source.exclude_dirs =
 # (list) List of exclusions using pattern matching
 source.exclude_patterns = Makefile,setup*,
     # the android zxing scanner is built through the p4a recipe
-    electrum/libZXing.*,
+    electrum_vtc/libZXing.*,
     # not reproducible:
     packages/aiohttp-*.dist-info/*,
     packages/frozenlist-*.dist-info/*
@@ -158,7 +158,7 @@ android.add_jars = .buildozer/android/platform/*/build/libs_collections/Electrum
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
-android.add_src = electrum/gui/qml/java_classes/
+android.add_src = electrum_vtc/gui/qml/java_classes/
 
 # (bool) Enable AndroidX support. We don't use any androidx packages, keep it
 # disabled so gradle fails the build if one gets pulled in.
@@ -176,7 +176,7 @@ android.add_activities = org.electrum.biometry.BiometricActivity
 # 3) A directory, here 'legal_resources' must contain one or more directories,
 # each of a resource kind:  drawable, xml, etc...
 # android.add_resources = legal_resources
-android.add_resources = electrum/gui/icons/electrum_light_icon.png:drawable
+android.add_resources = electrum_vtc/gui/icons/electrum_light_icon.png:drawable
 
 # (str) python-for-android branch to use, if not master, useful to try
 # not yet merged features.

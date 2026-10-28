@@ -9,35 +9,35 @@ from typing import Callable, Optional, Sequence
 
 import electrum_ecc as ecc
 
-from electrum.address_synchronizer import TX_HEIGHT_LOCAL
-from electrum import bitcoin, keystore
-from electrum.bitcoin import COIN
-import electrum.trampoline
-from electrum.channel_db import UpdateStatus
-from electrum.lnutil import (
+from electrum_vtc.address_synchronizer import TX_HEIGHT_LOCAL
+from electrum_vtc import bitcoin, keystore
+from electrum_vtc.bitcoin import COIN
+import electrum_vtc.trampoline
+from electrum_vtc.channel_db import UpdateStatus
+from electrum_vtc.lnutil import (
     RECEIVED, SENT, MIN_FINAL_CLTV_DELTA_ACCEPTED, serialize_htlc_key, LnFeatures, HTLCOwner, PaymentFailure,
     LOCAL, REMOTE, ImportedChannelBackupStorage, make_commitment_output_to_anchor_address, UpdateAddHtlc,
     NBLOCK_CLTV_DELTA_TOO_FAR_INTO_FUTURE,
 )
-from electrum.logging import console_stderr_handler
-from electrum.lnmsg import decode_msg
-from electrum.lnrouter import RouteEdge
-from electrum.bolt11 import encode_bolt11_invoice, BOLT11Addr
-from electrum.lntransport import LNPeerAddr
-from electrum.invoices import LN_EXPIRY_NEVER, PR_UNPAID, PR_INFLIGHT, Invoice
-from electrum.lnpeer import Peer
-from electrum.lnchannel import Channel, ChannelBackup, ChannelState
-from electrum.lnonion import (
+from electrum_vtc.logging import console_stderr_handler
+from electrum_vtc.lnmsg import decode_msg
+from electrum_vtc.lnrouter import RouteEdge
+from electrum_vtc.bolt11 import encode_bolt11_invoice, BOLT11Addr
+from electrum_vtc.lntransport import LNPeerAddr
+from electrum_vtc.invoices import LN_EXPIRY_NEVER, PR_UNPAID, PR_INFLIGHT, Invoice
+from electrum_vtc.lnpeer import Peer
+from electrum_vtc.lnchannel import Channel, ChannelBackup, ChannelState
+from electrum_vtc.lnonion import (
     OnionPacket, OnionRoutingFailure, OnionFailureCode, ProcessedOnionPacket, OnionHopsDataSingle,
 )
-from electrum.mpp_split import SplitConfig, SplitConfigRating
-from electrum.crypto import sha256, pw_encode_with_version_and_mac
-from electrum.simple_config import SimpleConfig
-from electrum.transaction import Transaction, TxOutpoint, BCDataStream
-from electrum.util import bfh, UserFacingException
-from electrum.storage import WalletStorage
-from electrum.wallet import Abstract_Wallet
-from electrum.wallet_db import WalletDB
+from electrum_vtc.mpp_split import SplitConfig, SplitConfigRating
+from electrum_vtc.crypto import sha256, pw_encode_with_version_and_mac
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.transaction import Transaction, TxOutpoint, BCDataStream
+from electrum_vtc.util import bfh, UserFacingException
+from electrum_vtc.storage import WalletStorage
+from electrum_vtc.wallet import Abstract_Wallet
+from electrum_vtc.wallet_db import WalletDB
 
 from . import ElectrumTestCase, lnhelpers
 from .lnhelpers import create_test_channels, find_free_port
@@ -144,14 +144,14 @@ class TestLNWallet(ElectrumTestCase):
         wallet._add_channel(chan_r)
 
         # only trampoline_peer is a known trampoline forwarder
-        electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+        electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
             'trampoline_peer': LNPeerAddr(
                 host="127.0.0.1",
                 port=9735,
                 pubkey=trampoline_pubkey,
             ),
         }
-        self.addCleanup(lambda: electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS.clear())
+        self.addCleanup(lambda: electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS.clear())
 
         amount_msat = 100_000
 
@@ -187,7 +187,7 @@ class TestLNWallet(ElectrumTestCase):
         self.assertFalse(wallet.uses_trampoline())
 
         # all peers trampoline: we signal trampoline support, even with trampoline disabled
-        electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS['regular_peer'] = LNPeerAddr(
+        electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS['regular_peer'] = LNPeerAddr(
             host="127.0.0.1",
             port=9735,
             pubkey=regular_pubkey,
@@ -206,7 +206,7 @@ class TestLNWallet(ElectrumTestCase):
         self.assertEqual(hint_node_ids2, {trampoline_pubkey, regular_pubkey})
 
         # assert only trampoline peers are included in r_tags if the invoice_features signal trampoline
-        del electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS['regular_peer']
+        del electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS['regular_peer']
         wallet.clear_invoices_cache()
         lnaddr3, _ = wallet.get_bolt11_invoice(payment_info=pi2, message='test', fallback_address=None)
         hint_node_ids3 = {route[0][0] for route in lnaddr3.get_routing_info()}
@@ -321,7 +321,7 @@ class TestLNWallet(ElectrumTestCase):
 
         wallet._cleanup_failed_jit_channel = mock.AsyncMock()
 
-        with mock.patch('electrum.lnworker.LN_P2P_NETWORK_TIMEOUT', 0.01):
+        with mock.patch('electrum_vtc.lnworker.LN_P2P_NETWORK_TIMEOUT', 0.01):
             with self.assertRaises(OnionRoutingFailure):
                 await wallet.open_channel_just_in_time(
                     next_peer=next_peer,
@@ -353,8 +353,8 @@ class TestLNWallet(ElectrumTestCase):
 
         wallet._cleanup_failed_jit_channel = mock.AsyncMock()
 
-        with mock.patch('electrum.lnworker.ZEROCONF_TIMEOUT', 0.01), \
-             mock.patch('electrum.lnworker.asyncio.sleep', new_callable=mock.AsyncMock):
+        with mock.patch('electrum_vtc.lnworker.ZEROCONF_TIMEOUT', 0.01), \
+             mock.patch('electrum_vtc.lnworker.asyncio.sleep', new_callable=mock.AsyncMock):
              with self.assertRaises(OnionRoutingFailure):
                 await wallet.open_channel_just_in_time(
                     next_peer=next_peer,
@@ -1051,10 +1051,10 @@ class TestChannelBackup(ToyServerTestCase):
 
         # the onchain backup only contains a node id prefix: bob must be findable as a hardcoded node
         bob_host, bob_port = self.bob_instance.config.LIGHTNING_LISTEN.rsplit(':', 1)
-        electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
+        electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS = {
             'bob': LNPeerAddr(host=bob_host, port=int(bob_port), pubkey=self.bob.lnworker.node_keypair.pubkey),
         }
-        self.addCleanup(lambda: electrum.trampoline._TRAMPOLINE_NODES_UNITTESTS.clear())
+        self.addCleanup(lambda: electrum_vtc.trampoline._TRAMPOLINE_NODES_UNITTESTS.clear())
         await alice.lnworker.request_force_close(chan_id)
 
         # bob force-closes with his own ctx, and alice claims her balance out of it

@@ -3,10 +3,10 @@ from typing import List
 
 import electrum_ecc as ecc
 
-from electrum import util
-from electrum import lntransport
-from electrum.lntransport import LNPeerAddr, LNResponderTransport, LNTransport, extract_nodeid, split_host_port, ConnStringFormatError
-from electrum.util import OldTaskGroup
+from electrum_vtc import util
+from electrum_vtc import lntransport
+from electrum_vtc.lntransport import LNPeerAddr, LNResponderTransport, LNTransport, extract_nodeid, split_host_port, ConnStringFormatError
+from electrum_vtc.util import OldTaskGroup
 
 from . import ElectrumTestCase
 from .test_bitcoin import needs_test_with_all_chacha20_implementations

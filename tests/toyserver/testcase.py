@@ -8,12 +8,12 @@ from dataclasses import dataclass, field
 from typing import Optional
 from unittest import mock
 
-from electrum import util
-from electrum.interface import PaddedRSTransport
-from electrum.simple_config import SimpleConfig
-from electrum.transaction import Transaction, TxOutput, TxOutpoint
-from electrum.util import wait_for2
-from electrum.wallet import Abstract_Wallet
+from electrum_vtc import util
+from electrum_vtc.interface import PaddedRSTransport
+from electrum_vtc.simple_config import SimpleConfig
+from electrum_vtc.transaction import Transaction, TxOutput, TxOutpoint
+from electrum_vtc.util import wait_for2
+from electrum_vtc.wallet import Abstract_Wallet
 
 from .. import ElectrumTestCase, restore_wallet_from_text__for_unittest
 from .toynetwork import ToyNetwork
