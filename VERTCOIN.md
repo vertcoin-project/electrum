@@ -52,6 +52,15 @@ These were treated as out of scope:
 - Tests: `tests/` imports were renamed, but the tests have not been updated for VTC.
 - Invoice import/export hiding.
 
+## Verification (2026-10-28)
+
+Test setup: vertcoind (bitcoin v32 rebase) in WSL with `-txindex`, ElectrumX 2.0 (`COIN=Vertcoin`), and Electrum-VTC on Windows (Python 3.14) with a fresh data dir and `--oneserver`. Results:
+
+- The generated `verthash.dat` has the expected sha256 and is byte-identical to vertcoind's.
+- The client reused Vertcoin Core's `verthash.dat` and fetched the 2 KGW-history chunks. It verified the 2,574 headers above the checkpoint (KGW and Verthash) and reached the tip at 2,706,029 in about 40 s. The tip hash matched vertcoind's `getblockhash`.
+- A watch-only wallet SPV-verified its history, including a transaction below the max checkpoint. Its balance matched `scantxoutset` exactly.
+- Tampered checkpoint chunks, nonces and nBits are rejected.
+
 ## Running against a local ElectrumX
 
 ```
