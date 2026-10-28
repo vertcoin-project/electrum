@@ -1,3 +1,13 @@
+# Electrum-VTC 4.8.3
+ * Rebased on Electrum 4.8.3 (see VERTCOIN.md)
+ * verthash.dat is generated natively in Python; the separate
+   create-verthash-datafile executable is no longer needed. Existing files in the
+   Electrum-VTC, Vertcoin Core and Vertcoin-OCM data directories are reused.
+ * Headers above the latest checkpoint (2703455) are fully verified:
+   Kimoto Gravity Well difficulty and Verthash proof-of-work.
+ * Standard Vertcoin Core WIF private keys can be imported again.
+ * Lightning, update checks, crash report sending and fiat rates remain disabled.
+
 # Release 4.8.3 (October 23, 2026) (security update)
  * Security fixes for reports received from:
    - dannydeezy
