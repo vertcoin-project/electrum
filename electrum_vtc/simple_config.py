@@ -659,6 +659,13 @@ class SimpleConfig(Logger):
     NETWORK_SERVER = ConfigVar('server', default=None, type_=str)
     NETWORK_NOONION = ConfigVar('noonion', default=False, type_=bool)
     NETWORK_OFFLINE = ConfigVar('offline', default=False, type_=bool)
+    VERTHASH_DATAFILE_PATH = ConfigVar(
+        'verthash_datafile', default=None, type_=str,
+        short_desc=lambda: _('Verthash datafile'),
+        long_desc=lambda: _('Path to verthash.dat. If not set, the Electrum-VTC, Vertcoin Core and '
+                            'Vertcoin-OCM data directories are searched, and the file is generated if missing.'),
+    )
+    VERTHASH_DATAFILE_VERIFIED = ConfigVar('verthash_datafile_verified', default=None, type_=str)
     NETWORK_SKIPMERKLECHECK = ConfigVar('skipmerklecheck', default=False, type_=bool)
     NETWORK_SERVERFINGERPRINT = ConfigVar('serverfingerprint', default=None, type_=str)
     NETWORK_MAX_INCOMING_MSG_SIZE = ConfigVar('network_max_incoming_msg_size', default=8_100_000, type_=int)  # in bytes

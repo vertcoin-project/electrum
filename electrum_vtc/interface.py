@@ -56,6 +56,7 @@ from . import x509
 from . import pem
 from . import version
 from . import blockchain
+from . import verthash
 from .blockchain import Blockchain, HEADER_SIZE, CHUNK_SIZE
 from . import bitcoin
 from .bitcoin import DummyAddress, DummyAddressUsedInTxException
@@ -967,10 +968,34 @@ class Interface(Logger):
             headers = await self.get_block_headers(start_height=index * CHUNK_SIZE, count=CHUNK_SIZE)
         finally:
             self._requested_chunks.discard(index)
-        conn = self.blockchain.connect_chunk(index, data=b"".join(headers))
+        conn = await asyncio.to_thread(self.blockchain.connect_chunk, index, b"".join(headers))
         if not conn:
             raise RequestCorrupted(f"chunk ({index=}, for {height=}) does not connect to blockchain")
         return None
+
+    async def _wait_for_verthash_datafile(self) -> None:
+        if verthash.datafile.is_ready():
+            return
+        self.logger.info("waiting for verthash datafile before verifying headers")
+        while not verthash.datafile.is_ready():
+            verthash.datafile.prepare_in_background(self.network.config)
+            if verthash.datafile.error:
+                raise GracefulDisconnect(f"verthash datafile unavailable: {verthash.datafile.error}")
+            await asyncio.sleep(1)
+
+    async def _ensure_kgw_history_below_max_checkpoint(self) -> None:
+        """KGW difficulty of the first headers after the max checkpoint depends on up to
+        KGW_PAST_BLOCKS_MAX previous headers, so download those checkpointed chunks.
+        """
+        max_cp = constants.net.max_checkpoint()
+        if max_cp == 0 or constants.net.TESTNET:
+            return
+        first = max(0, max_cp + 1 - blockchain.KGW_PAST_BLOCKS_MAX)
+        for index in range(first // CHUNK_SIZE, max_cp // CHUNK_SIZE + 1):
+            start = index * CHUNK_SIZE
+            if (self.blockchain.read_header(start) is None
+                    or self.blockchain.read_header(start + CHUNK_SIZE - 1) is None):
+                await self.request_chunk_below_max_checkpoint(height=start)
 
     async def _fast_forward_chain(
         self,
@@ -1009,7 +1034,7 @@ class Interface(Logger):
         num_headers = 0
         for index, task in tasks:
             headers = task.result()
-            conn = self.blockchain.connect_chunk(index, data=b"".join(headers))
+            conn = await asyncio.to_thread(self.blockchain.connect_chunk, index, b"".join(headers))
             if not conn:
                 break
             num_headers += len(headers)
@@ -1199,6 +1224,8 @@ class Interface(Logger):
     ) -> Tuple[ChainResolutionMode, int]:
         if next_height is None:
             next_height = self.tip
+        await self._wait_for_verthash_datafile()
+        await self._ensure_kgw_history_below_max_checkpoint()
         last = None  # type: Optional[ChainResolutionMode]
         while last is None or height <= next_height:
             prev_last, prev_height = last, height

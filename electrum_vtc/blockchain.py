@@ -23,13 +23,14 @@
 import os
 import threading
 import time
-from typing import Optional, Dict, Mapping, Sequence, TYPE_CHECKING
+from typing import Optional, Dict, Mapping, Sequence, Tuple, TYPE_CHECKING
 from pathlib import Path
 
 from . import util
 from .bitcoin import hash_encode
 from .crypto import sha256d
 from . import constants
+from . import verthash
 from .util import bfh, with_lock
 from .logging import Logger
 
@@ -40,8 +41,21 @@ if TYPE_CHECKING:
 HEADER_SIZE = 80  # bytes
 CHUNK_SIZE = 2016  # num headers in a difficulty retarget period
 
-# see https://github.com/bitcoin/bitcoin/blob/feedb9c84e72e4fff489810a2bbeec09bcda5763/src/chainparams.cpp#L76
-MAX_TARGET = 0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff  # compact: 0x1d00ffff
+# see https://github.com/vertcoin-project/vertcoin-core/blob/master/src/kernel/chainparams.cpp
+MAX_TARGET = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff  # powLimit
+PRE_VERTHASH_MAX_TARGET = 0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff  # preVerthashPowLimit
+
+VERTHASH_FORKBLOCK_MAINNET = 1500000
+LYRA2REV3_FORKBLOCK_MAINNET = 1080000
+KGW_FORKBLOCK_MAINNET = 26754
+
+# Kimoto Gravity Well parameters, see vertcoin-core src/pow.cpp
+KGW_BLOCKS_TARGET_SPACING = 150  # 2.5 minutes
+KGW_PAST_BLOCKS_MIN = (60 * 60 * 24 // 4) // KGW_BLOCKS_TARGET_SPACING  # 144
+KGW_PAST_BLOCKS_MAX = (60 * 60 * 24 * 7) // KGW_BLOCKS_TARGET_SPACING  # 4032
+# EventHorizonDeviation for PastBlocksMass in [1, KGW_PAST_BLOCKS_MAX]
+_KGW_EVENT_HORIZON = (0.0,) + tuple(
+    1 + (0.7084 * pow(float(mass) / float(144), -1.228)) for mass in range(1, KGW_PAST_BLOCKS_MAX + 1))
 
 
 class MissingHeader(Exception):
@@ -92,7 +106,86 @@ def hash_raw_header(header: bytes) -> str:
     return hash_encode(sha256d(header))
 
 
-pow_hash_header = hash_header
+def pow_hash_header(header: dict) -> str:
+    height = header['block_height']
+    if height < VERTHASH_FORKBLOCK_MAINNET and not constants.net.TESTNET:
+        # scrypt/lyra2re headers are only ever accepted below the max checkpoint
+        raise InvalidHeader(f"cannot verify pre-verthash proof of work (height {height})")
+    return hash_encode(verthash.datafile.hash(serialize_header(header)))
+
+
+def _div_trunc(a: int, b: int) -> int:
+    """Integer division rounding towards zero, like OpenSSL BN_div (CBigNum)."""
+    q = abs(a) // abs(b)
+    return q if (a >= 0) == (b > 0) else -q
+
+
+def kimoto_gravity_well(height: int, get_bits_and_time) -> int:
+    """Returns the compact target required for the block at `height`.
+    `get_bits_and_time(h)` returns (nBits, nTime) of the header at height h < height.
+    Exact port of KimotoGravityWell() in vertcoin-core src/pow.cpp.
+    """
+    last_solved = height - 1
+    if last_solved <= 0 or last_solved < KGW_PAST_BLOCKS_MIN:
+        return Blockchain.target_to_bits(MAX_TARGET)
+    mainnet = not constants.net.TESTNET
+    _, last_time = get_bits_and_time(last_solved)
+    past_blocks_mass = 0
+    past_rate_actual_seconds = 0
+    past_rate_target_seconds = 0
+    avg = avg_prev = 0
+    reading = last_solved
+    i = 1
+    while reading > 0:
+        if i > KGW_PAST_BLOCKS_MAX:
+            break
+        past_blocks_mass += 1
+        bits, reading_time = get_bits_and_time(reading)
+        target = Blockchain.bits_to_target(bits)
+        if i == 1:
+            avg = target
+        else:
+            avg = _div_trunc(target - avg_prev, i) + avg_prev
+        avg_prev = avg
+
+        past_rate_actual_seconds = last_time - reading_time
+        past_rate_target_seconds = KGW_BLOCKS_TARGET_SPACING * past_blocks_mass
+        past_rate_adjustment_ratio = 1.0
+        if past_rate_actual_seconds < 0:
+            past_rate_actual_seconds = 0
+        if past_rate_actual_seconds != 0 and past_rate_target_seconds != 0:
+            past_rate_adjustment_ratio = float(past_rate_target_seconds) / float(past_rate_actual_seconds)
+        event_horizon_deviation_fast = _KGW_EVENT_HORIZON[past_blocks_mass]
+        event_horizon_deviation_slow = 1 / event_horizon_deviation_fast
+
+        if past_blocks_mass >= KGW_PAST_BLOCKS_MIN:
+            if (past_rate_adjustment_ratio <= event_horizon_deviation_slow
+                    or past_rate_adjustment_ratio >= event_horizon_deviation_fast):
+                break
+        if mainnet and reading in (LYRA2REV3_FORKBLOCK_MAINNET, VERTHASH_FORKBLOCK_MAINNET):
+            break  # don't calculate past fork block on mainnet
+        reading -= 1
+        i += 1
+
+    new_target = avg
+    if past_rate_actual_seconds != 0 and past_rate_target_seconds != 0:
+        new_target *= past_rate_actual_seconds
+        new_target = _div_trunc(new_target, past_rate_target_seconds)
+
+    if mainnet:
+        if height >= VERTHASH_FORKBLOCK_MAINNET:
+            if new_target > MAX_TARGET:
+                return Blockchain.target_to_bits(MAX_TARGET)
+        elif new_target > PRE_VERTHASH_MAX_TARGET:
+            return Blockchain.target_to_bits(PRE_VERTHASH_MAX_TARGET)
+    elif new_target > MAX_TARGET:
+        new_target = MAX_TARGET
+    return Blockchain.target_to_bits(new_target)
+
+
+def _work_from_bits(bits: int) -> int:
+    target = Blockchain.bits_to_target(bits)
+    return ((2 ** 256 - target - 1) // (target + 1)) + 1
 
 
 # block hash -> chain work; up to and including that block
@@ -136,7 +229,7 @@ class BlockchainManager(Logger):
         # consistency checks
         if best_chain.height() > constants.net.max_checkpoint():
             header_after_cp = best_chain.read_header(constants.net.max_checkpoint()+1)
-            if not header_after_cp or not best_chain.can_connect(header_after_cp, check_height=False):
+            if not header_after_cp or not best_chain.can_connect(header_after_cp, check_height=False, check_bits=False):
                 self.logger.warning("[blockchain] deleting best chain. cannot connect header after last cp to last cp.")
                 best_chain.path().unlink()
                 best_chain.update_size()
@@ -365,27 +458,91 @@ class Blockchain(Logger):
         self._size = os.path.getsize(p)//HEADER_SIZE if p.exists() else 0
 
     @classmethod
-    def verify_header(cls, header: dict, prev_hash: str, target: int, expected_header_hash: str=None) -> None:
+    def verify_header(cls, header: dict, prev_hash: str, bits: Optional[int], expected_header_hash: str=None) -> None:
+        """`bits` is the required compact target, or None to only check linkage.
+        Below the max checkpoint, headers are only checked to link up to the checkpointed hashes.
+        """
         _hash = hash_header(header)
         if expected_header_hash and expected_header_hash != _hash:
             raise InvalidHeader("hash mismatches with expected: {} vs {}".format(expected_header_hash, _hash))
         if prev_hash != header.get('prev_block_hash'):
             raise InvalidHeader("prev hash mismatch: %s vs %s" % (prev_hash, header.get('prev_block_hash')))
-        if constants.net.TESTNET:
+        if constants.net.TESTNET or bits is None:
             return
-        bits = cls.target_to_bits(target)
         if bits != header.get('bits'):
             raise InvalidHeader("bits mismatch: %s vs %s" % (bits, header.get('bits')))
+        target = cls.bits_to_target(bits)
         _pow_hash = pow_hash_header(header)
         pow_hash_as_num = int.from_bytes(bfh(_pow_hash), byteorder='big')
         if pow_hash_as_num > target:
             raise InvalidHeader(f"insufficient proof of work: {pow_hash_as_num} vs target {target}")
 
+    def get_bits_required(self, height: int, recent: Optional[Mapping[int, Tuple[int, int]]] = None) -> int:
+        """Compact target required for the header at `height`.
+        `recent` maps height -> (bits, timestamp) for headers not yet saved (e.g. rest of a chunk).
+        """
+        if height <= constants.net.max_checkpoint():
+            raise Exception(f"difficulty is not computed below the max checkpoint (height {height})")
+        if not constants.net.TESTNET:
+            if height < KGW_FORKBLOCK_MAINNET:
+                raise Exception(f"pre-KGW difficulty is not supported (height {height})")
+            if height == 208301:
+                return 0x1e0ffff0
+            if LYRA2REV3_FORKBLOCK_MAINNET <= height < LYRA2REV3_FORKBLOCK_MAINNET + 10:
+                return 0x1b0ffff0  # forced difficulty for 10 blocks - Lyra2REv3 hardfork
+            if VERTHASH_FORKBLOCK_MAINNET <= height < VERTHASH_FORKBLOCK_MAINNET + 10:
+                return 0x1c07fff8  # forced difficulty for 10 blocks - Verthash hardfork
+        start = max(0, height - KGW_PAST_BLOCKS_MAX)
+        history = self._read_bits_and_timestamps(start, height - 1, recent or {})
+
+        def get_bits_and_time(h: int) -> Tuple[int, int]:
+            return history[h - start]
+        return kimoto_gravity_well(height, get_bits_and_time)
+
+    @with_lock
+    def _read_bits_and_timestamps(
+            self, start: int, end: int, recent: Mapping[int, Tuple[int, int]],
+    ) -> Sequence[Tuple[int, int]]:
+        """(bits, timestamp) of headers in [start, end], from `recent` or the headers files."""
+        res = []
+        recent_lo = min(recent) if recent else end + 1
+        height = start
+        while height <= end:
+            if height in recent:
+                res.append(recent[height])
+                height += 1
+                continue
+            if height < self.forkpoint:
+                stop = min(end, self.forkpoint - 1)
+                res.extend(self.parent._read_bits_and_timestamps(height, stop, recent))
+                height = stop + 1
+                continue
+            stop = min(end, self.height())
+            if recent_lo > height:
+                stop = min(stop, recent_lo - 1)  # `recent` takes precedence over the file
+            if stop < height:
+                raise MissingHeader(height)
+            name = self.path()
+            self.assert_headers_file_available(name)
+            with open(name, 'rb') as f:
+                f.seek((height - self.forkpoint) * HEADER_SIZE)
+                raw = f.read((stop - height + 1) * HEADER_SIZE)
+            if len(raw) != (stop - height + 1) * HEADER_SIZE:
+                raise MissingHeader(height)
+            for i in range(0, len(raw), HEADER_SIZE):
+                h = raw[i:i + HEADER_SIZE]
+                if h == bytes(HEADER_SIZE):
+                    raise MissingHeader(height + i // HEADER_SIZE)
+                res.append((int.from_bytes(h[72:76], 'little'), int.from_bytes(h[68:72], 'little')))
+            height = stop + 1
+        return res
+
     def verify_chunk(self, index: int, data: bytes) -> None:
         num = len(data) // HEADER_SIZE
         start_height = index * CHUNK_SIZE
         prev_hash = self.get_hash(start_height - 1)
-        target = self.get_target(index-1)
+        max_cp = constants.net.max_checkpoint()
+        recent = {}  # type: Dict[int, Tuple[int, int]]
         for i in range(num):
             height = start_height + i
             try:
@@ -394,7 +551,11 @@ class Blockchain(Logger):
                 expected_header_hash = None
             raw_header = data[i*HEADER_SIZE : (i+1)*HEADER_SIZE]
             header = deserialize_header(raw_header, index*CHUNK_SIZE + i)
-            self.verify_header(header, prev_hash, target, expected_header_hash)
+            bits = None
+            if height > max_cp and not constants.net.TESTNET:
+                bits = self.get_bits_required(height, recent)
+            self.verify_header(header, prev_hash, bits, expected_header_hash)
+            recent[height] = (header['bits'], header['timestamp'])
             prev_hash = hash_header(header)
 
     @with_lock
@@ -590,7 +751,10 @@ class Blockchain(Logger):
             return hash_header(header)
 
     def get_target(self, index: int) -> int:
-        # compute target from chunk x, used in chunk x+1
+        """Representative target of chunk `index` (with KGW, difficulty retargets every block).
+        For checkpointed chunks this is the target stored in the checkpoint, otherwise the
+        target of the last header in the chunk.
+        """
         if constants.net.TESTNET:
             return 0
         if index == -1:
@@ -598,21 +762,10 @@ class Blockchain(Logger):
         if index < len(self.checkpoints):
             h, t = self.checkpoints[index]
             return t
-        # new target
-        first = self.read_header(index * CHUNK_SIZE)
         last = self.read_header((index+1) * CHUNK_SIZE - 1)
-        if not first or not last:
+        if not last:
             raise MissingHeader()
-        bits = last.get('bits')
-        target = self.bits_to_target(bits)
-        nActualTimespan = last.get('timestamp') - first.get('timestamp')
-        nTargetTimespan = 14 * 24 * 60 * 60
-        nActualTimespan = max(nActualTimespan, nTargetTimespan // 4)
-        nActualTimespan = min(nActualTimespan, nTargetTimespan * 4)
-        new_target = min(MAX_TARGET, (target * nActualTimespan) // nTargetTimespan)
-        # not any target can be represented in 32 bits:
-        new_target = self.bits_to_target(self.target_to_bits(new_target))
-        return new_target
+        return self.bits_to_target(last['bits'])
 
     @classmethod
     def bits_to_target(cls, bits: int) -> int:
@@ -652,11 +805,20 @@ class Blockchain(Logger):
             bitsBase >>= 8
         return bitsN << 24 | bitsBase
 
-    def chainwork_of_header_at_height(self, height: int) -> int:
-        """work done by single header at given height"""
-        chunk_idx = height // CHUNK_SIZE - 1
-        target = self.get_target(chunk_idx)
-        work = ((2 ** 256 - target - 1) // (target + 1)) + 1
+    def chainwork_of_headers(self, start: int, end: int) -> int:
+        """work done by headers in [start, end]. Checkpointed chunks use the checkpoint target."""
+        work = 0
+        height = start
+        while height <= end:
+            index = height // CHUNK_SIZE
+            stop = min(end, (index + 1) * CHUNK_SIZE - 1)
+            if index < len(self.checkpoints):
+                target = self.get_target(index)
+                work += (stop - height + 1) * (((2 ** 256 - target - 1) // (target + 1)) + 1)
+            else:
+                for bits, _ in self._read_bits_and_timestamps(height, stop, {}):
+                    work += _work_from_bits(bits)
+            height = stop + 1
         return work
 
     @with_lock
@@ -677,16 +839,12 @@ class Blockchain(Logger):
         running_total = _CHAINWORK_CACHE[self.get_hash(cached_height)]
         while cached_height < last_retarget:
             cached_height += CHUNK_SIZE
-            work_in_single_header = self.chainwork_of_header_at_height(cached_height)
-            work_in_chunk = CHUNK_SIZE * work_in_single_header
-            running_total += work_in_chunk
+            running_total += self.chainwork_of_headers(cached_height - CHUNK_SIZE + 1, cached_height)
             _CHAINWORK_CACHE[self.get_hash(cached_height)] = running_total
-        cached_height += CHUNK_SIZE
-        work_in_single_header = self.chainwork_of_header_at_height(cached_height)
-        work_in_last_partial_chunk = (height % CHUNK_SIZE + 1) * work_in_single_header
+        work_in_last_partial_chunk = self.chainwork_of_headers(last_retarget + 1, height)
         return running_total + work_in_last_partial_chunk
 
-    def can_connect(self, header: Optional[dict], *, check_height: bool = True) -> bool:
+    def can_connect(self, header: Optional[dict], *, check_height: bool = True, check_bits: bool = True) -> bool:
         if header is None:
             return False
         height = header['block_height']
@@ -700,12 +858,14 @@ class Blockchain(Logger):
             return False
         if prev_hash != header.get('prev_block_hash'):
             return False
+        bits = None
+        if check_bits and height > constants.net.max_checkpoint() and not constants.net.TESTNET:
+            try:
+                bits = self.get_bits_required(height)
+            except MissingHeader:
+                return False
         try:
-            target = self.get_target(height // CHUNK_SIZE - 1)
-        except MissingHeader:
-            return False
-        try:
-            self.verify_header(header, prev_hash, target)
+            self.verify_header(header, prev_hash, bits)
         except BaseException as e:
             return False
         return True

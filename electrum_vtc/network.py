@@ -50,6 +50,7 @@ from . import constants
 from . import dns_hacks
 from .transaction import Transaction
 from .blockchain import Blockchain, BlockchainManager
+from . import verthash
 from .interface import (
     Interface, PREFERRED_NETWORK_PROTOCOL, RequestTimedOut, NetworkTimeout, BUCKET_NAME_OF_ONION_SERVERS,
     NetworkException, RequestCorrupted, ServerAddr, TxBroadcastError, KNOWN_ELEC_PROTOCOL_TRANSPORTS,
@@ -1248,6 +1249,8 @@ class Network(Logger, NetworkRetryManager[ServerAddr]):
         """
         self._was_started = True
         self._jobs = jobs or []
+        # headers above the max checkpoint are verified with verthash, which needs the datafile
+        verthash.datafile.prepare_in_background(self.config)
         asyncio.run_coroutine_threadsafe(self._start(), self.asyncio_loop)
 
     @log_exceptions
