@@ -72,23 +72,13 @@ class Exception_Window(BaseCrashReporter, QWidget, MessageBoxMixin, Logger):
 
         main_box.addWidget(collapse_info)
 
-        main_box.addWidget(QLabel(BaseCrashReporter.DESCRIBE_ERROR_MESSAGE))
-
         self.description_textfield = QTextEdit()
-        self.description_textfield.setFixedHeight(4 * font_height())
-        self.description_textfield.setPlaceholderText(self.USER_COMMENT_PLACEHOLDER)
-        main_box.addWidget(self.description_textfield)
 
         main_box.addWidget(QLabel(BaseCrashReporter.ASK_CONFIRM_SEND))
 
         buttons = QHBoxLayout()
 
-        report_button = QPushButton(_('Send Bug Report'))
-        report_button.clicked.connect(lambda _checked: self._ask_for_confirm_to_send_report())
-        report_button.setIcon(read_QIcon("tab_send.png"))
-        buttons.addWidget(report_button)
-
-        close_button = QPushButton(_('Not Now'))
+        close_button = QPushButton(_('Close'))
         close_button.clicked.connect(lambda _checked: self.close())
         buttons.addWidget(close_button)
 
