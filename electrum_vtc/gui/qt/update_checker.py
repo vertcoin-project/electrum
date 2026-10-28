@@ -30,7 +30,7 @@ class UpdateCheck(QDialog, Logger):
 
     def __init__(self, *, latest_version=None):
         QDialog.__init__(self)
-        self.setWindowTitle('Electrum - ' + _('Update Check'))
+        self.setWindowTitle('Electrum-VTC - ' + _('Update Check'))
         self.content = QVBoxLayout()
         self.content.setContentsMargins(*[10]*4)
 

@@ -36,7 +36,7 @@ class QEServerConnectWizard(ServerConnectWizard, QEAbstractWizard):
 class WCWelcome(WizardComponent):
     def __init__(self, parent, wizard):
         WizardComponent.__init__(self, parent, wizard, title='Network Configuration')
-        self.wizard_title = _('Electrum Bitcoin Wallet')
+        self.wizard_title = _('Electrum-VTC Vertcoin Wallet')
 
         self.first_help_label = QLabel()
         self.first_help_label.setText(_("Optional settings to customize your network connection") + ":")

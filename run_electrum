@@ -166,7 +166,7 @@ def init_cmdline(config_options, wallet_path, *, rpcserver: bool, config: 'Simpl
 
     if cmd.requires_wallet and not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'electrum-vtc create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys_exit(1)
 
     # important warning
@@ -563,7 +563,7 @@ def handle_cmd(*, cmdname: str, config: 'SimpleConfig', config_options: dict):
             try:
                 result = daemon.request(config, 'run_cmdline', (config_options,), timeout)
             except daemon.DaemonNotRunning:
-                print_msg("Daemon not running; try 'electrum daemon -d'")
+                print_msg("Daemon not running; try 'electrum-vtc daemon -d'")
                 if not cmd.requires_network:
                     print_msg("To run this command without a daemon, use --offline")
                 if cmd.name == "stop":  # remove lockfile if it exists, as daemon looks dead

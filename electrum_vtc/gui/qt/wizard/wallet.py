@@ -394,7 +394,7 @@ class WCWalletType(WalletWizardComponent):
             ChoiceItem(key='standard', label=_('Standard wallet')),
             ChoiceItem(key='2fa', label=_('Wallet with two-factor authentication')),
             ChoiceItem(key='multisig', label=_('Multi-signature wallet')),
-            ChoiceItem(key='imported', label=_('Import Bitcoin addresses or private keys')),
+            ChoiceItem(key='imported', label=_('Import Vertcoin addresses or private keys')),
         ]
         choices = [c for c in wallet_kinds if c.key in wallet_types]
 
@@ -957,7 +957,7 @@ class WCMultisig(WalletWizardComponent):
 
 class WCImport(WalletWizardComponent):
     def __init__(self, parent, wizard):
-        WalletWizardComponent.__init__(self, parent, wizard, title=_('Import Bitcoin Addresses or Private Keys'))
+        WalletWizardComponent.__init__(self, parent, wizard, title=_('Import Vertcoin Addresses or Private Keys'))
         message = _(
             'Enter a list of Bitcoin addresses (this will create a watching-only wallet), or a list of private keys.')
         header_layout = QHBoxLayout()

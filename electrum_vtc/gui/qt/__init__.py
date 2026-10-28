@@ -180,8 +180,8 @@ class ElectrumGui(BaseElectrumGui, Logger):
         if hasattr(QtCore.Qt, "AA_ShareOpenGLContexts"):
             QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         if hasattr(QGuiApplication, 'setDesktopFileName'):
-            QGuiApplication.setDesktopFileName('electrum')
-        QGuiApplication.setApplicationName("Electrum")
+            QGuiApplication.setDesktopFileName('electrum-vtc')
+        QGuiApplication.setApplicationName("Electrum-VTC")
         self.gui_thread = threading.current_thread()
         self.windows = []  # type: List[ElectrumWindow]
         self.open_file_efilter = OpenFileEventFilter(self.windows)
@@ -214,7 +214,7 @@ class ElectrumGui(BaseElectrumGui, Logger):
 
     def _init_tray(self):
         self.tray = QSystemTrayIcon(self.tray_icon(), None)
-        self.tray.setToolTip('Electrum')
+        self.tray.setToolTip('Electrum-VTC')
         self.tray.activated.connect(self.tray_activated)
         self.build_tray_menu()
         self.tray.show()

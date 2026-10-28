@@ -299,7 +299,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
         # If the option hasn't been set yet
         if not config.cv.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS.is_set():
-            choice = self.question(title="Electrum - " + _("Enable update check"),
+            choice = self.question(title="Electrum-VTC - " + _("Enable update check"),
                                    msg=_("For security reasons we advise that you always use the latest version of Electrum.") + " " +
                                        _("Would you like to be notified when there is a newer version of Electrum available?"))
             config.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS = bool(choice)
@@ -629,7 +629,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
     @classmethod
     def get_app_name_and_version_str(cls) -> str:
-        name = "Electrum"
+        name = "Electrum-VTC"
         if constants.net.TESTNET:
             name += " " + constants.net.NET_NAME.capitalize()
         return f"{name} {ELECTRUM_VERSION}"
@@ -651,8 +651,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         if self.wallet.is_watching_only():
             msg = ' '.join([
                 _("This wallet is watching-only."),
-                _("This means you will not be able to spend Bitcoins with it."),
-                _("Make sure you own the seed phrase or the private keys, before you request Bitcoins to be sent to this wallet.")
+                _("This means you will not be able to spend Vertcoins with it."),
+                _("Make sure you own the seed phrase or the private keys, before you request Vertcoins to be sent to this wallet.")
             ])
             self.show_warning(msg, title=_('Watch-only wallet'))
 
@@ -669,7 +669,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         msg = ''.join([
             _("You are in testnet mode."), ' ',
             _("Testnet coins are worthless."), '\n',
-            _("Testnet is separate from the main Bitcoin network. It is used for testing.")
+            _("Testnet is separate from the main Vertcoin network. It is used for testing.")
         ])
         cb = QCheckBox(_("Don't show this again."))
         cb_checked = False
@@ -857,8 +857,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         self.help_menu.addAction(_("&Official website"), lambda: webopen("https://electrum.org"))
         self.help_menu.addSeparator()
         self.help_menu.addAction(_("&Documentation"), lambda: webopen("http://docs.electrum.org/")).setShortcut(QKeySequence.StandardKey.HelpContents)
-        if not constants.net.TESTNET:
-            self.help_menu.addAction(_("&Bitcoin Paper"), self.show_bitcoin_paper)
         self.help_menu.addAction(_("&Report Bug"), self.show_report_bug)
         self.help_menu.addSeparator()
         if self.network:
@@ -877,9 +875,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             self.show_error(_('No donation address for this server'))
 
     def show_about(self):
-        QMessageBox.about(self, "Electrum",
+        QMessageBox.about(self, "Electrum-VTC",
                           (_("Version")+" %s" % ELECTRUM_VERSION + "\n\n" +
-                           _("Electrum's focus is speed, with low resource usage and simplifying Bitcoin.") + " " +
+                           _("Electrum-VTC's focus is speed, with low resource usage and simplifying Vertcoin.") + " " +
                            _("You do not need to perform regular backups, because your wallet can be "
                               "recovered from a secret phrase that you can memorize or write on paper.") + " " +
                            _("Startup times are instant because it operates in conjunction with high-performance "
@@ -917,7 +915,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
             _("Before reporting a bug, upgrade to the most recent version of Electrum (latest release or git HEAD), and include the version number in your report."),
             _("Try to explain not only what the bug is, but how it occurs.")
          ])
-        self.show_message(msg, title="Electrum - " + _("Reporting Bugs"), rich_text=True)
+        self.show_message(msg, title="Electrum-VTC - " + _("Reporting Bugs"), rich_text=True)
 
     def notify_transactions(self):
         if self.tx_notification_queue.qsize() == 0:
@@ -942,7 +940,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
     def notify(self, message):
         if self.tray:
-            self.tray.showMessage("Electrum", message, read_QIcon("electrum_dark_icon"), 20000)
+            self.tray.showMessage("Electrum-VTC", message, read_QIcon("electrum_dark_icon"), 20000)
 
     def timer_actions(self):
         # refresh invoices and requests because they show ETA
@@ -2011,7 +2009,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         line2 = QLineEdit()
         line2.setFixedWidth(32 * char_width_in_lineedit())
         address_label = QLabel(_("Address"))
-        address_label.setToolTip(_("Bitcoin- or Lightning address"))
+        address_label.setToolTip(_("Vertcoin- or Lightning address"))
         grid.addWidget(address_label, 1, 0)
         grid.addWidget(line1, 1, 1)
         grid.addWidget(QLabel(_("Name")), 2, 0)

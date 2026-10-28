@@ -202,7 +202,7 @@ class RequestList(MyTreeView):
         if req.get_address():
             copy_menu.addAction(_("Address"), lambda: self.main_window.do_copy(req.get_address(), title='Bitcoin Address'))
         if URI := self.wallet.get_request_URI(req):
-            copy_menu.addAction(_("Bitcoin URI"), lambda: self.main_window.do_copy(URI, title='Bitcoin URI'))
+            copy_menu.addAction(_("Vertcoin URI"), lambda: self.main_window.do_copy(URI, title='Bitcoin URI'))
         if req.is_lightning():
             copy_menu.addAction(_("Lightning Request"), lambda: self.main_window.do_copy(self.wallet.get_bolt11_invoice(req), title='Lightning Request'))
         #if 'view_url' in req:

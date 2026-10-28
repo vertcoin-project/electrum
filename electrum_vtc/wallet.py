@@ -903,7 +903,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
         if self.is_watching_only():
             raise UserFacingException(_("This is a watching-only wallet"))
         if not is_address(address):
-            raise UserFacingException(_('Invalid bitcoin address: {}').format(address))
+            raise UserFacingException(_('Invalid vertcoin address: {}').format(address))
         if not self.is_mine(address):
             raise UserFacingException(_('Address not in wallet: {}').format(address))
         index = self.get_address_index(address)
@@ -3351,7 +3351,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             address = address.strip()
             message = message.strip()
         if not bitcoin.is_address(address):
-            raise UserFacingException(_("Invalid Bitcoin address."))
+            raise UserFacingException(_("Invalid Vertcoin address."))
         if self.is_watching_only():
             raise UserFacingException(_("This is a watching-only wallet."))
         if not self.is_mine(address):
@@ -3383,7 +3383,7 @@ class Abstract_Wallet(ABC, Logger, EventListener):
             signature = signature.strip()
             message = message.strip()
         if not is_address(address):
-            raise UserFacingException(_("Invalid Bitcoin address."))
+            raise UserFacingException(_("Invalid Vertcoin address."))
         try:
             sig = base64.b64decode(signature, validate=True)
         except ValueError:
