@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
 COINBASE_MATURITY = 100
 COIN = 100000000
-TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 21000000
+TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 84000000
 
 NLOCKTIME_MIN = 0
 NLOCKTIME_BLOCKHEIGHT_MAX = 500_000_000 - 1
@@ -673,6 +673,9 @@ def deserialize_privkey(key: str) -> Tuple[str, bytes, bool]:
         # keys exported in version 3.0.x encoded script type in first byte
         prefix_value = vch[0] - constants.net.WIF_PREFIX
         try:
+            # Electrum-VTC 2.x exported p2pkh keys with prefix WIF_PREFIX + ADDRTYPE_P2PKH
+            if prefix_value == constants.net.ADDRTYPE_P2PKH:
+                prefix_value = WIF_SCRIPT_TYPES['p2pkh']
             txin_type = WIF_SCRIPT_TYPES_INV[prefix_value]
         except KeyError as e:
             raise BitcoinException('invalid prefix ({}) for WIF key (1)'.format(vch[0])) from None
