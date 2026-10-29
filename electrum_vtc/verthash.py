@@ -26,10 +26,13 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import errno
+import functools
 import hashlib
 import mmap
 import multiprocessing
 import os
+import shutil
 import struct
 import sys
 import threading
@@ -229,13 +232,48 @@ def generate_datafile(path: str, *, progress_cb: Optional[Callable[[float], None
     pk = hashlib.sha3_256(b"Verthash Proof-of-Space Datafile").digest()
     t0 = time.monotonic()
     _logger.info(f"generating verthash datafile at {path}")
-    with open(tmp_path, 'w+b') as f:
-        f.truncate(DATAFILE_SIZE)
-        with mmap.mmap(f.fileno(), DATAFILE_SIZE) as mm:
-            _GraphBuilder(mm, GRAPH_INDEX, pk, progress_cb).build()
-            mm.flush()
-    _logger.info(f"verthash datafile generated in {time.monotonic() - t0:.0f} s. verifying...")
-    _install_datafile(tmp_path, path)
+    try:
+        with open(tmp_path, 'w+b') as f:
+            _reserve(f, DATAFILE_SIZE)
+            with mmap.mmap(f.fileno(), DATAFILE_SIZE) as mm:
+                _GraphBuilder(mm, GRAPH_INDEX, pk, progress_cb).build()
+                mm.flush()
+        _logger.info(f"verthash datafile generated in {time.monotonic() - t0:.0f} s. verifying...")
+        _install_datafile(tmp_path, path)
+    except BaseException:
+        # don't leave 1.2 GiB behind
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
+def _reserve(f, size: int) -> None:
+    """Allocate the file's blocks before writing them through a memory map: on a full disk,
+    writing a page of a sparse file kills the process with SIGBUS instead of raising."""
+    if hasattr(os, 'posix_fallocate'):
+        try:
+            os.posix_fallocate(f.fileno(), 0, size)
+            return
+        except OSError as e:
+            if e.errno == errno.ENOSPC:
+                raise
+            # the filesystem can't allocate ahead
+    f.truncate(size)
+
+
+def check_disk_space(path: str) -> None:
+    """Raises VerthashDatafileError if there is no room to generate the datafile at path."""
+    try:
+        stale = os.path.getsize(path + '.tmp')  # the generator replaces it
+    except OSError:
+        stale = 0
+    free = shutil.disk_usage(os.path.dirname(os.path.abspath(path))).free + stale
+    if free < DATAFILE_SIZE:
+        raise VerthashDatafileError(
+            f"not enough disk space for the verthash datafile at {path}: "
+            f"it needs {DATAFILE_SIZE / 2**30:.1f} GiB, {free / 2**30:.1f} GiB are free")
 
 
 def _install_datafile(tmp_path: str, path: str) -> None:
@@ -289,6 +327,20 @@ def _generate_in_process(path: str, progress_cb: Callable[[float], None]) -> Non
         raise VerthashDatafileError(f"datafile generation exited with code {proc.exitcode}")
 
 
+def _read_through(path: str) -> None:
+    """Read the file once, into the OS page cache."""
+    t0 = time.monotonic()
+    try:
+        with open(path, 'rb', buffering=0) as f:
+            buf = bytearray(1 << 22)
+            while f.readinto(buf):
+                pass
+    except OSError as e:
+        _logger.info(f"could not read {path} through: {e!r}")
+        return
+    _logger.info(f"read the verthash datafile through in {time.monotonic() - t0:.1f} s")
+
+
 def verify_datafile(path: str) -> bool:
     try:
         if os.path.getsize(path) != DATAFILE_SIZE:
@@ -313,8 +365,33 @@ _SELFTEST_HEADER = bytes.fromhex(
     'a80e031b02560ad8')
 
 
+_UNPACK_NODE = struct.Struct('<8I')
+
+
+class _FileData:
+    """The datafile read with a system call for each 32 bytes a hash needs, for when it
+    can't be memory-mapped (e.g. no room for 1.2 GiB in a 32-bit address space)."""
+
+    def __init__(self, f):
+        self._f = f
+        self._size = os.fstat(f.fileno()).st_size
+        self._lock = threading.Lock()
+
+    def __len__(self) -> int:
+        return self._size
+
+    def unpack_at(self, offset: int):
+        if hasattr(os, 'pread'):
+            b = os.pread(self._f.fileno(), HASH_OUT_SIZE, offset)
+        else:
+            with self._lock:
+                self._f.seek(offset)
+                b = self._f.read(HASH_OUT_SIZE)
+        return _UNPACK_NODE.unpack(b)
+
+
 def verthash_pow(header: bytes, data) -> bytes:
-    """Verthash of an 80-byte block header. `data` is the datafile (bytes or mmap)."""
+    """Verthash of an 80-byte block header. `data` is the datafile (bytes, mmap or _FileData)."""
     assert len(header) == HEADER_SIZE, len(header)
     p1 = list(struct.unpack('<8I', hashlib.sha3_256(header).digest()))
 
@@ -328,13 +405,13 @@ def verthash_pow(header: bytes, data) -> bytes:
         words = [((w << 1) | (w >> 31)) & _M32 for w in words]
 
     mdiv = ((len(data) - HASH_OUT_SIZE) // BYTE_ALIGNMENT) + 1
-    unpack_from = struct.Struct('<8I').unpack_from
+    read_at = data.unpack_at if isinstance(data, _FileData) else functools.partial(_UNPACK_NODE.unpack_from, data)
     acc = _FNV_OFFSET
     a0, a1, a2, a3, a4, a5, a6, a7 = p1
     P, M = _FNV_PRIME, _M32
     for seek in seek_indexes:
         offset = ((((seek ^ acc) * P) & M) % mdiv) * BYTE_ALIGNMENT
-        v0, v1, v2, v3, v4, v5, v6, v7 = unpack_from(data, offset)
+        v0, v1, v2, v3, v4, v5, v6, v7 = read_at(offset)
         a0 = ((a0 ^ v0) * P) & M; acc = ((acc ^ v0) * P) & M
         a1 = ((a1 ^ v1) * P) & M; acc = ((acc ^ v1) * P) & M
         a2 = ((a2 ^ v2) * P) & M; acc = ((acc ^ v2) * P) & M
@@ -421,7 +498,21 @@ class VerthashDatafile:
 
     def _load(self, path: str) -> None:
         f = open(path, 'rb')
-        self._data = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        try:
+            self._data = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        except (OSError, ValueError, OverflowError) as e:
+            _logger.warning(f"could not map the verthash datafile, reading it from disk for every hash: {e!r}")
+            self._data = _FileData(f)
+        else:
+            if hasattr(mmap, 'MADV_RANDOM'):  # not on Windows
+                # Each hash reads 32 bytes at 4096 random offsets. Without this, every page fault
+                # also reads in the pages around it, which evicts the pages hashes need when the
+                # file doesn't fit in RAM.
+                self._data.madvise(mmap.MADV_RANDOM)
+                # But then, when it does fit, faults read it in only a page at a time: read it
+                # once, sequentially, as Vertcoin Core's startup check does. Hashing 2000 headers
+                # with the file not yet cached takes 2.6 s like this, instead of 60 s.
+                threading.Thread(target=_read_through, args=(path,), name='verthash-read', daemon=True).start()
         self._file = f
         self.path = path
         self.progress = None
@@ -441,48 +532,59 @@ class VerthashDatafile:
     def prepare(self, config: 'SimpleConfig', *, create: bool = True) -> None:
         """Blocking. Find a valid datafile, or generate one in the Electrum-VTC data dir."""
         with self._lock:
-            if self.is_ready():
-                return
-            self.error = None
-            for path in self.candidate_paths(config):
-                if self._is_known_good(config, path):
-                    self._load(path)
-                    return
-            if not create:
-                self.error = "verthash datafile not found"
-                return
-            path = config.VERTHASH_DATAFILE_PATH or self.default_path(config)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-
-            def on_progress(x: float):
-                self.progress = x
-                self._notify()
-            on_progress(0.0)
-            # the python generators check the checksum before renaming the file into place
-            verified = True
             try:
-                if _vertcoinhash is not None and hasattr(_vertcoinhash, 'create_datafile'):
-                    _generate_with_vertcoinhash(path, on_progress)
-                    verified = False
-                else:
-                    try:
-                        _generate_in_process(path, on_progress)
-                    except _CannotSpawn as e:
-                        _logger.info(f"generating the verthash datafile in this process: {e}")
-                        generate_datafile(path, progress_cb=on_progress)
+                self._prepare(config, create=create)
             except Exception as e:
+                # e.g. the datafile can't be opened: say so, instead of leaving GUIs waiting for it
                 self.error = repr(e)
                 self.progress = None
-                _logger.exception("failed to generate verthash datafile")
+                _logger.exception("failed to load verthash datafile")
                 self._notify()
-                return
-            config.VERTHASH_DATAFILE_VERIFIED = self._stamp(path) if verified else None
+
+    def _prepare(self, config: 'SimpleConfig', *, create: bool) -> None:
+        if self.is_ready():
+            return
+        self.error = None
+        for path in self.candidate_paths(config):
             if self._is_known_good(config, path):
                 self._load(path)
+                return
+        if not create:
+            self.error = "verthash datafile not found"
+            return
+        path = config.VERTHASH_DATAFILE_PATH or self.default_path(config)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        def on_progress(x: float):
+            self.progress = x
+            self._notify()
+        on_progress(0.0)
+        # the python generators check the checksum before renaming the file into place
+        verified = True
+        try:
+            check_disk_space(path)
+            if _vertcoinhash is not None and hasattr(_vertcoinhash, 'create_datafile'):
+                _generate_with_vertcoinhash(path, on_progress)
+                verified = False
             else:
-                self.error = "generated verthash datafile failed verification"
-                self.progress = None
-                self._notify()
+                try:
+                    _generate_in_process(path, on_progress)
+                except _CannotSpawn as e:
+                    _logger.info(f"generating the verthash datafile in this process: {e}")
+                    generate_datafile(path, progress_cb=on_progress)
+        except Exception as e:
+            self.error = repr(e)
+            self.progress = None
+            _logger.exception("failed to generate verthash datafile")
+            self._notify()
+            return
+        config.VERTHASH_DATAFILE_VERIFIED = self._stamp(path) if verified else None
+        if self._is_known_good(config, path):
+            self._load(path)
+        else:
+            self.error = "generated verthash datafile failed verification"
+            self.progress = None
+            self._notify()
 
     def prepare_in_background(self, config: 'SimpleConfig') -> None:
         if self.is_ready() or (self._thread and self._thread.is_alive()):
