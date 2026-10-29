@@ -235,10 +235,25 @@ def generate_datafile(path: str, *, progress_cb: Optional[Callable[[float], None
             _GraphBuilder(mm, GRAPH_INDEX, pk, progress_cb).build()
             mm.flush()
     _logger.info(f"verthash datafile generated in {time.monotonic() - t0:.0f} s. verifying...")
+    _install_datafile(tmp_path, path)
+
+
+def _install_datafile(tmp_path: str, path: str) -> None:
+    """Rename a generated datafile into place once its checksum is verified."""
     if not verify_datafile(tmp_path):
         os.unlink(tmp_path)
         raise VerthashDatafileError("generated verthash datafile has an unexpected checksum")
     os.replace(tmp_path, path)
+
+
+def _generate_with_vertcoinhash(path: str, progress_cb: Callable[[float], None]) -> None:
+    """vertcoinhash's port of Vertcoin Core's generator (1.1.0 and later): about 15 s on a
+    desktop. It writes path + '.tmp' through a memory map and renames it to path; the GIL
+    is released meanwhile, except to call progress_cb. It does not check the checksum."""
+    t0 = time.monotonic()
+    _logger.info(f"generating verthash datafile at {path} with vertcoinhash")
+    _vertcoinhash.create_datafile(path, progress_cb=progress_cb)
+    _logger.info(f"verthash datafile generated in {time.monotonic() - t0:.0f} s")
 
 
 def _generate_in_child(path: str, progress) -> None:
@@ -379,15 +394,22 @@ class VerthashDatafile:
     def default_path(config: 'SimpleConfig') -> str:
         return os.path.join(config.electrum_path_root(), DATAFILE_NAME)
 
-    def _is_known_good(self, config: 'SimpleConfig', path: str) -> bool:
-        """Avoid re-hashing 1.2 GiB on every start: remember size+mtime of a verified file."""
+    @staticmethod
+    def _stamp(path: str) -> Optional[str]:
+        """size+mtime of a datafile, or None if it is missing or has the wrong size"""
         try:
             st = os.stat(path)
         except OSError:
-            return False
+            return None
         if st.st_size != DATAFILE_SIZE:
+            return None
+        return f"{os.path.abspath(path)}|{st.st_size}|{int(st.st_mtime)}"
+
+    def _is_known_good(self, config: 'SimpleConfig', path: str) -> bool:
+        """Avoid re-hashing 1.2 GiB on every start: remember size+mtime of a verified file."""
+        stamp = self._stamp(path)
+        if stamp is None:
             return False
-        stamp = f"{os.path.abspath(path)}|{st.st_size}|{int(st.st_mtime)}"
         if config.VERTHASH_DATAFILE_VERIFIED == stamp:
             return True
         _logger.info(f"verifying verthash datafile {path}")
@@ -436,19 +458,25 @@ class VerthashDatafile:
                 self.progress = x
                 self._notify()
             on_progress(0.0)
+            # the python generators check the checksum before renaming the file into place
+            verified = True
             try:
-                try:
-                    _generate_in_process(path, on_progress)
-                except _CannotSpawn as e:
-                    _logger.info(f"generating the verthash datafile in this process: {e}")
-                    generate_datafile(path, progress_cb=on_progress)
+                if _vertcoinhash is not None and hasattr(_vertcoinhash, 'create_datafile'):
+                    _generate_with_vertcoinhash(path, on_progress)
+                    verified = False
+                else:
+                    try:
+                        _generate_in_process(path, on_progress)
+                    except _CannotSpawn as e:
+                        _logger.info(f"generating the verthash datafile in this process: {e}")
+                        generate_datafile(path, progress_cb=on_progress)
             except Exception as e:
                 self.error = repr(e)
                 self.progress = None
                 _logger.exception("failed to generate verthash datafile")
                 self._notify()
                 return
-            config.VERTHASH_DATAFILE_VERIFIED = None
+            config.VERTHASH_DATAFILE_VERIFIED = self._stamp(path) if verified else None
             if self._is_known_good(config, path):
                 self._load(path)
             else:

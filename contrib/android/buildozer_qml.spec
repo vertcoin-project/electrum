@@ -80,7 +80,8 @@ requirements =
     pycryptodomex,
     pyqt6sip,
     pyqt6,
-    libzxing
+    libzxing,
+    vertcoinhash
 
 # (str) Presplash of the application
 presplash.filename = %(source.dir)s/electrum_vtc/gui/icons/electrum_presplash.png
