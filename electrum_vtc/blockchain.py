@@ -56,6 +56,7 @@ KGW_PAST_BLOCKS_MAX = (60 * 60 * 24 * 7) // KGW_BLOCKS_TARGET_SPACING  # 4032
 # EventHorizonDeviation for PastBlocksMass in [1, KGW_PAST_BLOCKS_MAX]
 _KGW_EVENT_HORIZON = (0.0,) + tuple(
     1 + (0.7084 * pow(float(mass) / float(144), -1.228)) for mass in range(1, KGW_PAST_BLOCKS_MAX + 1))
+_KGW_EVENT_HORIZON_SLOW = (0.0,) + tuple(1 / x for x in _KGW_EVENT_HORIZON[1:])
 
 
 class MissingHeader(Exception):
@@ -114,63 +115,70 @@ def pow_hash_header(header: dict) -> str:
     return hash_encode(verthash.datafile.hash(serialize_header(header)))
 
 
-def _div_trunc(a: int, b: int) -> int:
-    """Integer division rounding towards zero, like OpenSSL BN_div (CBigNum)."""
-    q = abs(a) // abs(b)
-    return q if (a >= 0) == (b > 0) else -q
+class KGWHistory:
+    """Targets and timestamps of the consecutive headers from height `base` on,
+    which KGW reads back from. verify_chunk appends to it as it goes."""
+
+    def __init__(self, base: int, bits_and_times: Sequence[Tuple[int, int]]):
+        self.base = base
+        self.targets = [Blockchain.bits_to_target(bits) for bits, _ in bits_and_times]
+        self.times = [timestamp for _, timestamp in bits_and_times]
+
+    def append(self, bits: int, timestamp: int) -> None:
+        self.targets.append(Blockchain.bits_to_target(bits))
+        self.times.append(timestamp)
 
 
 def kimoto_gravity_well(height: int, get_bits_and_time) -> int:
     """Returns the compact target required for the block at `height`.
     `get_bits_and_time(h)` returns (nBits, nTime) of the header at height h < height.
-    Exact port of KimotoGravityWell() in vertcoin-core src/pow.cpp.
+    """
+    base = max(0, height - KGW_PAST_BLOCKS_MAX)
+    return _kimoto_gravity_well(height, KGWHistory(base, [get_bits_and_time(h) for h in range(base, height)]))
+
+
+def _kimoto_gravity_well(height: int, history: KGWHistory) -> int:
+    """Exact port of KimotoGravityWell() in vertcoin-core src/pow.cpp.
+    PastBlocksMass is always equal to the loop counter i, and CBigNum division
+    truncates towards zero. On a steady chain the loop runs the full
+    KGW_PAST_BLOCKS_MAX blocks, so it is kept lean.
     """
     last_solved = height - 1
     if last_solved <= 0 or last_solved < KGW_PAST_BLOCKS_MIN:
         return Blockchain.target_to_bits(MAX_TARGET)
     mainnet = not constants.net.TESTNET
-    _, last_time = get_bits_and_time(last_solved)
-    past_blocks_mass = 0
-    past_rate_actual_seconds = 0
-    past_rate_target_seconds = 0
-    avg = avg_prev = 0
+    targets, times, base = history.targets, history.times, history.base
+    fork_blocks = (LYRA2REV3_FORKBLOCK_MAINNET, VERTHASH_FORKBLOCK_MAINNET) if mainnet else ()
+    fast, slow = _KGW_EVENT_HORIZON, _KGW_EVENT_HORIZON_SLOW
+    last_time = times[last_solved - base]
+    actual_seconds = target_seconds = 0
+    avg = 0
     reading = last_solved
     i = 1
-    while reading > 0:
-        if i > KGW_PAST_BLOCKS_MAX:
-            break
-        past_blocks_mass += 1
-        bits, reading_time = get_bits_and_time(reading)
-        target = Blockchain.bits_to_target(bits)
+    while reading > 0 and i <= KGW_PAST_BLOCKS_MAX:
+        target = targets[reading - base]
         if i == 1:
             avg = target
         else:
-            avg = _div_trunc(target - avg_prev, i) + avg_prev
-        avg_prev = avg
-
-        past_rate_actual_seconds = last_time - reading_time
-        past_rate_target_seconds = KGW_BLOCKS_TARGET_SPACING * past_blocks_mass
-        past_rate_adjustment_ratio = 1.0
-        if past_rate_actual_seconds < 0:
-            past_rate_actual_seconds = 0
-        if past_rate_actual_seconds != 0 and past_rate_target_seconds != 0:
-            past_rate_adjustment_ratio = float(past_rate_target_seconds) / float(past_rate_actual_seconds)
-        event_horizon_deviation_fast = _KGW_EVENT_HORIZON[past_blocks_mass]
-        event_horizon_deviation_slow = 1 / event_horizon_deviation_fast
-
-        if past_blocks_mass >= KGW_PAST_BLOCKS_MIN:
-            if (past_rate_adjustment_ratio <= event_horizon_deviation_slow
-                    or past_rate_adjustment_ratio >= event_horizon_deviation_fast):
+            d = target - avg
+            avg += d // i if d >= 0 else -(-d // i)
+        actual_seconds = last_time - times[reading - base]
+        if actual_seconds < 0:
+            actual_seconds = 0
+        target_seconds = KGW_BLOCKS_TARGET_SPACING * i
+        # with no time elapsed the ratio is 1.0, which is never outside the event horizon
+        if i >= KGW_PAST_BLOCKS_MIN and actual_seconds != 0:
+            ratio = target_seconds / actual_seconds
+            if ratio <= slow[i] or ratio >= fast[i]:
                 break
-        if mainnet and reading in (LYRA2REV3_FORKBLOCK_MAINNET, VERTHASH_FORKBLOCK_MAINNET):
+        if reading in fork_blocks:
             break  # don't calculate past fork block on mainnet
         reading -= 1
         i += 1
 
     new_target = avg
-    if past_rate_actual_seconds != 0 and past_rate_target_seconds != 0:
-        new_target *= past_rate_actual_seconds
-        new_target = _div_trunc(new_target, past_rate_target_seconds)
+    if actual_seconds != 0 and target_seconds != 0:
+        new_target = new_target * actual_seconds // target_seconds
 
     if mainnet:
         if height >= VERTHASH_FORKBLOCK_MAINNET:
@@ -477,10 +485,9 @@ class Blockchain(Logger):
         if pow_hash_as_num > target:
             raise InvalidHeader(f"insufficient proof of work: {pow_hash_as_num} vs target {target}")
 
-    def get_bits_required(self, height: int, recent: Optional[Mapping[int, Tuple[int, int]]] = None) -> int:
-        """Compact target required for the header at `height`.
-        `recent` maps height -> (bits, timestamp) for headers not yet saved (e.g. rest of a chunk).
-        """
+    @staticmethod
+    def _forced_bits(height: int) -> Optional[int]:
+        """The compact target of the heights where vertcoin-core does not use KGW, else None."""
         if height <= constants.net.max_checkpoint():
             raise Exception(f"difficulty is not computed below the max checkpoint (height {height})")
         if not constants.net.TESTNET:
@@ -492,12 +499,21 @@ class Blockchain(Logger):
                 return 0x1b0ffff0  # forced difficulty for 10 blocks - Lyra2REv3 hardfork
             if VERTHASH_FORKBLOCK_MAINNET <= height < VERTHASH_FORKBLOCK_MAINNET + 10:
                 return 0x1c07fff8  # forced difficulty for 10 blocks - Verthash hardfork
-        start = max(0, height - KGW_PAST_BLOCKS_MAX)
-        history = self._read_bits_and_timestamps(start, height - 1, recent or {})
+        return None
 
-        def get_bits_and_time(h: int) -> Tuple[int, int]:
-            return history[h - start]
-        return kimoto_gravity_well(height, get_bits_and_time)
+    def _kgw_history(self, height: int, recent: Mapping[int, Tuple[int, int]]) -> KGWHistory:
+        """The headers KGW may read for the block at `height`."""
+        base = max(0, height - KGW_PAST_BLOCKS_MAX)
+        return KGWHistory(base, self._read_bits_and_timestamps(base, height - 1, recent))
+
+    def get_bits_required(self, height: int, recent: Optional[Mapping[int, Tuple[int, int]]] = None) -> int:
+        """Compact target required for the header at `height`.
+        `recent` maps height -> (bits, timestamp) for headers not yet saved (e.g. rest of a chunk).
+        """
+        bits = self._forced_bits(height)
+        if bits is not None:
+            return bits
+        return _kimoto_gravity_well(height, self._kgw_history(height, recent or {}))
 
     @with_lock
     def _read_bits_and_timestamps(
@@ -543,6 +559,7 @@ class Blockchain(Logger):
         prev_hash = self.get_hash(start_height - 1)
         max_cp = constants.net.max_checkpoint()
         recent = {}  # type: Dict[int, Tuple[int, int]]
+        history = None  # type: Optional[KGWHistory]  # read once, then extended header by header
         for i in range(num):
             height = start_height + i
             try:
@@ -553,9 +570,15 @@ class Blockchain(Logger):
             header = deserialize_header(raw_header, index*CHUNK_SIZE + i)
             bits = None
             if height > max_cp and not constants.net.TESTNET:
-                bits = self.get_bits_required(height, recent)
+                bits = self._forced_bits(height)
+                if bits is None:
+                    if history is None:
+                        history = self._kgw_history(height, recent)
+                    bits = _kimoto_gravity_well(height, history)
             self.verify_header(header, prev_hash, bits, expected_header_hash)
             recent[height] = (header['bits'], header['timestamp'])
+            if history is not None:
+                history.append(header['bits'], header['timestamp'])
             prev_hash = hash_header(header)
 
     @with_lock
