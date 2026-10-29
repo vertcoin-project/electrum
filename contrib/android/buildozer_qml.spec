@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = Electrum
+title = Electrum-VTC
 
 # (str) Package name
-package.name = Electrum
+package.name = electrum_vtc
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.electrum
+package.domain = org.vertcoin
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -63,7 +63,7 @@ source.exclude_patterns = Makefile,setup*,
 
 # (str) Application versioning (method 1)
 version.regex = ELECTRUM_VERSION = '(.*)'
-version.filename = %(source.dir)s/electrum/version.py
+version.filename = %(source.dir)s/electrum_vtc/version.py
 
 # (str) Application versioning (method 2)
 #version = 1.9.8
@@ -83,12 +83,12 @@ requirements =
     libzxing
 
 # (str) Presplash of the application
-presplash.filename = %(source.dir)s/electrum/gui/icons/electrum_presplash.png
+presplash.filename = %(source.dir)s/electrum_vtc/gui/icons/electrum_presplash.png
 
 # (str) Icon of the application
-icon.filename = %(source.dir)s/electrum/gui/icons/android_electrum_icon_legacy.png
-icon.adaptive_foreground.filename = %(source.dir)s/electrum/gui/icons/android_electrum_icon_foreground.png
-icon.adaptive_background.filename = %(source.dir)s/electrum/gui/icons/android_electrum_icon_background.png
+icon.filename = %(source.dir)s/electrum_vtc/gui/icons/android_electrum_icon_legacy.png
+icon.adaptive_foreground.filename = %(source.dir)s/electrum_vtc/gui/icons/android_electrum_icon_foreground.png
+icon.adaptive_background.filename = %(source.dir)s/electrum_vtc/gui/icons/android_electrum_icon_background.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = portrait
@@ -153,7 +153,7 @@ android.accept_sdk_license = True
 # OUYA-ODK/libs/*.jar
 #android.add_jars = foo.jar,bar.jar,path/to/more/*.jar
 
-android.add_jars = .buildozer/android/platform/*/build/libs_collections/Electrum/jar/*.jar
+android.add_jars = .buildozer/android/platform/*/build/libs_collections/electrum_vtc/jar/*.jar
 
 
 # (list) List of Java files to add to the android project (can be java or a

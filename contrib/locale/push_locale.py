@@ -20,7 +20,7 @@ except ImportError as e:
 project_root = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 os.chdir(project_root)
 
-locale_dir = os.path.join(project_root, "electrum", "locale")
+locale_dir = os.path.join(project_root, "electrum_vtc", "locale")
 if not os.path.exists(os.path.join(locale_dir, "locale")):
     raise Exception(f"missing git submodule for locale? {locale_dir}")
 
@@ -107,7 +107,7 @@ print('Add custom header to template')
 subprocess.check_output(cmd)
 
 # prepare uploading to crowdin
-os.chdir(os.path.join(project_root, "electrum"))
+os.chdir(os.path.join(project_root, "electrum_vtc"))
 
 crowdin_api_key = None
 filename = os.path.expanduser('~/.crowdin_api_key')
