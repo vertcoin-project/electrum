@@ -237,6 +237,7 @@ ApplicationWindow
 
                         LightningNetworkStatusIndicator {
                             id: lnnsi
+                            visible: false  // vtc: lightning is disabled
                         }
                         OnchainNetworkStatusIndicator { }
                     }
@@ -603,7 +604,7 @@ ApplicationWindow
             stack.pop()
         } else {
             var dialog = app.messageDialog.createObject(app, {
-                title: qsTr('Close Electrum?'),
+                title: qsTr('Close Electrum-VTC?'),
                 yesno: true
             })
             dialog.accepted.connect(function() {

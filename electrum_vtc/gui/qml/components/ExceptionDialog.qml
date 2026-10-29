@@ -42,7 +42,7 @@ ElDialog
 
         Label {
             Layout.fillWidth: true
-            text: qsTr('Something went wrong while executing Electrum.')
+            text: qsTr('Something went wrong while executing Electrum-VTC.')
         }
         Label {
             Layout.fillWidth: true
@@ -61,42 +61,27 @@ ElDialog
                 dialog.open()
             }
         }
+        // vtc: crash reports would go to electrum.org, so sending them is disabled
         Label {
             Layout.fillWidth: true
-            text: qsTr('Please briefly describe what led to the error (optional):')
+            text: qsTr('Please copy the report contents and open an issue on GitHub.')
+            wrapMode: Text.Wrap
         }
-        TextArea {
-            id: user_text
-            Layout.fillWidth: true
+        Item {
             Layout.fillHeight: true
-            background: Rectangle {
-                color: Qt.darker(Material.background, 1.25)
-            }
-        }
-        Label {
-            text: qsTr('Do you want to send this report?')
+            Layout.preferredWidth: 1
         }
         RowLayout {
             Button {
                 Layout.fillWidth: true
-                Layout.preferredWidth: 3
-                text: qsTr('Send Bug Report')
-                onClicked: {
-                    var dialog = app.messageDialog.createObject(app, {
-                        text: qsTr('Confirm to send bugreport?'),
-                        yesno: true,
-                        z: 1001  // assure topmost of all other dialogs
-                    })
-                    dialog.accepted.connect(function() {
-                        AppController.sendReport(user_text.text)
-                    })
-                    dialog.open()
-                }
+                Layout.preferredWidth: 1
+                text: qsTr('Copy report')
+                onClicked: AppController.textToClipboard(crashData.reportstring)
             }
             Button {
                 Layout.fillWidth: true
-                Layout.preferredWidth: 2
-                text: qsTr('Not Now')
+                Layout.preferredWidth: 1
+                text: qsTr('Close')
                 onClicked: close()
             }
         }

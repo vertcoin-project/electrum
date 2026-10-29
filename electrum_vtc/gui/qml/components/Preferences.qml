@@ -15,7 +15,7 @@ Pane {
 
     padding: 0
 
-    property var _baseunits: ['BTC','mBTC','bits','sat']
+    property var _baseunits: ['VTC','mVTC','bits','sat']
 
     ColumnLayout {
         anchors.fill: parent
@@ -55,7 +55,7 @@ Pane {
                                 if (Config.language != currentValue) {
                                     Config.language = currentValue
                                     var dialog = app.messageDialog.createObject(app, {
-                                        text: qsTr('Please restart Electrum to activate the new GUI settings')
+                                        text: qsTr('Please restart Electrum-VTC to activate the new GUI settings')
                                     })
                                     dialog.open()
                                 }
@@ -89,12 +89,14 @@ Pane {
                         }
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr('Add thousands separators to bitcoin amounts')
+                            text: qsTr('Add thousands separators to vertcoin amounts')
                             wrapMode: Text.Wrap
                         }
                     }
 
+                    // vtc: exchange rates are for BTC, so fiat is hidden
                     RowLayout {
+                        visible: false
                         spacing: 0
                         Switch {
                             id: fiatEnable
@@ -112,6 +114,7 @@ Pane {
 
                     ElComboBox {
                         id: currencies
+                        visible: false
                         model: Daemon.fx.currencies
                         enabled: Daemon.fx.enabled
                         onCurrentValueChanged: {
@@ -121,6 +124,7 @@ Pane {
                     }
 
                     RowLayout {
+                        visible: false
                         Layout.columnSpan: 2
                         Layout.fillWidth: true
                         spacing: 0
@@ -140,12 +144,14 @@ Pane {
                     }
 
                     Label {
+                        visible: false
                         text: qsTr('Exchange rate provider')
                         enabled: Daemon.fx.enabled
                     }
 
                     ElComboBox {
                         id: rateSources
+                        visible: false
                         enabled: Daemon.fx.enabled
                         model: Daemon.fx.rateSources
                         onModelChanged: {
@@ -355,18 +361,22 @@ Pane {
                         }
                     }
 
+                    // vtc: lightning is disabled
                     PrefsHeading {
+                        visible: false
                         Layout.columnSpan: 2
                         text: qsTr('Lightning')
                     }
 
                     Label {
+                        visible: false
                         Layout.fillWidth: true
                         text: Config.shortDescFor('LIGHTNING_PAYMENT_FEE_MAX_MILLIONTHS')
                         wrapMode: Text.Wrap
                     }
 
                     Label {
+                        visible: false
                         Layout.fillWidth: true
                         text: qsTr('<b>%1%</b> of payment').arg(maxfeeslider._fees[maxfeeslider.value]/10000)
                         textFormat: Text.RichText
@@ -375,6 +385,7 @@ Pane {
 
                     Slider {
                         id: maxfeeslider
+                        visible: false
                         Layout.columnSpan: 2
                         Layout.fillWidth: true
                         Layout.leftMargin: constants.paddingXLarge
@@ -398,6 +409,7 @@ Pane {
                     }
 
                     RowLayout {
+                        visible: false
                         Layout.columnSpan: 2
                         Layout.fillWidth: true
                         spacing: 0
@@ -433,6 +445,7 @@ Pane {
                     }
 
                     RowLayout {
+                        visible: false
                         Layout.columnSpan: 2
                         Layout.fillWidth: true
                         spacing: 0

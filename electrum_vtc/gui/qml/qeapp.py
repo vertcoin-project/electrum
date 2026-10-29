@@ -173,13 +173,13 @@ class QEAppController(BaseCrashReporter, QObject):
             )
         try:
             if self.isAndroid():
-                self._notify_android('Electrum', message, large_icon=icon)
+                self._notify_android('Electrum-VTC', message, large_icon=icon)
                 return
             # TODO: lazy load not in UI thread please
             global notification
             if not notification:
                 from plyer import notification
-            notification.notify('Electrum', message, app_icon=icon, app_name='Electrum')
+            notification.notify('Electrum-VTC', message, app_icon=icon, app_name='Electrum-VTC')
         except ImportError:
             self.logger.warning('Notification: needs plyer; `python3 -m pip install plyer`')
         except Exception as e:

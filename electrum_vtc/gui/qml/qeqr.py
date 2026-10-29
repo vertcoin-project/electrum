@@ -27,6 +27,7 @@ except ImportError:
     _LUMA_PLANE_FORMATS = frozenset()
 
 from electrum_vtc.logging import get_logger
+from electrum_vtc.bip21 import BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME
 from electrum_vtc.qrreader import get_qr_reader
 from electrum_vtc.util import profiler
 from electrum_vtc.gui.common_qt.util import draw_qr
@@ -178,7 +179,7 @@ class QEQRImageProvider(QQuickImageProvider):
         # (unknown schemes might be found when a colon is in a serialized TX, which
         # leads to mangling of the tx, so we check for supported schemes.)
         uri = urllib.parse.urlparse(qstr)
-        if uri.scheme and uri.scheme in ['bitcoin', 'lightning']:
+        if uri.scheme and uri.scheme in [BITCOIN_BIP21_URI_SCHEME, LIGHTNING_URI_SCHEME]:
             # urlencode request parameters
             query = urllib.parse.parse_qs(uri.query)
             query = urllib.parse.urlencode(query, doseq=True, quote_via=urllib.parse.quote)
