@@ -777,7 +777,7 @@ class TxEditor(WindowModalDialog, SubmarineSwapMixin, Logger):
         self.submarine_we_send_label = IconLabel(text=_('You send')+':')
         self.submarine_we_send_label.setIcon(read_QIcon('lightning.png'))
         self.submarine_they_receive_label = IconLabel(text=_('They receive')+':')
-        self.submarine_they_receive_label.setIcon(read_QIcon('bitcoin.png'))
+        self.submarine_they_receive_label.setIcon(read_QIcon('vertcoin.png'))
         # column 0 (labels)
         h.addWidget(self.submarine_we_send_label, 0, 0)
         h.addWidget(self.submarine_they_receive_label, 1, 0)
