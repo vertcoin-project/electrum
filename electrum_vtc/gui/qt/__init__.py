@@ -365,6 +365,9 @@ class ElectrumGui(BaseElectrumGui, Logger):
         w.warn_if_testnet()
         w.warn_if_watching_only()
         w.show_startup_warnings()
+        # vtc: a missing verthash datafile is generated in a child process from the
+        # start; if it is not ready yet, the window shows its progress
+        w.watch_verthash_datafile()
         return w
 
     def count_wizards_in_progress(func):

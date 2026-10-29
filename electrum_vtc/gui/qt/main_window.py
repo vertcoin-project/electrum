@@ -50,7 +50,7 @@ import electrum_ecc as ecc
 import electrum_vtc
 from electrum_vtc.gui import messages
 from electrum_vtc import (keystore, constants, util, bitcoin, commands,
-                      lnutil)
+                      lnutil, verthash)
 from electrum_vtc.bitcoin import COIN, is_address, DummyAddress
 from electrum_vtc.plugin import run_hook
 from electrum_vtc.i18n import _
@@ -488,6 +488,24 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
     @qt_event_listener
     def on_event_network_updated(self, *args):
+        self.update_status()
+
+    def watch_verthash_datafile(self):
+        """vtc: show the progress of generating verthash.dat, if it is (or gets)
+        under way while this window is open."""
+        self._verthash_dialog_shown = False
+        self._maybe_show_verthash_dialog()
+
+    def _maybe_show_verthash_dialog(self):
+        if getattr(self, '_verthash_dialog_shown', True) or verthash.datafile.progress is None:
+            return
+        self._verthash_dialog_shown = True
+        from .verthash_dialog import VerthashDialog
+        VerthashDialog(self).show()
+
+    @qt_event_listener
+    def on_event_verthash_progress(self, progress):
+        self._maybe_show_verthash_dialog()
         self.update_status()
 
     @qt_event_listener
@@ -1092,8 +1110,14 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
                 name = list(self._coroutines_scheduled.values())[0] + '...'
         else:
             name = f"{num_tasks} " + _('tasks') + '...'
+        # vtc: generating verthash.dat, in the background
+        progress = verthash.datafile.progress
+        if progress is not None and not verthash.datafile.is_ready():
+            vh = (_('Creating verthash.dat: {}%').format(int(progress * 100)) if progress < 1
+                  else _('Checking verthash.dat...'))
+            name = f'{name}  {vh}' if name else vh
         self.tasks_label.setText(name)
-        self.tasks_label.setVisible(num_tasks > 0)
+        self.tasks_label.setVisible(bool(name))
 
     def num_tasks(self):
         # For the moment, all the coroutines in this set are outgoing LN payments,

@@ -28,8 +28,10 @@
 
 import hashlib
 import mmap
+import multiprocessing
 import os
 import struct
+import sys
 import threading
 import time
 from typing import Callable, Optional, Sequence, TYPE_CHECKING
@@ -239,6 +241,39 @@ def generate_datafile(path: str, *, progress_cb: Optional[Callable[[float], None
     os.replace(tmp_path, path)
 
 
+def _generate_in_child(path: str, progress) -> None:
+    def on_progress(x: float):
+        progress.value = x
+    generate_datafile(path, progress_cb=on_progress)
+
+
+class _CannotSpawn(Exception):
+    pass
+
+
+def _generate_in_process(path: str, progress_cb: Callable[[float], None]) -> None:
+    """generate_datafile() in a child process. It is minutes of CPU-bound pure
+    python, which in a thread holds the GIL and makes the GUI sluggish.
+    Raises _CannotSpawn if no child process could be run here."""
+    if 'ANDROID_DATA' in os.environ or not sys.executable:
+        raise _CannotSpawn("no python executable to run a child process")
+    ctx = multiprocessing.get_context('spawn')
+    progress = ctx.Value('d', 0.0, lock=False)
+    proc = ctx.Process(target=_generate_in_child, args=(path, progress), name='verthash-datafile', daemon=True)
+    try:
+        proc.start()
+    except Exception as e:
+        raise _CannotSpawn(repr(e)) from e
+    while proc.is_alive():
+        proc.join(0.5)
+        progress_cb(progress.value)
+    if proc.exitcode != 0:
+        if progress.value == 0:
+            # it never got going, e.g. a frozen app that cannot run the child
+            raise _CannotSpawn(f"child process exited with code {proc.exitcode}")
+        raise VerthashDatafileError(f"datafile generation exited with code {proc.exitcode}")
+
+
 def verify_datafile(path: str) -> bool:
     try:
         if os.path.getsize(path) != DATAFILE_SIZE:
@@ -323,7 +358,7 @@ class VerthashDatafile:
         self._file = None
         self.path = None  # type: Optional[str]
         self.error = None  # type: Optional[str]
-        self.progress = None  # type: Optional[float]
+        self.progress = None  # type: Optional[float]  # set while generating
         self._thread = None  # type: Optional[threading.Thread]
 
     def is_ready(self) -> bool:
@@ -402,7 +437,11 @@ class VerthashDatafile:
                 self._notify()
             on_progress(0.0)
             try:
-                generate_datafile(path, progress_cb=on_progress)
+                try:
+                    _generate_in_process(path, on_progress)
+                except _CannotSpawn as e:
+                    _logger.info(f"generating the verthash datafile in this process: {e}")
+                    generate_datafile(path, progress_cb=on_progress)
             except Exception as e:
                 self.error = repr(e)
                 self.progress = None

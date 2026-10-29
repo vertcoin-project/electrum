@@ -625,4 +625,8 @@ def handle_cmd(*, cmdname: str, config: 'SimpleConfig', config_options: dict):
 
 
 if __name__ == '__main__':
+    # vtc: the verthash datafile is generated in a child process, which a frozen
+    # (PyInstaller) executable runs by starting itself again; this hands it over
+    import multiprocessing
+    multiprocessing.freeze_support()
     main()
