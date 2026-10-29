@@ -81,17 +81,22 @@ done
 
 mkdir -p "$DIST_BASE" "$OUTDIR_BASE" "$DISTSRC_BASE" "$CACHE_PATH"
 
-# The translations are a submodule; check it out at the commit the tree records
-git submodule update --init electrum_vtc/locale
+# The translations and vertcoinhash (whose verthash module the releases
+# bundle) are submodules; check them out at the commits the tree records
+SUBMODULES="electrum_vtc/locale contrib/vertcoinhash"
+# shellcheck disable=SC2086
+git submodule update --init $SUBMODULES
 
 # git archive output depends only on the commits
 SRC_TAR="${DIST_BASE}/electrum-vtc-${SHORT}.tar"
 if [ ! -e "$SRC_TAR" ]; then
     git archive --format=tar --prefix=src/ --output="${SRC_TAR}.tmp" HEAD
-    git -C electrum_vtc/locale archive --format=tar --prefix=src/electrum_vtc/locale/ \
-        --output="${DIST_BASE}/locale.tar" HEAD
-    tar --concatenate --file="${SRC_TAR}.tmp" "${DIST_BASE}/locale.tar"
-    rm "${DIST_BASE}/locale.tar"
+    for sub in $SUBMODULES; do
+        git -C "$sub" archive --format=tar --prefix="src/${sub}/" \
+            --output="${DIST_BASE}/submodule.tar" "$(git rev-parse "HEAD:${sub}")"
+        tar --concatenate --file="${SRC_TAR}.tmp" "${DIST_BASE}/submodule.tar"
+        rm "${DIST_BASE}/submodule.tar"
+    done
     mv "${SRC_TAR}.tmp" "$SRC_TAR"
 fi
 

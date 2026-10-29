@@ -6,7 +6,7 @@
 # Every release bundles a python-build-standalone CPython 3.12, Electrum-VTC's
 # pure-python dependencies built here from their (hash-pinned) source, the
 # binary wheels upstream Electrum also ships (PyQt6, cryptography, cffi), and a
-# libsecp256k1 compiled here for the target.
+# libsecp256k1 and vertcoinhash's verthash module compiled here for the target.
 export LC_ALL=C
 export TZ=UTC
 set -o errexit -o pipefail -o nounset
@@ -107,16 +107,17 @@ install_packages() {
     rm -rf "$site/bin"
 }
 
-# install_electrum SITE_PACKAGES LIBSECP: the electrum_vtc package, compiled
-# translations only, and libsecp256k1 next to electrum_ecc, which loads it from
-# its own directory
+# install_electrum SITE_PACKAGES LIBSECP VERTHASH_MODULE: the electrum_vtc
+# package, compiled translations only, libsecp256k1 next to electrum_ecc, which
+# loads it from its own directory, and the verthash module
 install_electrum() {
-    local site="$1" lib="$2"
+    local site="$1" lib="$2" verthash="$3"
     cp -a "$SRC/electrum_vtc" "$site/"
     find "$site/electrum_vtc/locale" -type f ! -name '*.mo' -delete
     find "$site/electrum_vtc/locale" -depth -type d -empty -delete
     rm -f "$site"/electrum_vtc/*.dll "$site"/electrum_vtc/*.so* "$site"/electrum_vtc/*.dylib
     cp "$lib" "$site/electrum_ecc/"
+    cp "$verthash" "$site/"
 }
 
 # Unused parts of the interpreter and of Qt, as contrib/build-linux/appimage/make_appimage.sh removes
@@ -172,6 +173,50 @@ build_secp() {
     echo "built $(basename "$SECP_LIB")"
 }
 
+# build_vertcoinhash CC CFLAGS SUFFIX LINK...: vertcoinhash's verthash module
+# (its C Verthash and verthash.dat generator, which electrum_vtc/verthash.py
+# uses when it imports) from the contrib/vertcoinhash submodule, with the
+# sources and flags of its setup.py, against the stable ABI as its wheels are;
+# sets VERTHASH_MOD to the module. Needs extract_python's headers in /tmp/pbs.
+VERTHASH_SOURCES="scrypt.c Lyra2RE.c Sponge.c Lyra2.c sha3/blake.c sha3/groestl.c sha3/keccak.c
+                  sha3/cubehash.c sha3/bmw.c sha3/skein.c h2.c tiny_sha3/sha3.c
+                  verthashmodule.c verthash_datfile.c"
+build_vertcoinhash() {
+    local cc="$1" cflags="$2" suffix="$3" src obj objs=()
+    shift 3
+    rm -rf /tmp/vertcoinhash
+    mkdir -p /tmp/vertcoinhash
+    for src in $VERTHASH_SOURCES; do
+        obj="/tmp/vertcoinhash/$(echo "$src" | tr / _).o"
+        # shellcheck disable=SC2086
+        (cd "$SRC/contrib/vertcoinhash" && $cc -O3 -fno-strict-aliasing -std=c99 -DNDEBUG \
+            -DPy_LIMITED_API=0x030B0000 -I. -I./sha3 -I./tiny_sha3 \
+            -ffile-prefix-map="$SRC/contrib/vertcoinhash"=. $cflags -c "$src" -o "$obj")
+        objs+=("$obj")
+    done
+    VERTHASH_MOD="/tmp/vertcoinhash/verthash${suffix}"
+    # shellcheck disable=SC2086
+    $cc "$@" -o "$VERTHASH_MOD" "${objs[@]}"
+    echo "built $(basename "$VERTHASH_MOD")"
+}
+
+# check_elf FILE: it needs only libraries every glibc system has, nothing newer
+# than glibc 2.31, and has no search path
+check_elf() {
+    local needed newest lib
+    needed="$("${HOST}-readelf" -d "$1" | sed -n 's/.*(NEEDED).*\[\(.*\)\]/\1/p' | tr '\n' ' ')"
+    for lib in $needed; do
+        case "$lib" in
+            libc.so.6|libm.so.6|libgcc_s.so.1|ld-linux-x86-64.so.2) ;;
+            *) echo "ERR: $(basename "$1") needs $lib" >&2; exit 1 ;;
+        esac
+    done
+    if "${HOST}-readelf" -d "$1" | grep -E 'RPATH|RUNPATH'; then echo "ERR: search path in $1" >&2; exit 1; fi
+    newest="$("${HOST}-readelf" -V --wide "$1" | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)"
+    printf '%s\n' "$newest" GLIBC_2.31 | sort -CV || { echo "ERR: $(basename "$1") needs $newest" >&2; exit 1; }
+    echo "$(basename "$1"): needs $needed, newest symbol $newest"
+}
+
 # extract_python TARBALL DEST: python-build-standalone's install_only layout is python/...
 extract_python() {
     rm -rf /tmp/pbs
@@ -206,15 +251,21 @@ case "$HOST" in
         cross_paths "$(store_path "glibc-cross-${HOST}")" "$(store_path "linux-libre-headers-cross-${HOST}")"
         build_secp "$HOST" CC="${HOST}-gcc"
         "${HOST}-strip" -R .note.gnu.build-id -R .comment "$SECP_LIB"
-        newest="$("${HOST}-readelf" -V --wide "$SECP_LIB" | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)"
-        printf '%s\n' "$newest" GLIBC_2.31 | sort -CV || { echo "ERR: libsecp256k1 needs $newest" >&2; exit 1; }
+        check_elf "$SECP_LIB"
 
         echo "== AppDir"
         APPDIR=/tmp/Electrum-VTC.AppDir
         extract_python "${PBS}-x86_64-unknown-linux-gnu-install_only.tar.gz" "$APPDIR/usr"
+
+        echo "== vertcoinhash's verthash module ($HOST)"
+        build_vertcoinhash "${HOST}-gcc" "-fPIC -I/tmp/pbs/python/include/python${PY_MAJOR}" .abi3.so \
+            -shared -Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now
+        "${HOST}-strip" --strip-unneeded -R .note.gnu.build-id -R .comment "$VERTHASH_MOD"
+        check_elf "$VERTHASH_MOD"
+
         site="$APPDIR/usr/lib/python${PY_MAJOR}/site-packages"
         install_packages "$site" manylinux_2_28_x86_64 manylinux_2_17_x86_64 manylinux2014_x86_64
-        install_electrum "$site" "$SECP_LIB"
+        install_electrum "$site" "$SECP_LIB" "$VERTHASH_MOD"
         cp run_electrum "$APPDIR/usr/bin/electrum-vtc"
         cat > "$APPDIR/AppRun" <<'EOF'
 #!/bin/sh
@@ -255,6 +306,15 @@ EOF
         WINEPY=(wine "$PYHOME/python.exe" -B)
         "${WINEPY[@]}" -c "import sys; print('Windows', sys.version)"
 
+        echo "== vertcoinhash's verthash module ($HOST)"
+        # MS_WIN64: Python's Windows pyconfig.h only sets 64-bit sizes for MSVC otherwise.
+        # Linking python3.dll, the stable ABI's DLL, as vertcoinhash's wheel does.
+        build_vertcoinhash "${HOST}-gcc" "-DMS_WIN64 -I/tmp/pbs/python/include" .pyd \
+            -shared -static-libgcc -Wl,--no-insert-timestamp -L/tmp/pbs/python -lpython3
+        "${HOST}-strip" --strip-unneeded "$VERTHASH_MOD"
+        echo "$(basename "$VERTHASH_MOD"): imports $("${HOST}-objdump" -p "$VERTHASH_MOD" | sed -n 's/^\s*DLL Name: //p' | tr '\n' ' ')"
+        "${WINEPY[@]}" -c "import sys; sys.path.insert(0, r'Z:/tmp/vertcoinhash'); import verthash; print('imports', verthash.__file__, hasattr(verthash, 'create_datafile'))"
+
         echo "== PyInstaller, with its bootloader built from source"
         # as contrib/build-wine/prepare-wine.sh: our own bootloader, tagged with
         # the commit, so each release's differs from the stock one
@@ -282,7 +342,7 @@ EOF
         echo "== Electrum-VTC and its dependencies"
         site="$PYHOME/Lib/site-packages"
         install_packages "$site" win_amd64
-        install_electrum "$site" "$SECP_LIB"
+        install_electrum "$site" "$SECP_LIB" "$VERTHASH_MOD"
         PROJECT="$WINEPREFIX/drive_c/electrum"
         cp -a "$SRC" "$PROJECT"
         cp "$SECP_LIB" "$PROJECT/electrum_vtc/"
@@ -353,9 +413,15 @@ EOF
         APP=/tmp/mac/Electrum-VTC.app
         mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
         extract_python "${PBS}-${conf_host}-install_only.tar.gz" "$APP/Contents/Resources/python"
+
+        echo "== vertcoinhash's verthash module ($HOST)"
+        build_vertcoinhash "$darwin_cc" "-I/tmp/pbs/python/include/python${PY_MAJOR}" .abi3.so \
+            -bundle -undefined dynamic_lookup
+        llvm-objdump --macho --private-headers "$VERTHASH_MOD" | grep -A3 -E 'LC_BUILD_VERSION|LC_CODE_SIGNATURE' | head -12
+
         site="$APP/Contents/Resources/python/lib/python${PY_MAJOR}/site-packages"
         install_packages "$site" "$platform"
-        install_electrum "$site" "$SECP_LIB"
+        install_electrum "$site" "$SECP_LIB" "$VERTHASH_MOD"
         cp run_electrum "$APP/Contents/Resources/electrum-vtc"
         cp electrum_vtc/gui/icons/electrum.icns "$APP/Contents/Resources/electrum.icns"
         cat > "$APP/Contents/MacOS/Electrum-VTC" <<'EOF'

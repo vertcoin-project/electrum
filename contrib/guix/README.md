@@ -40,10 +40,14 @@ Outputs, and a `SHA256SUMS.part` for each host, are written to
    - builds every dependency in `requirements.txt` from source as pure python, without optional C
      extensions, as `contrib/make_packages.sh` does;
    - adds the binary wheels upstream Electrum ships too (PyQt6, PyQt6-Qt6, PyQt6-sip, cryptography, cffi);
-   - compiles libsecp256k1 for the target:
+   - compiles libsecp256k1, and vertcoinhash's `verthash` module, for the target:
      - Linux: Bitcoin Core's GCC 14 targeting glibc 2.31;
      - Windows: its MinGW-w64 toolchain;
      - macOS: clang/lld 19 against the SDK.
+
+     vertcoinhash comes from the `contrib/vertcoinhash` submodule and is built with the sources and flags of
+     its `setup.py`, for CPython's stable ABI as its wheels are. `electrum_vtc/verthash.py` then uses its C
+     Verthash to check headers, and its C generator to create verthash.dat, instead of the pure-python ones.
 3. **packaging**:
    - **AppImage**: CPython, packages and `electrum_vtc/` in an AppDir, packed with `mksquashfs`
      (fixed times, root owned) behind the type2 runtime.

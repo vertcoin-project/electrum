@@ -5,3 +5,6 @@
 [submodule "electrum_vtc/plugins/keepkey/keepkeylib"]
 	path = electrum_vtc/plugins/keepkey/keepkeylib
     url = https://github.com/spesmilo/electrum-keepkeylib.git
+[submodule "contrib/vertcoinhash"]
+	path = contrib/vertcoinhash
+	url = https://github.com/vertcoin-project/vertcoinhash-python.git
