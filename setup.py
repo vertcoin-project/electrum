@@ -62,7 +62,7 @@ setup(
     install_requires=requirements,
     extras_require=extras_require,
     packages=(['electrum_vtc',]
-              + [('electrum.'+pkg) for pkg in
+              + [('electrum_vtc.'+pkg) for pkg in
                  find_packages('electrum_vtc', exclude=["tests"])]),
     package_dir={
         'electrum_vtc': 'electrum_vtc'
@@ -71,12 +71,12 @@ setup(
     # package_data kwarg lists what gets put in site-packages when pip installing the tar.gz.
     # By specifying include_package_data=True, MANIFEST.in becomes responsible for both.
     include_package_data=True,
-    scripts=['electrum_vtc/electrum'],
+    scripts=['electrum_vtc/electrum-vtc'],
     data_files=data_files,
     description="Lightweight Vertcoin Wallet",
     author="Thomas Voegtlin",
     author_email="thomasv@electrum.org",
     license="MIT Licence",
-    url="https://electrum.org",
+    url="https://github.com/vertcoin-project/electrum",
     long_description="""Lightweight Vertcoin Wallet""",
 )
