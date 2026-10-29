@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT
 
 
-PYPKG="electrum"
+PYPKG="electrum_vtc"
 MAIN_SCRIPT="run_electrum"
-PROJECT_ROOT = "C:/electrum"
+PROJECT_ROOT = os.environ.get("ELECTRUM_PROJECT_ROOT", "C:/electrum")
 ICONS_FILE=f"{PROJECT_ROOT}/{PYPKG}/gui/icons/electrum.ico"
 
 cmdline_name = os.environ.get("ELECTRUM_CMDLINE_NAME")
@@ -44,14 +44,16 @@ datas = [
     (f"{PROJECT_ROOT}/{PYPKG}/gui/fonts", f"{PYPKG}/gui/fonts"),
 ]
 datas += collect_data_files(f"{PYPKG}.plugins")
-datas += collect_data_files('trezorlib')  # TODO is this needed? and same question for other hww libs
-datas += collect_data_files('safetlib')
-datas += collect_data_files('ckcc')
-datas += collect_data_files('bitbox02')
+# hardware wallet libraries are optional (not bundled by the Guix build)
+import importlib.util
+for hw_pkg in ('trezorlib', 'safetlib', 'ckcc', 'bitbox02'):  # TODO is this needed? and same question for other hww libs
+    if importlib.util.find_spec(hw_pkg):
+        datas += collect_data_files(hw_pkg)
 
 # some deps rely on importlib metadata
-datas += copy_metadata('slip10')  # from trezor->slip10
-datas += copy_metadata('trezor')
+for hw_dist, hw_module in (('slip10', 'slip10'), ('trezor', 'trezorlib')):  # from trezor->slip10
+    if importlib.util.find_spec(hw_module):
+        datas += copy_metadata(hw_dist)
 
 # Exclude parts of Qt that we never use. Reduces binary size by tens of MBs. see #4815
 excludes = [

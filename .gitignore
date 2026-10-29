@@ -50,3 +50,7 @@ electrum/*.so.*
 electrum/*.dll
 electrum/*.dylib
 contrib/osx/*.dylib
+
+# guix builds (contrib/guix)
+/guix-build-*/
+/guix-cache/

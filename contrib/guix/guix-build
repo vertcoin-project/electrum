@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+# Reproducible build of the Electrum-VTC releases with Guix. See contrib/guix/README.md.
+#
+#   ./contrib/guix/guix-build
+#
+# Environment:
+#   HOSTS      what to build (default: all of them)
+#                sdist                Electrum-VTC-<name>.tar.gz, the Python source distribution
+#                x86_64-linux-gnu     electrum-vtc-<name>-x86_64.AppImage
+#                x86_64-w64-mingw32   electrum-vtc-<name>-setup.exe, electrum-vtc-<name>.exe
+#                                     (standalone) and electrum-vtc-<name>-portable.exe
+#                x86_64-apple-darwin  electrum-vtc-<name>-x86_64-macos.zip
+#                arm64-apple-darwin   electrum-vtc-<name>-arm64-macos.zip
+#   SDK_PATH   directory holding Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers,
+#              needed for the macOS hosts (see contrib/guix/README.md)
+#   VERSION    version to name the outputs after. Unset, it is the version in
+#              electrum_vtc/version.py, followed by the commit unless HEAD is
+#              tagged with that version.
+#   JOBS       parallel jobs (default: nproc)
+#   CACHE_PATH where the downloaded Python distributions and packages are kept
+#              between builds (default: ./guix-cache). Everything in it is
+#              checked against contrib/guix/downloads.txt and the hash-pinned
+#              requirements files.
+export LC_ALL=C
+set -o errexit -o pipefail -o nounset
+
+cd "$(git rev-parse --show-toplevel)"
+
+# The Guix commit every package comes from. Changing it changes the output.
+# It is the one Bitcoin Core v32.0 pins, so the toolchains copied into
+# manifest.scm build exactly as they do there.
+GUIX_COMMIT=c5eee3336cc1d10a3cc1c97fde2809c3451624d3
+
+ALL_HOSTS="sdist x86_64-linux-gnu x86_64-w64-mingw32 x86_64-apple-darwin arm64-apple-darwin"
+HOSTS="${HOSTS:-$ALL_HOSTS}"
+JOBS="${JOBS:-$(nproc)}"
+CACHE_PATH="${CACHE_PATH:-$PWD/guix-cache}"
+SDK_NAME="Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers"
+
+# The build is of the commit, not the working tree, so refuse to run when they differ
+if [ -n "$(git status --porcelain --untracked-files=no --ignore-submodules=all)" ]; then
+    echo "ERR: the working tree has uncommitted changes; commit or stash them first" >&2
+    git status --short --untracked-files=no >&2
+    exit 1
+fi
+
+COMMIT="$(git rev-parse HEAD)"
+SHORT="${COMMIT:0:12}"
+SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git log -1 --format=%ct HEAD)}"
+PKG_VERSION="$(sed -n "s/^ELECTRUM_VERSION = '\([^']*\)'.*/\1/p" electrum_vtc/version.py)"
+if [ -z "${VERSION:-}" ]; then
+    if [ "$(git tag --points-at HEAD | grep -cx "v\?${PKG_VERSION}")" != 0 ]; then
+        VERSION="$PKG_VERSION"
+    else
+        VERSION="${PKG_VERSION}-${SHORT}"
+    fi
+fi
+
+BUILD_BASE="$PWD/guix-build-${SHORT}"
+DIST_BASE="${BUILD_BASE}/dist-archive"
+OUTDIR_BASE="${BUILD_BASE}/output"
+DISTSRC_BASE="${BUILD_BASE}/distsrc"
+
+for host in $HOSTS; do
+    case " $ALL_HOSTS " in
+        *" $host "*) ;;
+        *) echo "ERR: unsupported host '$host'" >&2; exit 1 ;;
+    esac
+    if [ -e "${OUTDIR_BASE}/${host}" ]; then
+        echo "ERR: ${OUTDIR_BASE}/${host} already exists; remove it to rebuild" >&2
+        exit 1
+    fi
+    case "$host" in
+        *-apple-darwin)
+            if [ ! -d "${SDK_PATH:-}/${SDK_NAME}" ]; then
+                echo "ERR: ${host} needs SDK_PATH with ${SDK_NAME} in it" >&2
+                exit 1
+            fi ;;
+    esac
+done
+
+mkdir -p "$DIST_BASE" "$OUTDIR_BASE" "$DISTSRC_BASE" "$CACHE_PATH"
+
+# The translations are a submodule; check it out at the commit the tree records
+git submodule update --init electrum_vtc/locale
+
+# git archive output depends only on the commits
+SRC_TAR="${DIST_BASE}/electrum-vtc-${SHORT}.tar"
+if [ ! -e "$SRC_TAR" ]; then
+    git archive --format=tar --prefix=src/ --output="${SRC_TAR}.tmp" HEAD
+    git -C electrum_vtc/locale archive --format=tar --prefix=src/electrum_vtc/locale/ \
+        --output="${DIST_BASE}/locale.tar" HEAD
+    tar --concatenate --file="${SRC_TAR}.tmp" "${DIST_BASE}/locale.tar"
+    rm "${DIST_BASE}/locale.tar"
+    mv "${SRC_TAR}.tmp" "$SRC_TAR"
+fi
+
+time-machine() {
+    guix time-machine --url=https://codeberg.org/guix/guix.git \
+                      --commit="$GUIX_COMMIT" \
+                      --cores="$JOBS" \
+                      --keep-failed \
+                      --fallback \
+                      -- "$@"
+}
+
+# Container flags shared by both steps:
+#   --container --pure --no-cwd  nothing from this machine's environment or
+#                                 working directory reaches the build
+#   --rebuild-cache               guix shell caches the profile per manifest file
+#                                 and ignores HOST, which the manifest reads, so
+#                                 without it every step gets the first step's profile
+#   --expose                      the scripts and the source archive, read-only
+container=(
+    --manifest="$PWD/contrib/guix/manifest.scm"
+    --rebuild-cache
+    --container
+    --pure
+    --no-cwd
+    --expose="$PWD/contrib/guix/libexec=/libexec"
+    --expose="$DIST_BASE=/dist"
+    --share="$CACHE_PATH=/cache"
+)
+
+echo "Fetching Python distributions and packages for ${SHORT} into ${CACHE_PATH}"
+HOST=fetch time-machine shell "${container[@]}" --network -- \
+    env SRC_TAR="/dist/$(basename "$SRC_TAR")" \
+        HOSTS="$HOSTS" \
+    bash /libexec/fetch.sh
+
+for host in $HOSTS; do
+    echo "Building ${host} for ${SHORT} (${VERSION})"
+    rm -rf "${DISTSRC_BASE:?}/${host}"
+    mkdir -p "${DISTSRC_BASE}/${host}" "${OUTDIR_BASE}/${host}"
+    sdk=()
+    case "$host" in
+        *-apple-darwin) sdk=(--expose="${SDK_PATH}/${SDK_NAME}=/sdk") ;;
+    esac
+    # No --network: the build sees only the archive and the fetched packages
+    HOST="$host" time-machine shell "${container[@]}" "${sdk[@]}" \
+        --share="${DISTSRC_BASE}/${host}=/distsrc" \
+        --share="${OUTDIR_BASE}/${host}=/outdir" -- \
+        env HOST="$host" \
+            JOBS="$JOBS" \
+            NAME="$VERSION" \
+            COMMIT="$COMMIT" \
+            SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" \
+            SRC_TAR="/dist/$(basename "$SRC_TAR")" \
+        bash /libexec/build.sh
+done
+
+echo
+echo "Outputs in ${OUTDIR_BASE}:"
+cat "${OUTDIR_BASE}"/*/SHA256SUMS.part

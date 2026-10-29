@@ -1,0 +1,20 @@
+# Files fetch.sh downloads into $CACHE_PATH/dl, each checked against its sha256.
+# <sha256> <host(s) that need it, comma separated> <file name> <url>
+#
+# python-build-standalone: relocatable CPython 3.12 builds, the interpreter
+# bundled in the AppImage, the Windows executables and the macOS app.
+# https://github.com/astral-sh/python-build-standalone/releases/tag/20261021 (SHA256SUMS)
+5ff9f0602ce964a529ed1e8555d3abab6341926d724402ba9a15e9e877191124 x86_64-linux-gnu cpython-3.12.15+20261021-x86_64-unknown-linux-gnu-install_only.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.12.15%2B20261021-x86_64-unknown-linux-gnu-install_only.tar.gz
+be7f14464d1d66f84429ad27e01f6d1482963afff64a2fb5256b2a51c7b5d398 x86_64-w64-mingw32 cpython-3.12.15+20261021-x86_64-pc-windows-msvc-install_only.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.12.15%2B20261021-x86_64-pc-windows-msvc-install_only.tar.gz
+869e0b30959beccc616ce14907439f4d0b3170c5830a2362dade07f07b0ed3b8 x86_64-apple-darwin cpython-3.12.15+20261021-x86_64-apple-darwin-install_only.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.12.15%2B20261021-x86_64-apple-darwin-install_only.tar.gz
+a18cc33862b53bd54a148c710def5375c1b47470cccedf817a19c2d211764584 arm64-apple-darwin cpython-3.12.15+20261021-aarch64-apple-darwin-install_only.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.12.15%2B20261021-aarch64-apple-darwin-install_only.tar.gz
+#
+# libsecp256k1 v0.8.0, the commit contrib/make_libsecp256k1.sh pins
+3fe9fd705f4fdf2fe90d6e04b6c1fedd7e8f244a119315886f6468f52c2dfc33 x86_64-linux-gnu,x86_64-w64-mingw32,x86_64-apple-darwin,arm64-apple-darwin secp256k1-6e2c8bc4ecdc6e71dbe7a368f360d8d453ce435d.tar.gz https://github.com/bitcoin-core/secp256k1/archive/6e2c8bc4ecdc6e71dbe7a368f360d8d453ce435d.tar.gz
+#
+# AppImage type2 runtime (static), prepended to the squashfs image
+2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d x86_64-linux-gnu runtime-x86_64 https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-x86_64
+#
+# PyInstaller 6.13.0, the release contrib/build-wine/prepare-wine.sh pins; its
+# bootloader is rebuilt from this source with the MinGW-w64 toolchain
+38911feec2c5e215e5159a7e66fdb12400168bd116143b54a8a7a37f08733456 x86_64-w64-mingw32 pyinstaller-6.13.0.tar.gz https://files.pythonhosted.org/packages/a8/b1/2949fe6d3874e961898ca5cfc1bf2cf13bdeea488b302e74a745bc28c8ba/pyinstaller-6.13.0.tar.gz

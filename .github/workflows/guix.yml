@@ -1,0 +1,102 @@
+name: guix
+
+# Reproducible Electrum-VTC release builds with Guix (contrib/guix), one job per
+# target. Based on Feather Wallet's .github/workflows/guix.yml.
+
+on:
+  push:
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-guix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        host:
+          - sdist
+          - x86_64-linux-gnu
+          - x86_64-w64-mingw32
+          - x86_64-apple-darwin
+          - arm64-apple-darwin
+    name: ${{ matrix.host }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          fetch-depth: 0
+      # https://github.com/actions/checkout/issues/1467
+      - name: git fetch tags
+        run: git fetch --tags --force
+      - name: remove bundled packages
+        run: sudo rm -rf /usr/local
+      - name: download cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        with:
+          path: guix-cache
+          key: guix-cache-${{ matrix.host }}-${{ hashFiles('contrib/guix/downloads.txt', 'contrib/deterministic-build/*.txt') }}
+      - name: install dependencies
+        run: sudo apt update; sudo apt -y install git ca-certificates apparmor-utils
+      - name: apparmor workaround
+        # https://bugs.launchpad.net/ubuntu/+source/guix/+bug/2064115
+        run: |
+          sudo tee /etc/apparmor.d/guix << EOF
+          abi <abi/3.0>,
+          include <tunables/global>
+          profile guix /gnu/store/{*-guix-command,*/bin/guix-daemon,*/bin/guix,*/bin/guile} flags=(unconfined) {
+            userns,
+            include if exists <local/guix>
+          }
+          EOF
+          sudo /etc/init.d/apparmor reload
+          sudo aa-enforce guix || true
+          sudo apt purge apparmor
+      - name: install guix
+        run: |
+          set -exo pipefail
+
+          export ARCHIVE="guix-binary-1.5.0.x86_64-linux.tar.xz"
+          export ARCHIVE_HASH=aa41025489c5061543e9c48873eaa829b900b2da75d40f9648913622f5f47817
+
+          wget --tries=5 --waitretry=10 --no-verbose https://mirrors.ocf.berkeley.edu/gnu/guix/${ARCHIVE} -O /tmp/${ARCHIVE}
+          echo "${ARCHIVE_HASH}  /tmp/${ARCHIVE}" | sha256sum -c -
+
+          curl -fsSL https://raw.githubusercontent.com/monero-project/guix/7fd75725c5daf9d3bdfd9122dcdb37f650493d18/etc/guix-install.sh -o /tmp/guix-install.sh
+          chmod +x /tmp/guix-install.sh
+
+          { yes "" 2>/dev/null || true; } | sudo env GUIX_BINARY_FILE_NAME="/tmp/${ARCHIVE}" /tmp/guix-install.sh
+          source /etc/profile.d/zzz-guix.sh
+          /usr/local/bin/guix --version
+      - name: macOS SDK
+        if: ${{ endsWith(matrix.host, '-apple-darwin') }}
+        run: |
+          set -exo pipefail
+          mkdir -p "$HOME/SDKs"
+          SDK=Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers
+          wget --tries=5 --waitretry=10 --no-verbose "https://bitcoincore.org/depends-sources/sdks/${SDK}.tar" -O "/tmp/${SDK}.tar"
+          echo "9600fa93644df674ee916b5e2c8a6ba8dacf631996a65dc922d003b98b5ea3b1  /tmp/${SDK}.tar" | sha256sum -c -
+          tar -C "$HOME/SDKs" -xf "/tmp/${SDK}.tar"
+      - name: build
+        run: SDK_PATH="$HOME/SDKs" HOSTS="${{ matrix.host }}" ./contrib/guix/guix-build
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: ${{ matrix.host }}
+          path: |
+            guix-build-*/output/${{ matrix.host }}/*
+
+  print-hashes:
+    runs-on: ubuntu-24.04
+    needs: [build-guix]
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          merge-multiple: true
+      - name: print hashes
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          find . -name 'SHA256SUMS.part' -print0 | env LC_ALL=C sort -z | xargs -r0 cat >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

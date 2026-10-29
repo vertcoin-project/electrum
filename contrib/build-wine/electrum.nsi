@@ -6,9 +6,9 @@
 ;--------------------------------
 ;Variables
 
-  !define PRODUCT_NAME "Electrum"
-  !define PRODUCT_WEB_SITE "https://github.com/spesmilo/electrum"
-  !define PRODUCT_PUBLISHER "Electrum Technologies GmbH"
+  !define PRODUCT_NAME "Electrum-VTC"
+  !define PRODUCT_WEB_SITE "https://github.com/vertcoin-project/electrum"
+  !define PRODUCT_PUBLISHER "Vertcoin"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
 ;--------------------------------
@@ -16,7 +16,7 @@
 
   ;Name and file
   Name "${PRODUCT_NAME}"
-  OutFile "dist/electrum-setup.exe"
+  OutFile "dist/electrum-vtc-setup.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES64\${PRODUCT_NAME}"
@@ -72,7 +72,7 @@
   !define MUI_ABORTWARNING
   !define MUI_ABORTWARNING_TEXT "Are you sure you wish to abort the installation of ${PRODUCT_NAME}?"
 
-  !define MUI_ICON "..\..\electrum\gui\icons\electrum.ico"
+  !define MUI_ICON "..\..\electrum_vtc\gui\icons\electrum.ico"
 
 ;--------------------------------
 ;Pages
@@ -167,8 +167,8 @@ Section
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\*.*"
 
   ;Files to pack into the installer
-  File /r "dist\electrum\*.*"
-  File "..\..\electrum\gui\icons\electrum.ico"
+  File /r "dist\electrum_vtc\*.*"
+  File "..\..\electrum_vtc\gui\icons\electrum.ico"
 
   ;Store installation folder
   WriteRegStr HKCU "Software\${PRODUCT_NAME}" "" $INSTDIR
@@ -179,33 +179,21 @@ Section
 
   ;Create desktop shortcut
   DetailPrint "Creating desktop shortcut..."
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-${PRODUCT_VERSION}.exe" ""
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-vtc-${PRODUCT_VERSION}.exe" ""
 
   ;Create start-menu items
   DetailPrint "Creating start-menu items..."
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-${PRODUCT_VERSION}.exe" "" "$INSTDIR\electrum-${PRODUCT_VERSION}.exe" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME} Testnet.lnk" "$INSTDIR\electrum-${PRODUCT_VERSION}.exe" "--testnet" "$INSTDIR\electrum-${PRODUCT_VERSION}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\electrum-vtc-${PRODUCT_VERSION}.exe" "" "$INSTDIR\electrum-vtc-${PRODUCT_VERSION}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME} Testnet.lnk" "$INSTDIR\electrum-vtc-${PRODUCT_VERSION}.exe" "--testnet" "$INSTDIR\electrum-vtc-${PRODUCT_VERSION}.exe" 0
 
 
-  ;Links bitcoin:, lightning: and lnurl LUD-17 URIs to Electrum
-  WriteRegStr HKCU "Software\Classes\bitcoin" "" "URL:bitcoin Protocol"
-  WriteRegStr HKCU "Software\Classes\bitcoin" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\bitcoin" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
-  WriteRegStr HKCU "Software\Classes\bitcoin\shell\open\command" "" "$\"$INSTDIR\electrum-${PRODUCT_VERSION}.exe$\" $\"%1$\""
-  WriteRegStr HKCU "Software\Classes\lightning" "" "URL:lightning Protocol"
-  WriteRegStr HKCU "Software\Classes\lightning" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\lightning" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
-  WriteRegStr HKCU "Software\Classes\lightning\shell\open\command" "" "$\"$INSTDIR\electrum-${PRODUCT_VERSION}.exe$\" $\"%1$\""
-  WriteRegStr HKCU "Software\Classes\lnurlp" "" "URL:lnurlp Protocol"
-  WriteRegStr HKCU "Software\Classes\lnurlp" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\lnurlp" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
-  WriteRegStr HKCU "Software\Classes\lnurlp\shell\open\command" "" "$\"$INSTDIR\electrum-${PRODUCT_VERSION}.exe$\" $\"%1$\""
-  WriteRegStr HKCU "Software\Classes\lnurlw" "" "URL:lnurlw Protocol"
-  WriteRegStr HKCU "Software\Classes\lnurlw" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\lnurlw" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
-  WriteRegStr HKCU "Software\Classes\lnurlw\shell\open\command" "" "$\"$INSTDIR\electrum-${PRODUCT_VERSION}.exe$\" $\"%1$\""
+  ;Links vertcoin: URIs to Electrum-VTC
+  WriteRegStr HKCU "Software\Classes\vertcoin" "" "URL:vertcoin Protocol"
+  WriteRegStr HKCU "Software\Classes\vertcoin" "URL Protocol" ""
+  WriteRegStr HKCU "Software\Classes\vertcoin" "DefaultIcon" "$\"$INSTDIR\electrum.ico, 0$\""
+  WriteRegStr HKCU "Software\Classes\vertcoin\shell\open\command" "" "$\"$INSTDIR\electrum-vtc-${PRODUCT_VERSION}.exe$\" $\"%1$\""
 
   ;Adds an uninstaller possibility to Windows Uninstall or change a program section
   WriteRegStr HKCU "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
@@ -236,10 +224,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\*.*"
   RMDir  "$SMPROGRAMS\${PRODUCT_NAME}"
 
-  DeleteRegKey HKCU "Software\Classes\bitcoin"
-  DeleteRegKey HKCU "Software\Classes\lightning"
-  DeleteRegKey HKCU "Software\Classes\lnurlp"
-  DeleteRegKey HKCU "Software\Classes\lnurlw"
+  DeleteRegKey HKCU "Software\Classes\vertcoin"
   DeleteRegKey HKCU "Software\${PRODUCT_NAME}"
   DeleteRegKey HKCU "${PRODUCT_UNINST_KEY}"
 SectionEnd
