@@ -164,7 +164,10 @@ class QEAbstractWizard(QDialog, MessageBoxMixin):
     @pyqtSlot(object)
     def on_page_updated(self, page):
         page.apply()
-        if page == self.main_widget.currentWidget():
+        # After Finish, submit() has moved the wizard past its last view, but the
+        # page can still emit updated; refreshing it then asked is_last_view()
+        # about no view at all (spesmilo/electrum#8815)
+        if page == self.main_widget.currentWidget() and self._current.view is not None:
             self.update()
 
     def set_icon(self, filename):
