@@ -57,7 +57,7 @@ except ImportError as e:
 
 MSG_NEEDS_FW_UPDATE_GENERIC = _('Firmware version too old. Please update at') + \
     ' https://www.ledger.com'
-MSG_NEEDS_FW_UPDATE_SEGWIT = _('Firmware version (or "Bitcoin" app) too old for Segwit support. Please update at') + \
+MSG_NEEDS_FW_UPDATE_SEGWIT = _('Firmware version (or "Vertcoin" app) too old for Segwit support. Please update at') + \
     ' https://www.ledger.com'
 MULTI_OUTPUT_SUPPORT = '1.1.4'
 SEGWIT_SUPPORT = '1.1.10'
@@ -140,7 +140,7 @@ def test_pin_unlocked(func):
         except OSError as e:
             _logger.exception('')
             raise UserFacingException(
-                _('Communication with Ledger failed. Open the Bitcoin app and try again.') + f'\n{str(e)}',
+                _('Communication with Ledger failed. Open the Vertcoin app and try again.') + f'\n{str(e)}',
             )
     return catch_exception
 

@@ -868,7 +868,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         if d:
             self.show_send_tab()
             host = self.network.get_parameters().server.host
-            self.handle_payment_identifier('bitcoin:%s?message=donation for %s' % (d, host))
+            self.handle_payment_identifier('%s:%s?message=donation for %s' % (BITCOIN_BIP21_URI_SCHEME, d, host))
         else:
             self.show_error(_('No donation address for this server'))
 
@@ -879,7 +879,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
                            _("You do not need to perform regular backups, because your wallet can be "
                               "recovered from a secret phrase that you can memorize or write on paper.") + " " +
                            _("Startup times are instant because it operates in conjunction with high-performance "
-                              "servers that handle the most complicated parts of the Bitcoin system.") + "\n\n" +
+                              "servers that handle the most complicated parts of the Vertcoin system.") + "\n\n" +
                            _("Uses icons from the Icons8 icon pack (icons8.com).")))
 
     def show_bitcoin_paper(self):

@@ -1651,7 +1651,7 @@ class Interface(Logger):
             return ''
         if not isinstance(res, str):
             raise RequestCorrupted(f'{res!r} should be a str')
-        address = res.removeprefix('bitcoin:')
+        address = res.removeprefix('vertcoin:').removeprefix('bitcoin:')
         if not bitcoin.is_address(address):
             # note: do not hard-fail -- allow server to use future-type
             #       bitcoin address we do not recognize
@@ -1813,7 +1813,7 @@ def sanitize_tx_broadcast_response(server_msg) -> str:
         r"bad-txns-too-many-sigops": None,
         r"mempool min fee not met":
             ("mempool min fee not met\n" +
-             _("Your transaction is paying a fee that is so low that the bitcoin node cannot "
+             _("Your transaction is paying a fee that is so low that the vertcoin node cannot "
                "fit it into its mempool. The mempool is already full of hundreds of megabytes "
                "of transactions that all pay higher fees. Try to increase the fee.")),
         r"min relay fee not met": None,

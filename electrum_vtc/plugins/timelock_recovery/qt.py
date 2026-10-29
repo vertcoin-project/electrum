@@ -295,7 +295,7 @@ class Plugin(TimelockRecoveryPlugin):
             (
                 _("Recipient of the funds, after the cancellation time window has expired")
                 + "\n\n"
-                + _("This field must contain a single Bitcoin address, or multiple lines in the format: 'address, amount'.") + "\n"
+                + _("This field must contain a single Vertcoin address, or multiple lines in the format: 'address, amount'.") + "\n"
                 + "\n"
                 + _("If multiple lines are used, at least one line must be set to 'max', using the '!' special character.") + "\n"
                 + _("Integers weights can also be used in conjunction with '!', "
@@ -477,7 +477,7 @@ class Plugin(TimelockRecoveryPlugin):
         else:
             if not pi.is_available() or pi.type != PaymentIdentifierType.SPK or not pi.spk_is_address:
                 payto_e.setStyleSheet(ColorScheme.RED.as_stylesheet(True))
-                payto_e.setToolTip(_("Invalid address type - must be a Bitcoin address."))
+                payto_e.setToolTip(_("Invalid address type - must be a Vertcoin address."))
                 return False
             assert pi.spk and pi.spk_is_address
             if context.wallet.is_mine(pi.text):

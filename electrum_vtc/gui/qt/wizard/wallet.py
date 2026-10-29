@@ -959,7 +959,7 @@ class WCImport(WalletWizardComponent):
     def __init__(self, parent, wizard):
         WalletWizardComponent.__init__(self, parent, wizard, title=_('Import Vertcoin Addresses or Private Keys'))
         message = _(
-            'Enter a list of Bitcoin addresses (this will create a watching-only wallet), or a list of private keys.')
+            'Enter a list of Vertcoin addresses (this will create a watching-only wallet), or a list of private keys.')
         header_layout = QHBoxLayout()
         label = WWLabel(message)
         label.setMinimumWidth(400)
