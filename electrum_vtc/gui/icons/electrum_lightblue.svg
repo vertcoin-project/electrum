@@ -13,7 +13,7 @@
    height="779.8111"
    id="svg2"
    inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="electrum_lightblue.svg"
+   sodipodi:docname="electrum_darkblue.svg"
    inkscape:export-filename="/home/voegtlin/logos/electrum_blue.png"
    inkscape:export-xdpi="10.014582"
    inkscape:export-ydpi="10.014582">
@@ -41,12 +41,12 @@
      inkscape:window-width="1920"
      inkscape:window-height="1027"
      id="namedview51"
-     showgrid="false"
+     showgrid="true"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:zoom="0.1767767"
-     inkscape:cx="637.59035"
-     inkscape:cy="804.37887"
+     inkscape:zoom="0.35355339"
+     inkscape:cx="871.76177"
+     inkscape:cy="293.6255"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -54,20 +54,26 @@
      inkscape:showpageshadow="false"
      showborder="false"
      inkscape:document-rotation="0"
-     fit-margin-top="43.37159"
+     fit-margin-top="43.371585"
      fit-margin-left="5"
      fit-margin-right="5"
-     fit-margin-bottom="43.37159" />
+     fit-margin-bottom="43.37159">
+    <inkscape:grid
+       type="xygrid"
+       id="grid40"
+       originx="0.8417048"
+       originy="30.067951" />
+  </sodipodi:namedview>
   <defs
      id="defs4">
     <linearGradient
        id="linearGradient3987">
       <stop
-         style="stop-color:#41b3ec;stop-opacity:1;"
+         style="stop-color:#048657;stop-opacity:1;"
          offset="0"
          id="stop4032" />
       <stop
-         style="stop-color:#0581c4;stop-opacity:1;"
+         style="stop-color:#048657;stop-opacity:1;"
          offset="1"
          id="stop3991" />
     </linearGradient>
@@ -120,7 +126,7 @@
        fx="523.18433"
        fy="732.08508"
        r="146.04732"
-       gradientTransform="matrix(-0.89061708,0.86297075,-0.78291311,-0.80799475,1427.0215,361.93369)"
+       gradientTransform="matrix(-0.89061708,0.86297075,-0.78291311,-0.80799475,1427.0215,361.93374)"
        gradientUnits="userSpaceOnUse" />
     <radialGradient
        inkscape:collect="always"
@@ -131,7 +137,7 @@
        fx="529.57996"
        fy="728.15845"
        r="146.04732"
-       gradientTransform="matrix(-0.87083717,0.55292729,-0.71897156,-1.1320773,466.9435,499.54917)"
+       gradientTransform="matrix(-0.87083717,0.55292729,-0.71897156,-1.1320773,466.94349,499.54907)"
        gradientUnits="userSpaceOnUse" />
     <radialGradient
        inkscape:collect="always"
@@ -142,7 +148,7 @@
        fx="505.65533"
        fy="726.3916"
        r="146.04732"
-       gradientTransform="matrix(-0.94821917,1.3404019,-1.4302101,-1.0037148,1646.3219,-657.0863)"
+       gradientTransform="matrix(-0.94821917,1.3404019,-1.4302101,-1.0037148,1646.3221,-657.08623)"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        xlink:href="#linearGradient3987"
@@ -151,37 +157,37 @@
        y1="1"
        x2="0"
        y2="0" />
-  </defs>
+  </defs><rect width="779.8111" height="779.8111" rx="175" fill="#048657"/><g transform="translate(85.77922099999999,85.77922099999999) scale(0.78)">
   <ellipse
-     style="fill:none;fill-opacity:0;stroke:url(#radialGradient3786);stroke-width:37.5001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+     style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:37.5001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
      id="path3803"
-     inkscape:export-filename="/home/voegtlin/logos/electrum_light.png"
+     inkscape:export-filename="/home/voegtlin/logos/electrum_blue_128.png"
      inkscape:export-xdpi="15.13"
      inkscape:export-ydpi="15.13"
      cx="389.90555"
-     cy="389.90555"
+     cy="389.90558"
      rx="366.15549"
      ry="173.5993" />
   <ellipse
      transform="matrix(-0.50141536,-0.8652067,0.86684024,-0.498586,0,0)"
      id="path4023"
-     style="fill:none;fill-opacity:0;stroke:url(#radialGradient3796);stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
-     inkscape:export-filename="/home/voegtlin/logos/electrum_light.png"
+     style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+     inkscape:export-filename="/home/voegtlin/logos/electrum_blue_128.png"
      inkscape:export-xdpi="15.13"
      inkscape:export-ydpi="15.13"
      cx="-532.39014"
-     cy="141.84499"
+     cy="141.84494"
      rx="365.12195"
      ry="174.09163" />
   <ellipse
-     style="fill:none;fill-opacity:0;stroke:url(#radialGradient3800);stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+     style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
      id="path4029"
      transform="matrix(-0.50141531,0.86520673,-0.86684024,-0.498586,0,0)"
-     inkscape:export-filename="/home/voegtlin/logos/electrum_light.png"
+     inkscape:export-filename="/home/voegtlin/logos/electrum_blue_128.png"
      inkscape:export-xdpi="15.13"
      inkscape:export-ydpi="15.13"
-     cx="143.58514"
-     cy="-532.85632"
+     cx="143.58517"
+     cy="-532.85626"
      rx="365.12195"
      ry="174.09163" />
   <g
@@ -190,6 +196,6 @@
     <path
        id="vtc-check-path"
        d="m 298.48528,5631.1251 103.1634,-118.659 h 367.0776 l 225.5121,290.5936 590.19062,-825.7702 c 35.147,31.8358 67.9354,68.16 98.3651,108.9726 30.4297,40.8127 56.8203,84.4017 79.1719,130.7672 l -724.5429,1012.2343 c -13.6918,14.5297 -28.0867,21.7945 -43.18472,21.7945 -15.098,0 -30.2926,-7.2648 -45.5838,-21.7945 l -458.2374,-598.1385 z"
-       style="fill:url(#vtcCheckGradient);fill-opacity:1;stroke:none" />
+       style="fill:#ffffff;fill-opacity:1;stroke:none" />
   </g>
-</svg>
+</g></svg>

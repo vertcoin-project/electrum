@@ -69,11 +69,11 @@
     <linearGradient
        id="linearGradient3987">
       <stop
-         style="stop-color:#1382ef;stop-opacity:1;"
+         style="stop-color:#048657;stop-opacity:1;"
          offset="0"
          id="stop4032" />
       <stop
-         style="stop-color:#0056c0;stop-opacity:1;"
+         style="stop-color:#048657;stop-opacity:1;"
          offset="1"
          id="stop3991" />
     </linearGradient>
@@ -157,9 +157,9 @@
        y1="1"
        x2="0"
        y2="0" />
-  </defs>
+  </defs><rect width="779.8111" height="779.8111" rx="175" fill="#048657"/><g transform="translate(85.77922099999999,85.77922099999999) scale(0.78)">
   <ellipse
-     style="fill:none;fill-opacity:0;stroke:url(#radialGradient3786);stroke-width:37.5001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+     style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:37.5001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
      id="path3803"
      inkscape:export-filename="/home/voegtlin/logos/electrum_blue_128.png"
      inkscape:export-xdpi="15.13"
@@ -171,7 +171,7 @@
   <ellipse
      transform="matrix(-0.50141536,-0.8652067,0.86684024,-0.498586,0,0)"
      id="path4023"
-     style="fill:none;fill-opacity:0;stroke:url(#radialGradient3796);stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+     style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
      inkscape:export-filename="/home/voegtlin/logos/electrum_blue_128.png"
      inkscape:export-xdpi="15.13"
      inkscape:export-ydpi="15.13"
@@ -180,7 +180,7 @@
      rx="365.12195"
      ry="174.09163" />
   <ellipse
-     style="fill:none;fill-opacity:0;stroke:url(#radialGradient3800);stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+     style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:37.5002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
      id="path4029"
      transform="matrix(-0.50141531,0.86520673,-0.86684024,-0.498586,0,0)"
      inkscape:export-filename="/home/voegtlin/logos/electrum_blue_128.png"
@@ -196,6 +196,6 @@
     <path
        id="vtc-check-path"
        d="m 298.48528,5631.1251 103.1634,-118.659 h 367.0776 l 225.5121,290.5936 590.19062,-825.7702 c 35.147,31.8358 67.9354,68.16 98.3651,108.9726 30.4297,40.8127 56.8203,84.4017 79.1719,130.7672 l -724.5429,1012.2343 c -13.6918,14.5297 -28.0867,21.7945 -43.18472,21.7945 -15.098,0 -30.2926,-7.2648 -45.5838,-21.7945 l -458.2374,-598.1385 z"
-       style="fill:url(#vtcCheckGradient);fill-opacity:1;stroke:none" />
+       style="fill:#ffffff;fill-opacity:1;stroke:none" />
   </g>
-</svg>
+</g></svg>
