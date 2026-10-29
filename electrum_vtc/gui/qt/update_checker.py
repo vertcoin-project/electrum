@@ -3,7 +3,6 @@
 # file LICENCE or http://www.opensource.org/licenses/mit-license.php
 
 import asyncio
-import base64
 from typing import Optional
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
@@ -11,7 +10,6 @@ from PyQt6.QtWidgets import QVBoxLayout, QLabel, QProgressBar, QHBoxLayout, QPus
 
 from electrum_vtc import version
 from electrum_vtc import constants
-from electrum_vtc.bitcoin import verify_usermessage_with_address
 from electrum_vtc.i18n import _
 from electrum_vtc.util import make_aiohttp_session
 from electrum_vtc.logging import Logger
@@ -20,13 +18,10 @@ from electrum_vtc._vendor.distutils.version import StrictVersion
 
 
 class UpdateCheck(QDialog, Logger):
-    url = "https://electrum.org/version"
-    download_url = "https://electrum.org/#download"
-
-    VERSION_ANNOUNCEMENT_SIGNING_KEYS = (
-        "13xjmVAB1EATPP8RshTE8S8sNwwSUM9p1P",  # ThomasV (since 3.3.4)
-        "1Nxgk6NTooV4qZsX5fdqQwrLjYcsQZAfTg",  # ghost43 (since 4.1.2)
-    )
+    # vtc: the latest Electrum-VTC release on GitHub (never a draft or a prerelease),
+    # instead of electrum.org's signed version announcement
+    url = "https://api.github.com/repos/vertcoin-project/electrum/releases/latest"
+    download_url = f"{constants.GIT_REPO_URL}/releases/latest"
 
     def __init__(self, *, latest_version=None):
         QDialog.__init__(self)
@@ -110,31 +105,16 @@ class UpdateCheckThread(QThread, Logger):
         # note: Use long timeout here as it is not critical that we get a response fast,
         #       and it's bad not to get an update notification just because we did not wait enough.
         async with make_aiohttp_session(proxy=self.network.proxy, timeout=120) as session:
-            async with session.get(UpdateCheck.url) as result:
-                signed_version_dict = await result.json(content_type=None)
-                # example signed_version_dict:
+            async with session.get(UpdateCheck.url, headers={'Accept': 'application/vnd.github+json'}) as result:
+                result.raise_for_status()
+                release = await result.json(content_type=None)
+                # example release (abridged):
                 # {
-                #     "version": "3.9.9",
-                #     "signatures": {
-                #         "1Lqm1HphuhxKZQEawzPse8gJtgjm9kUKT4": "IA+2QG3xPRn4HAIFdpu9eeaCYC7S5wS/sDxn54LJx6BdUTBpse3ibtfq8C43M7M1VfpGkD5tsdwl5C6IfpZD/gQ="
-                #     }
+                #     "tag_name": "v4.8.3",
+                #     "html_url": "https://github.com/vertcoin-project/electrum/releases/tag/v4.8.3"
                 # }
-                version_num = signed_version_dict['version']
-                sigs = signed_version_dict['signatures']
-                for address, sig in sigs.items():
-                    if address not in UpdateCheck.VERSION_ANNOUNCEMENT_SIGNING_KEYS:
-                        continue
-                    sig = base64.b64decode(sig, validate=True)
-                    msg = version_num.encode('utf-8')
-                    if verify_usermessage_with_address(
-                        address=address, sig65=sig, message=msg,
-                        net=constants.BitcoinMainnet
-                    ):
-                        self.logger.info(f"valid sig for version announcement '{version_num}' from address '{address}'")
-                        break
-                else:
-                    raise Exception('no valid signature for version announcement')
-                return StrictVersion(version_num.strip())
+                version_num = release['tag_name'].strip().removeprefix('v')
+                return StrictVersion(version_num)
 
     def run(self):
         if not self.network:

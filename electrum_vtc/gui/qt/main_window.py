@@ -296,8 +296,25 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
 
         self.contacts.fetch_openalias(self.config)
 
-        # vtc: the update check queries electrum.org, so it is disabled
+        # If the option hasn't been set yet
+        if not config.cv.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS.is_set():
+            choice = self.question(title="Electrum-VTC - " + _("Enable update check"),
+                                   msg=_("For security reasons we advise that you always use the latest version of Electrum.") + " " +
+                                       _("Would you like to be notified when there is a newer version of Electrum available?"))
+            config.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS = bool(choice)
+
         self._update_check_thread = None
+        if config.AUTOMATIC_CENTRALIZED_UPDATE_CHECKS:
+            # The references to both the thread and the window need to be stored somewhere
+            # to prevent GC from getting in our way.
+            def on_version_received(v):
+                if UpdateCheck.is_newer(v):
+                    self.update_check_button.setText(_("Update to Electrum {} is available").format(v))
+                    self.update_check_button.clicked.connect(lambda: self.show_update_check(v))
+                    self.update_check_button.show()
+            self._update_check_thread = UpdateCheckThread()
+            self._update_check_thread.checked.connect(on_version_received)
+            self._update_check_thread.start()
 
     def run_coroutine_dialog(self, coro, text):
         """ run coroutine in a waiting dialog, with a Cancel button that cancels the coroutine"""
