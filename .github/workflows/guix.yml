@@ -1,20 +1,33 @@
 name: guix
 
 # Reproducible Electrum-VTC release builds with Guix (contrib/guix), one job per
-# target. Based on Feather Wallet's .github/workflows/guix.yml.
+# target, as Feather Wallet does. The outputs should match a local Guix build
+# of the same commit byte for byte; the hashes are in the run's summary to compare.
 
+# Only tags and manual runs: each job builds the cross toolchains from source,
+# which can take hours of the 6-hour job limit
 on:
   push:
-    tags: ['*']
+    tags:
+      - '*'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: guix-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-guix:
     runs-on: ubuntu-24.04
+    # The cross toolchains in manifest.scm are built from source on a cold run
     timeout-minutes: 360
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     strategy:
       fail-fast: false
       matrix:
@@ -26,23 +39,32 @@ jobs:
           - arm64-apple-darwin
     name: ${{ matrix.host }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       # https://github.com/actions/checkout/issues/1467
+      # guix-build names the build after the tag on HEAD
       - name: git fetch tags
         run: git fetch --tags --force
       - name: remove bundled packages
+        # Frees disk space for /gnu/store, and keeps the installer's
+        # /usr/local/bin/guix from clashing with anything preinstalled
         run: sudo rm -rf /usr/local
+      # The files fetch.sh downloads, kept between runs. Everything in it is
+      # checked against contrib/guix/downloads.txt and the hash-pinned
+      # requirements files, so the cache can't change the output.
       - name: download cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: guix-cache
           key: guix-cache-${{ matrix.host }}-${{ hashFiles('contrib/guix/downloads.txt', 'contrib/deterministic-build/*.txt') }}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install git ca-certificates apparmor-utils
+        run: sudo apt-get update; sudo apt-get -y install git ca-certificates apparmor-utils
       - name: apparmor workaround
         # https://bugs.launchpad.net/ubuntu/+source/guix/+bug/2064115
+        # Ubuntu 24.04 blocks unprivileged user namespaces, which
+        # guix shell --container needs
         run: |
           sudo tee /etc/apparmor.d/guix << EOF
           abi <abi/3.0>,
@@ -54,7 +76,7 @@ jobs:
           EOF
           sudo /etc/init.d/apparmor reload
           sudo aa-enforce guix || true
-          sudo apt purge apparmor
+          sudo apt-get -y purge apparmor
       - name: install guix
         run: |
           set -exo pipefail
@@ -65,6 +87,8 @@ jobs:
           wget --tries=5 --waitretry=10 --no-verbose https://mirrors.ocf.berkeley.edu/gnu/guix/${ARCHIVE} -O /tmp/${ARCHIVE}
           echo "${ARCHIVE_HASH}  /tmp/${ARCHIVE}" | sha256sum -c -
 
+          # The installer Feather uses, pinned: it installs non-interactively
+          # from a local binary tarball
           curl -fsSL https://raw.githubusercontent.com/monero-project/guix/7fd75725c5daf9d3bdfd9122dcdb37f650493d18/etc/guix-install.sh -o /tmp/guix-install.sh
           chmod +x /tmp/guix-install.sh
 
@@ -72,7 +96,8 @@ jobs:
           source /etc/profile.d/zzz-guix.sh
           /usr/local/bin/guix --version
       - name: macOS SDK
-        if: ${{ endsWith(matrix.host, '-apple-darwin') }}
+        if: endsWith(matrix.host, '-apple-darwin')
+        # Bitcoin Core's extracted Xcode 26.1.1 SDK, checked against its sha256
         run: |
           set -exo pipefail
           mkdir -p "$HOME/SDKs"
@@ -81,22 +106,59 @@ jobs:
           echo "9600fa93644df674ee916b5e2c8a6ba8dacf631996a65dc922d003b98b5ea3b1  /tmp/${SDK}.tar" | sha256sum -c -
           tar -C "$HOME/SDKs" -xf "/tmp/${SDK}.tar"
       - name: build
-        run: SDK_PATH="$HOME/SDKs" HOSTS="${{ matrix.host }}" ./contrib/guix/guix-build
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        id: build
+        env:
+          HOSTS: ${{ matrix.host }}
+        run: |
+          SDK_PATH="$HOME/SDKs" ./contrib/guix/guix-build
+          echo "sums=$(ls guix-build-*/output/"$HOSTS"/SHA256SUMS.part)" >> "$GITHUB_OUTPUT"
+      - name: attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-checksums: ${{ steps.build.outputs.sums }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.host }}
-          path: |
-            guix-build-*/output/${{ matrix.host }}/*
+          path: guix-build-*/output/${{ matrix.host }}/*
+          if-no-files-found: error
 
-  print-hashes:
+  hashes:
     runs-on: ubuntu-24.04
     needs: [build-guix]
+    timeout-minutes: 15
     steps:
-      - uses: actions/download-artifact@v8
-        with:
-          merge-multiple: true
+      # One folder per artifact, named after the host: every host's file is
+      # called SHA256SUMS.part, so they must not be merged into one folder
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       - name: print hashes
         run: |
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          find . -name 'SHA256SUMS.part' -print0 | env LC_ALL=C sort -z | xargs -r0 cat >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          find . -name 'SHA256SUMS.part' -print0 | env LC_ALL=C sort -z | xargs -r0 cat | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  release:
+    name: draft release
+    if: github.ref_type == 'tag'
+    needs: [build-guix]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: artifacts
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          mkdir -p dist
+          find artifacts -type f ! -name SHA256SUMS.part -exec cp -t dist {} +
+          (cd dist && sha256sum * > SHA256SUMS)
+          cat dist/SHA256SUMS
+          flags=(--draft --generate-notes --verify-tag --title "$TAG")
+          case "$TAG" in
+            *alpha*|*beta*|*rc*) flags+=(--prerelease) ;;
+          esac
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" "${flags[@]}" dist/*
