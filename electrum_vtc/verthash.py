@@ -42,6 +42,13 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
+# Optional C implementation from the vertcoinhash package (an absolute import: its
+# module is also called verthash). Used only if it agrees with verthash_pow().
+try:
+    import verthash as _vertcoinhash
+except ImportError:
+    _vertcoinhash = None
+
 DATAFILE_NAME = 'verthash.dat'
 GRAPH_INDEX = 17
 NODE_SIZE = 32
@@ -249,6 +256,13 @@ def verify_datafile(path: str) -> bool:
 # Hashing
 # ---------------------------------------------------------------------------
 
+# vertcoinhash's test header; its verthash is e0f6c10b4a38f35a6cdcc26d32a7ed8c3bfc5d827a9bc72647afa324b70d0463
+_SELFTEST_HEADER = bytes.fromhex(
+    '000000203a297b4b7685170d7644b43e5a6056234cc2414edde454a87580e1967d14c107'
+    '8c13ea916117b0608732f3f65c2e03b81322efc0a62bcee77d8a9371261970a58a5a715d'
+    'a80e031b02560ad8')
+
+
 def verthash_pow(header: bytes, data) -> bytes:
     """Verthash of an 80-byte block header. `data` is the datafile (bytes or mmap)."""
     assert len(header) == HEADER_SIZE, len(header)
@@ -305,6 +319,7 @@ class VerthashDatafile:
         self._lock = threading.Lock()
         self._ready = threading.Event()
         self._data = None  # type: Optional[mmap.mmap]
+        self._c_hash = None  # type: Optional[Callable[[bytes, mmap.mmap], bytes]]
         self._file = None
         self.path = None  # type: Optional[str]
         self.error = None  # type: Optional[str]
@@ -353,6 +368,7 @@ class VerthashDatafile:
         self._file = f
         self.path = path
         self.progress = None
+        self._c_hash = self._find_c_implementation()
         self._ready.set()
         _logger.info(f"using verthash datafile {path}")
 
@@ -394,9 +410,28 @@ class VerthashDatafile:
         self._thread = threading.Thread(target=self.prepare, args=(config,), name='verthash-datafile', daemon=True)
         self._thread.start()
 
+    def _find_c_implementation(self):
+        """vertcoinhash's verthash.getPoWHash, if it is installed, takes the mmap
+        (1.1.0 and later) and gives the same hash as verthash_pow; else None."""
+        if _vertcoinhash is None:
+            return None
+        try:
+            agrees = (_vertcoinhash.getPoWHash(_SELFTEST_HEADER, self._data)
+                      == verthash_pow(_SELFTEST_HEADER, self._data))
+        except Exception as e:
+            _logger.info(f"not using vertcoinhash's verthash: {e!r}")
+            return None
+        if not agrees:
+            _logger.warning("not using vertcoinhash's verthash: it disagrees with verthash_pow")
+            return None
+        _logger.info("using vertcoinhash's C verthash")
+        return _vertcoinhash.getPoWHash
+
     def hash(self, header: bytes) -> bytes:
         if not self.is_ready():
             raise VerthashDatafileError("verthash datafile not loaded")
+        if self._c_hash is not None:
+            return self._c_hash(header, self._data)
         return verthash_pow(header, self._data)
 
 
