@@ -1,8 +1,8 @@
 name: check-submodules
 
+# vtc: upstream Electrum's workflow, run by hand only (Electrum-VTC releases are built by guix.yml)
 on:
-  push:
-    tags: ['*']
+  workflow_dispatch:
 
 permissions:
   contents: read

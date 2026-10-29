@@ -1,8 +1,7 @@
 name: locale
 
+# vtc: upstream Electrum's workflow, run by hand only (Electrum-VTC releases are built by guix.yml)
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 permissions:

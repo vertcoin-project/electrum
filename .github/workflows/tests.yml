@@ -1,10 +1,7 @@
 name: tests
 
+# vtc: upstream Electrum's workflow, run by hand only (Electrum-VTC releases are built by guix.yml)
 on:
-  push:
-    branches: [master]
-    tags: ['*']
-  pull_request:
   workflow_dispatch:
 
 concurrency:

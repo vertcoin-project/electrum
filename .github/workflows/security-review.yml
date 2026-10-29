@@ -1,7 +1,7 @@
 name: security-review
 
+# vtc: upstream Electrum's workflow, run by hand only (Electrum-VTC releases are built by guix.yml)
 on:
-  pull_request_target:
   workflow_dispatch:
     inputs:
       pr_number:

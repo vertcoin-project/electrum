@@ -1,8 +1,7 @@
 name: builds
 
+# vtc: upstream Electrum's workflow, run by hand only (Electrum-VTC releases are built by guix.yml)
 on:
-  schedule:
-    - cron: '30 2 * * *'   # 02:30 UTC daily
   workflow_dispatch:
     inputs:
       target:
