@@ -92,6 +92,21 @@ Pane {
                     visible: Network.serverHeight != 0 && Network.serverHeight != Network.height
                 }
                 Label {
+                    text: qsTr('Verthash:');
+                    color: Material.accentColor
+                }
+                Label {
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
+                    text: Network.verthashError != ''
+                        ? qsTr('error: %1').arg(Network.verthashError)
+                        : Network.verthashReady
+                            ? qsTr('datafile loaded')
+                            : Network.verthashProgress >= 0
+                                ? qsTr('generating datafile (%1%)').arg(Math.floor(Network.verthashProgress * 100))
+                                : qsTr('datafile not loaded')
+                }
+                Label {
                     text: qsTr('Chain tips:');
                     color: Material.accentColor
                     visible: opacity > 0

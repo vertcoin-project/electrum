@@ -266,6 +266,10 @@ ApplicationWindow
             Layout.fillWidth: true
         }
 
+        VerthashBanner {
+            Layout.fillWidth: true
+        }
+
         StackView {
             id: mainStackView
             Layout.fillHeight: true

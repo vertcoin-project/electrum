@@ -371,6 +371,15 @@ class VerthashDatafile:
         self._c_hash = self._find_c_implementation()
         self._ready.set()
         _logger.info(f"using verthash datafile {path}")
+        self._notify()
+
+    def _notify(self) -> None:
+        """Tell GUIs that progress, readiness or error changed."""
+        from . import util
+        try:
+            util.trigger_callback('verthash_progress', self.progress)
+        except Exception:  # no running event loop, e.g. in tests
+            pass
 
     def prepare(self, config: 'SimpleConfig', *, create: bool = True) -> None:
         """Blocking. Find a valid datafile, or generate one in the Electrum-VTC data dir."""
@@ -390,18 +399,23 @@ class VerthashDatafile:
 
             def on_progress(x: float):
                 self.progress = x
-                from . import util
-                util.trigger_callback('verthash_progress', x)
+                self._notify()
+            on_progress(0.0)
             try:
                 generate_datafile(path, progress_cb=on_progress)
             except Exception as e:
                 self.error = repr(e)
                 self.progress = None
                 _logger.exception("failed to generate verthash datafile")
+                self._notify()
                 return
             config.VERTHASH_DATAFILE_VERIFIED = None
             if self._is_known_good(config, path):
                 self._load(path)
+            else:
+                self.error = "generated verthash datafile failed verification"
+                self.progress = None
+                self._notify()
 
     def prepare_in_background(self, config: 'SimpleConfig') -> None:
         if self.is_ready() or (self._thread and self._thread.is_alive()):

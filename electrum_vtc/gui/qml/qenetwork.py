@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from PyQt6.QtCore import pyqtProperty, pyqtSignal, QObject, pyqtSlot
 
 from electrum_vtc.logging import get_logger
-from electrum_vtc import constants
+from electrum_vtc import constants, verthash
 from electrum_vtc.network import ProxySettings
 from electrum_vtc.interface import ServerAddr
 from electrum_vtc.fee_policy import FEERATE_DEFAULT_RELAY
@@ -33,6 +33,7 @@ class QENetwork(QObject, QtEventListener):
     chaintipsChanged = pyqtSignal()
     isLaggingChanged = pyqtSignal()
     gossipUpdated = pyqtSignal()
+    verthashUpdated = pyqtSignal()
 
     # shared signal for static properties
     dataChanged = pyqtSignal()
@@ -147,6 +148,10 @@ class QENetwork(QObject, QtEventListener):
             'max_fee': capped_histogram[0][0] if capped_histogram else FEERATE_DEFAULT_RELAY/1000
         }
         self.feeHistogramUpdated.emit()
+
+    @event_listener
+    def on_event_verthash_progress(self, progress):
+        self.verthashUpdated.emit()
 
     @event_listener
     def on_event_channel_db(self, num_nodes, num_channels, num_policies):
@@ -301,6 +306,20 @@ class QENetwork(QObject, QtEventListener):
             'db_channels': self._gossipDbChannels,
             'db_policies': self._gossipDbPolicies
         }
+
+    @pyqtProperty(float, notify=verthashUpdated)
+    def verthashProgress(self):
+        """datafile generation progress 0..1, or -1 if not generating"""
+        progress = verthash.datafile.progress
+        return -1.0 if progress is None else progress
+
+    @pyqtProperty(bool, notify=verthashUpdated)
+    def verthashReady(self):
+        return verthash.datafile.is_ready()
+
+    @pyqtProperty(str, notify=verthashUpdated)
+    def verthashError(self):
+        return verthash.datafile.error or ''
 
     serverListModelChanged = pyqtSignal()
     @pyqtProperty(QEServerListModel, notify=serverListModelChanged)
