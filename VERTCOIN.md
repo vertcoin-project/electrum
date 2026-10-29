@@ -46,7 +46,7 @@ Branch `vtc-4.8.3` starts from upstream tag `4.8.3`:
 
 These were treated as out of scope:
 
-- Build scripts (AppImage, Windows, macOS), `create-verthash-datafile` packaging and Tcl/Tk. The executable is no longer needed. `make_libsecp256k1.sh` and `make_osx.sh` were updated for the renamed dir.
+- The Docker-based build scripts (`contrib/build-linux`, `contrib/build-wine`, `contrib/osx`), `create-verthash-datafile` packaging and Tcl/Tk. Releases are built with Guix instead (see below). Only `make_libsecp256k1.sh` and `make_osx.sh` were updated for the renamed directory.
 - Kivy GUI: upstream removed it. The QML/Android GUI is renamed but not branded or tested.
 - Hardware-wallet plugin branding and disabling, and the Ledger `m/128'` path.
 - Tests: `tests/` imports were renamed, but the tests have not been updated for VTC.
@@ -60,6 +60,20 @@ Test setup: vertcoind (bitcoin v32 rebase) in WSL with `-txindex`, ElectrumX 2.0
 - The client reused Vertcoin Core's `verthash.dat` and fetched the 2 KGW-history chunks. It verified the 2,574 headers above the checkpoint (KGW and Verthash) and reached the tip at 2,706,029 in about 40 s. The tip hash matched vertcoind's `getblockhash`.
 - A watch-only wallet SPV-verified its history, including a transaction below the max checkpoint. Its balance matched `scantxoutset` exactly.
 - Tampered checkpoint chunks, nonces and nBits are rejected.
+
+## Release builds (Guix)
+
+`contrib/guix/guix-build` builds all release targets in Guix containers; see [contrib/guix/README.md](contrib/guix/README.md):
+- the sdist;
+- the x86_64 AppImage;
+- the Windows setup, standalone and portable exes;
+- the x86_64 and arm64 macOS `Electrum-VTC.app` zips.
+
+At commit `30503e3` (2026-10-28), two clean builds of all five targets produced identical sha256s. Tested results:
+- The AppImage (in WSL Ubuntu) generated `verthash.dat` natively and synced to the tip against the local ElectrumX.
+- The Windows standalone exe synced to the tip on Windows 11.
+- The sdist installs with `pip install 'Electrum-VTC-….tar.gz[crypto]'`.
+- The macOS apps were only checked structurally (architectures, ad-hoc signatures); they have not been run on a Mac.
 
 ## Running against a local ElectrumX
 
