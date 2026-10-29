@@ -127,9 +127,67 @@ jobs:
           path: ${{ steps.build.outputs.dir }}/*
           if-no-files-found: error
 
+  # Guix has no Android toolchain, so the APKs are built as upstream Electrum
+  # builds its reproducible ones: contrib/android/build.sh with ELECBUILD_COMMIT,
+  # from a fresh clone of the commit, in its Docker image (a Debian base pinned
+  # by digest, the NDK and SDK checked against their sha256). They are
+  # unsigned; contrib/android/apkdiff.py compares one against a signed APK.
+  build-android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # one job each: make_apk.sh's "all" does not fail when one of them does
+        arch:
+          - armeabi-v7a
+          - arm64-v8a
+          - x86_64
+    name: android-${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: free disk space
+        # the image and the build need about 40 GB
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/share/swift /usr/local/lib/android /usr/local/.ghcup \
+            /usr/local/share/powershell /opt/ghc /opt/hostedtoolcache/CodeQL /opt/microsoft /opt/pipx
+          sudo docker image prune --all --force
+          df -h /
+      - name: build
+        id: build
+        env:
+          ARCH: ${{ matrix.arch }}
+          # A fresh clone of the checked out commit. NOCACHE also builds the image
+          # from scratch, and skips build.sh's download cache, which is named
+          # after the latest tag.
+          ELECBUILD_COMMIT: HEAD
+          ELECBUILD_NOCACHE: 1
+        run: |
+          ./contrib/android/build.sh qml "$ARCH" release-unsigned
+          cd dist
+          sha256sum -- *.apk > SHA256SUMS.part
+          cat SHA256SUMS.part
+          echo "sums=dist/SHA256SUMS.part" >> "$GITHUB_OUTPUT"
+      - name: attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-checksums: ${{ steps.build.outputs.sums }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+
   hashes:
     runs-on: ubuntu-24.04
-    needs: [build-guix]
+    needs: [build-guix, build-android]
     timeout-minutes: 15
     steps:
       # One folder per artifact, named after the host: every host's file is
@@ -144,7 +202,7 @@ jobs:
   release:
     name: draft release
     if: github.ref_type == 'tag'
-    needs: [build-guix]
+    needs: [build-guix, build-android]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
