@@ -3,7 +3,7 @@ include README.md
 include electrum-vtc.desktop
 include *.py
 include run_electrum
-include org.electrum.electrum.metainfo.xml
+include org.vertcoin.electrum_vtc.metainfo.xml
 recursive-include packages *.py
 recursive-include packages cacert.pem
 

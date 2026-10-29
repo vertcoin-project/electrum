@@ -274,8 +274,8 @@ exec "${APPDIR}/usr/bin/python3" -s "${APPDIR}/usr/bin/electrum-vtc" "$@"
 EOF
         chmod 0755 "$APPDIR/AppRun" "$APPDIR/usr/bin/electrum-vtc"
         cp electrum-vtc.desktop "$APPDIR/electrum-vtc.desktop"
-        cp electrum_vtc/gui/icons/electrum.png "$APPDIR/electrum.png"
-        ln -s electrum.png "$APPDIR/.DirIcon"
+        cp electrum_vtc/gui/icons/electrum-vtc.png "$APPDIR/electrum-vtc.png"
+        ln -s electrum-vtc.png "$APPDIR/.DirIcon"
         prune_python "$APPDIR/usr/lib/python${PY_MAJOR}" "$site"
         rm -rf "$APPDIR"/usr/{include,share} "$APPDIR"/usr/lib/{libtcl*,libtk*,tcl*,tk*,itcl*,thread*,pkgconfig}
         normalize_times "$APPDIR"

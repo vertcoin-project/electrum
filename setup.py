@@ -36,8 +36,9 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
     # note: we can't use absolute paths here. see #7787
     data_files += [
         (os.path.join('share', 'applications'),               ['electrum-vtc.desktop']),
-        (os.path.join('share', 'pixmaps'),                    ['electrum_vtc/gui/icons/electrum.png']),
-        (os.path.join('share', 'icons/hicolor/128x128/apps'), ['electrum_vtc/gui/icons/electrum.png']),
+        (os.path.join('share', 'pixmaps'),                    ['electrum_vtc/gui/icons/electrum-vtc.png']),
+        (os.path.join('share', 'icons/hicolor/128x128/apps'), ['electrum_vtc/gui/icons/electrum-vtc.png']),
+        (os.path.join('share', 'metainfo'),                   ['org.vertcoin.electrum_vtc.metainfo.xml']),
     ]
 
 extras_require = {

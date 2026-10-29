@@ -160,8 +160,8 @@ info "installing electrum and its dependencies."
 
 
 info "desktop integration."
-cp "$PROJECT_ROOT/electrum-vtc.desktop" "$APPDIR/electrum.desktop"
-cp "$PROJECT_ROOT/electrum/gui/icons/electrum.png" "$APPDIR/electrum.png"
+cp "$PROJECT_ROOT/electrum-vtc.desktop" "$APPDIR/electrum-vtc.desktop"
+cp "$PROJECT_ROOT/electrum_vtc/gui/icons/electrum-vtc.png" "$APPDIR/electrum-vtc.png"
 
 
 # add launcher
