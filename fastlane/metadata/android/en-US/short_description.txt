@@ -1,1 +1,1 @@
-Fast and self-custodial wallet for Bitcoin and the Lightning Network
+Fast and self-custodial wallet for Vertcoin, based on Electrum
