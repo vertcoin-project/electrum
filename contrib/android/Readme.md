@@ -37,24 +37,102 @@ similar system.
 3. The generated binary is in `./dist`.
 
 
+## Signing a release (Electrum-VTC)
+
+The release build (`.github/workflows/guix.yml`, on a tag) attaches unsigned APKs,
+`electrum_vtc-<version>-<arch>-release-unsigned.apk`, to a draft release. They are signed
+offline, and only their detached signatures are published:
+[`apksig.sh`](apksig.sh) signs an APK and extracts its APK Signing Block with
+[apksigcopier](https://github.com/obfusk/apksigcopier), in a Debian image pinned by digest.
+
+1. Download the unsigned APKs from the draft release:
+    ```
+    $ gh release download v4.8.3 --repo vertcoin-project/electrum --pattern '*-release-unsigned.apk'
+    ```
+2. Sign them with the release key. Its password is asked for. This writes
+   `…-release.apk` and its signature `…-release.apk.sig.tar` next to each one, and prints
+   the certificate's SHA-256:
+    ```
+    $ contrib/android/apksig.sh sign ~/electrum-vtc.keystore electrum-vtc *-release-unsigned.apk
+    ```
+3. Upload only the signatures:
+    ```
+    $ gh release upload v4.8.3 --repo vertcoin-project/electrum *-release.apk.sig.tar
+    ```
+4. Run the `apk signatures` workflow with the tag. It puts each signature on the unsigned
+   APK the release build made, checks that the result verifies, and uploads the signed
+   APKs and the updated `SHA256SUMS` to the draft. A signature of any other APK, such as
+   one built locally from different sources, does not verify there.
+
+The release key is created once (`keytool -genkeypair -keyalg RSA -keysize 4096
+-validity 10000 …`), never leaves the maintainer's machine, and is backed up: Android only
+installs updates signed with the key that signed the installed app.
+
+The signed APK is the unsigned one plus an APK Signing Block: `apksig.sh` signs with v2
+and v3 signatures only (`minSdkVersion` is 26) and keeps the entries' alignment as built.
+
+
 ## Verifying reproducibility and comparing against official binary
 
 Every user can verify that the official binary was created from the source code in this
 repository.
 
-1. Build your own binary as described above.
-   Make sure you don't build in `debug` mode,
-   instead use either of `release` or `release-unsigned`.
-   If you build in `release` mode, the apk will be signed, which requires a keystore
-   that you need to create manually (see source of `make_apk.sh` for an example).
-2. Note that the binaries are not going to be byte-for-byte identical, as the official
-   release is signed by a keystore that only the project maintainers have.
-   You can use the `apkdiff.py` python script (written by the Signal developers) to compare
-   the two binaries.
+1. Build your own binary as described above, with `release-unsigned` and
+   `ELECBUILD_COMMIT` set to the release tag's commit (the APK depends on the commit's
+   time).
+2. Check that the official APK is your build plus a signature:
+    ```
+    $ contrib/android/apksig.sh compare electrum_vtc-4.8.3-arm64-v8a-release.apk dist/electrum_vtc-4.8.3-arm64-v8a-release-unsigned.apk
+    ```
+   or put the published signature on your build: the result is the official APK, byte
+   for byte.
+    ```
+    $ contrib/android/apksig.sh attach electrum_vtc-4.8.3-arm64-v8a-release.apk.sig.tar dist/electrum_vtc-4.8.3-arm64-v8a-release-unsigned.apk mine.apk
+    $ sha256sum mine.apk electrum_vtc-4.8.3-arm64-v8a-release.apk
+    ```
+   Upstream's `apkdiff.py` (written by the Signal developers) also compares two APKs,
+   ignoring their signatures:
     ```
     $ python3 contrib/android/apkdiff.py Electrum_apk_that_you_built.apk Electrum_apk_official_release.apk
     ```
-   This should output `APKs match!`.
+
+
+## F-Droid
+
+F-Droid builds every app from source on its own build server. With
+[reproducible builds](https://f-droid.org/docs/Reproducible_Builds/) it publishes the
+developer's signed APK instead of signing its own build: it builds the APK, copies the
+signature of the APK named in `Binaries` onto it with apksigcopier, and publishes it if
+that verifies, which needs its build to be byte for byte the release's unsigned APK. Apps
+installed from F-Droid and from the GitHub releases can then update each other.
+
+The app's metadata (`metadata/org.vertcoin.electrum_vtc.yml` in
+[fdroiddata](https://gitlab.com/fdroid/fdroiddata)) names the release APKs and the
+release certificate. One `Builds` entry per architecture, as each APK has its own
+`versionCode` (`get_apk_versioncode.py`: 45408032, 45408033 and 45408034 for 4.8.3's
+armeabi-v7a, arm64-v8a and x86_64):
+
+```yaml
+AllowedAPKSigningKeys: <the certificate's SHA-256, as apksig.sh sign prints it>
+
+Builds:
+  - versionName: 4.8.3
+    versionCode: 45408033
+    commit: v4.8.3
+    binary: https://github.com/vertcoin-project/electrum/releases/download/v%v/electrum_vtc-%v-arm64-v8a-release.apk
+    # sudo, prebuild, build, output: F-Droid's recipe for the build
+```
+
+Notes:
+- F-Droid's build server does not run Docker: its recipe has to reproduce what
+  `build.sh` does in `Dockerfile` (the same Debian packages, NDK, SDK, buildozer and
+  python-for-android commits), and every dependency is built from source, without
+  prebuilt binaries. This is the part to work out with F-Droid's maintainers.
+- The `versionCode` comes from `ELECTRUM_VERSION`, which a release candidate shares with
+  its release (and `get_apk_versioncode.py` ignores alpha and beta suffixes): only
+  releases may go to F-Droid.
+- Alternatively, a self-hosted F-Droid repository (`fdroid init`, `fdroid update`) can
+  serve the signed release APKs as they are, without F-Droid reproducing them.
 
 
 ## FAQ

@@ -135,7 +135,8 @@ jobs:
   # builds its reproducible ones: contrib/android/build.sh with ELECBUILD_COMMIT,
   # from a fresh clone of the commit, in its Docker image (a Debian base pinned
   # by digest, the NDK and SDK checked against their sha256). They are
-  # unsigned; contrib/android/apkdiff.py compares one against a signed APK.
+  # unsigned: they are signed offline, and the apk-signatures workflow puts the
+  # published signatures on them (contrib/android/Readme.md).
   build-android:
     runs-on: ubuntu-24.04
     timeout-minutes: 300
