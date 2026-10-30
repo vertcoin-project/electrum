@@ -38,7 +38,7 @@ from electrum_vtc.bitcoin import is_address
 from electrum_vtc.wallet import InternalAddressCorruption
 from electrum_vtc.simple_config import SimpleConfig
 
-from .util import MONOSPACE_FONT, ColorScheme, webopen
+from .util import MONOSPACE_FONT, ColorScheme, webopen, webopen_block_explorer
 from .my_treeview import MyTreeView, MySortModel
 from ..messages import MSG_FREEZE_ADDRESS
 
@@ -325,7 +325,7 @@ class AddressList(MyTreeView):
                 menu.addAction(_("Remove from wallet"), lambda: self.main_window.remove_address(addr))
             addr_URL = block_explorer_URL(self.config, 'addr', addr)
             if addr_URL:
-                menu.addAction(_("View on block explorer"), lambda: webopen(addr_URL))
+                menu.addAction(_("View on block explorer"), lambda: webopen_block_explorer(self.config, 'addr', addr))
 
             if not self.wallet.is_frozen_address(addr):
                 act = menu.addAction(_("Freeze"), lambda: self.main_window.set_frozen_state_of_addresses([addr], True))

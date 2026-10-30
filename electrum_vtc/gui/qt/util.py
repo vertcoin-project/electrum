@@ -1369,6 +1369,44 @@ def webopen(url: str):
         webbrowser.open(url)
 
 
+class _BlockExplorerOpener(QObject):
+    # to call webopen() in the GUI thread: it forks in AppImages
+    open_url = pyqtSignal(str)
+
+
+_block_explorer_opener = None  # type: Optional[_BlockExplorerOpener]
+
+
+def webopen_block_explorer(config: 'SimpleConfig', kind: str, item: str) -> None:
+    """vtc: opens item on the block explorer, or on its fallback if the explorer doesn't
+    answer (util.block_explorer_URL_or_fallback). Called from the GUI thread."""
+    global _block_explorer_opener
+    import asyncio
+    from electrum_vtc.network import Network
+    from electrum_vtc.util import block_explorer_URL, block_explorer_URL_or_fallback
+    network = Network.get_instance()
+    if network is None:  # offline: nothing to check with
+        if url := block_explorer_URL(config, kind, item):
+            webopen(url)
+        return
+    if _block_explorer_opener is None:
+        _block_explorer_opener = _BlockExplorerOpener()
+        _block_explorer_opener.open_url.connect(webopen)
+    opener = _block_explorer_opener
+    fut = asyncio.run_coroutine_threadsafe(
+        block_explorer_URL_or_fallback(config, kind, item, proxy=network.proxy), network.asyncio_loop)
+
+    def on_done(f):
+        try:
+            url = f.result()
+        except Exception:
+            _logger.exception("block explorer URL")
+            return
+        if url:
+            opener.open_url.emit(url)
+    fut.add_done_callback(on_done)
+
+
 class FixedAspectRatioLayout(QLayout):
     def __init__(self, parent: QWidget = None, aspect_ratio: float = 1.0):
         super().__init__(parent)

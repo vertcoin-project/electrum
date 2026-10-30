@@ -50,7 +50,7 @@ from electrum_vtc.simple_config import SimpleConfig
 from .custom_model import CustomNode, CustomModel
 from .util import (read_QIcon, MONOSPACE_FONT, Buttons, CancelButton, OkButton,
                    filename_field, AcceptFileDragDrop, WindowModalDialog,
-                   CloseButton, webopen, WWLabel)
+                   CloseButton, webopen, webopen_block_explorer, WWLabel)
 from .my_treeview import MyTreeView
 
 if TYPE_CHECKING:
@@ -800,7 +800,7 @@ class HistoryList(MyTreeView, AcceptFileDragDrop):
             for inv in invoices:
                 menu_invs.addAction(_("View invoice"), lambda inv=inv: self.main_window.show_onchain_invoice(inv))
         if tx_URL:
-            menu.addAction(_("View on block explorer"), lambda: webopen(tx_URL))
+            menu.addAction(_("View on block explorer"), lambda: webopen_block_explorer(self.config, 'tx', tx_hash))
         self.open_menu(menu, position)
 
     def remove_local_tx(self, tx_hash: str):

@@ -36,7 +36,7 @@ from electrum_vtc.util import block_explorer_URL
 from electrum_vtc.plugin import run_hook
 from electrum_vtc.gui.qt.util import read_QIcon
 
-from .util import webopen
+from .util import webopen, webopen_block_explorer
 from .my_treeview import MyTreeView
 
 if TYPE_CHECKING:
@@ -98,7 +98,7 @@ class ContactList(MyTreeView):
             menu.addAction(_("Delete"), lambda: self.main_window.delete_contacts(selected_keys))
             URLs = [block_explorer_URL(self.config, 'addr', key) for key in filter(is_address, selected_keys)]
             if URLs:
-                menu.addAction(_("View on block explorer"), lambda: [webopen(u) for u in URLs])
+                menu.addAction(_("View on block explorer"), lambda: [webopen_block_explorer(self.config, 'addr', key) for key in filter(is_address, selected_keys)])
 
         run_hook('create_contact_menu', menu, selected_keys)
         self.open_menu(menu, position)

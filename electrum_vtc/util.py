@@ -995,9 +995,15 @@ mainnet_block_explorers = {
                         {'tx': 'tx/', 'addr': 'address/'}),
     'cryptoID.info': ('https://chainz.cryptoid.info/vtc/',
                         {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
+    'vtcblocks.com': ('https://vtcblocks.com/',
+                        {'tx': 'tx/', 'addr': 'address/'}),
     'system default': ('blockchain:/',
                         {'tx': 'tx/', 'addr': 'address/'}),
 }
+
+# vtc: the explorers that are Blockbook instances (https://github.com/trezor/blockbook): as a
+# fallback, one is only used when its API says it is in sync
+BLOCKBOOK_EXPLORERS = ('vtcblocks.com',)
 
 testnet_block_explorers = {
     'system default': ('blockchain://cee8f24feb7a64c8f07916976aa4855decac79b6741a8ec2e32e2747497ad2c9/',
@@ -1055,6 +1061,62 @@ def block_explorer_URL(config: 'SimpleConfig', kind: str, item: str) -> Optional
         explorer_url += "/"
     url_parts = [explorer_url, kind_str, item]
     return ''.join(url_parts)
+
+
+# vtc: when the selected explorer doesn't answer, block explorer links open on the first of
+# these that does (the Blockbook ones, then BitInfoCharts), or else on the last one
+BLOCK_EXPLORER_FALLBACKS = {
+    'cryptoID.info': BLOCKBOOK_EXPLORERS + ('BitInfoCharts.com',),
+}
+
+
+def _hardcoded_block_explorer_URL(name: str, kind: str, item: str) -> Optional[str]:
+    explorer_url, explorer_dict = block_explorer_info()[name]
+    kind_str = explorer_dict.get(kind)
+    if kind_str is None:
+        return None
+    if explorer_url[-1] != "/":
+        explorer_url += "/"
+    return ''.join([explorer_url, kind_str, item])
+
+
+async def _block_explorer_answers(name: str, url: str, *, proxy, timeout: float) -> bool:
+    """A Blockbook explorer answers if its API says it is in sync; others if url gets a
+    response that isn't a server error."""
+    async with make_aiohttp_session(proxy=proxy, timeout=timeout) as session:
+        if name in BLOCKBOOK_EXPLORERS:
+            explorer_url = block_explorer_info()[name][0]
+            async with session.get(explorer_url.rstrip('/') + '/api/') as response:
+                if response.status != 200:
+                    return False
+                status = await response.json(content_type=None)
+                return status['blockbook']['inSync'] is True
+        async with session.head(url, allow_redirects=True) as response:
+            return response.status < 500
+
+
+async def block_explorer_URL_or_fallback(
+        config: 'SimpleConfig', kind: str, item: str, *,
+        proxy: Optional['ProxySettings'] = None, timeout: float = 5,
+) -> Optional[str]:
+    """block_explorer_URL(), or, if the selected explorer has fallbacks in
+    BLOCK_EXPLORER_FALLBACKS and doesn't answer (no response in time, or a server error),
+    the URL on the first fallback that does answer, or else on the last one."""
+    url = block_explorer_URL(config, kind, item)
+    selected = block_explorer(config)
+    fallbacks = BLOCK_EXPLORER_FALLBACKS.get(selected)
+    if url is None or not fallbacks:
+        return url
+    candidates = [(selected, url)] + [(name, _hardcoded_block_explorer_URL(name, kind, item)) for name in fallbacks]
+    candidates = [(name, candidate) for name, candidate in candidates if candidate]
+    for name, candidate in candidates[:-1]:
+        try:
+            if await _block_explorer_answers(name, candidate, proxy=proxy, timeout=timeout):
+                return candidate
+            _logger.info(f"block explorer {name} is not available")
+        except (aiohttp.ClientError, asyncio.TimeoutError, OSError, ValueError, LookupError, TypeError) as e:
+            _logger.info(f"block explorer {name} did not answer: {e!r}")
+    return candidates[-1][1]
 
 
 # Python bug (http://bugs.python.org/issue1927) causes raw_input
