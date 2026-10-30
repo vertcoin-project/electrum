@@ -10,8 +10,8 @@ class VertcoinhashRecipe(CompiledComponentsPythonRecipe):
     # Vertcoin Core's verthash.dat generator. Built from the sdist with setup.py's -fno-strict-aliasing.
     # The sdist is the one vertcoinhash-python's Guix build makes reproducibly, and which its release
     # workflow uploads to PyPI.
-    version = "1.1.0"
-    sha512sum = "bb7b2ad92c869d69e5e8d859afb5e9786fec8581b736e8750d8cac2e215f0189d6a74698ebe657d2ca6b72a71a782eb46d6789ece35fc180fb48b6ebd0380033"
+    version = "1.1.1"
+    sha512sum = "e318093b896877ecf9258ff29495d802f37c073edb9bc51281512d08175a4ca7f7198bfdae91539ad7cc5833ec9113720e2a08954cf273fb3e113cf3a5591471"
     url = "https://files.pythonhosted.org/packages/source/v/vertcoinhash/vertcoinhash-{version}.tar.gz"
     site_packages_name = "verthash"
     call_hostpython_via_targetpython = False
