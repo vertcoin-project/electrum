@@ -993,8 +993,6 @@ def delta_time_str(distance_in_time: timedelta, *, include_seconds: bool = False
 mainnet_block_explorers = {
     'BitInfoCharts.com': ('https://bitinfocharts.com/vertcoin/',
                         {'tx': 'tx/', 'addr': 'address/'}),
-    'trezor.io': ('https://vtc1.trezor.io/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
     'cryptoID.info': ('https://chainz.cryptoid.info/vtc/',
                         {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
     'system default': ('blockchain:/',
