@@ -76,6 +76,7 @@ VTC_UNSUPPORTED_PLUGINS = {
     'keepkey', 'safe_t',  # asked to sign as Bitcoin; no Vertcoin support of theirs is known
     'nwc', 'swapserver', 'watchtower',  # Lightning, which is disabled
     'psbt_nostr',  # Nostr Cosigner: not offered in Electrum-VTC
+    'timelock_recovery',  # its recovery document sends heirs to Bitcoin explorers and broadcast sites
 }
 
 PLUGIN_PASSWORD_VERSION = 1

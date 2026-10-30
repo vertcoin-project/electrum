@@ -2030,7 +2030,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger, QtEventListener):
         line2 = QLineEdit()
         line2.setFixedWidth(32 * char_width_in_lineedit())
         address_label = QLabel(_("Address"))
-        address_label.setToolTip(_("Vertcoin- or Lightning address"))
+        address_label.setToolTip(_("Vertcoin address"))
         grid.addWidget(address_label, 1, 0)
         grid.addWidget(line1, 1, 1)
         grid.addWidget(QLabel(_("Name")), 2, 0)

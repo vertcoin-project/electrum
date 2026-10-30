@@ -74,7 +74,6 @@ class SendTab(QWidget, MessageBoxMixin, Logger):
                + "\n\n"
                + _("This field can contain:") + "\n"
                + _("- a Vertcoin address or BIP21 URI") + "\n"
-               + _("- a Lightning invoice") + "\n"
                + _("- a label from your list of contacts") + "\n"
                + _("- an openalias") + "\n"
                + _("- an arbitrary on-chain script, e.g.:") + " script(OP_RETURN deadbeef)" + "\n"
