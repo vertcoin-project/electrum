@@ -59,9 +59,8 @@ class NetworkDialog(QDialog, QtEventListener):
         self.tabs = tabs = QTabWidget()
         self._blockchain_tab = ServerWidget(network)
         self._proxy_tab = ProxyWidget(network)
-        self._nostr_tab = NostrWidget(network)
+        # vtc: no Nostr tab: its relays are for submarine swaps, and lightning is disabled
         tabs.addTab(self._blockchain_tab, _('Server'))
-        tabs.addTab(self._nostr_tab, _('Nostr'))
         tabs.addTab(self._proxy_tab, _('Proxy'))
         vbox = QVBoxLayout(self)
         vbox.addWidget(self.tabs)

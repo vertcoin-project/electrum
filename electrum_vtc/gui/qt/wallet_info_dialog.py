@@ -104,8 +104,10 @@ class WalletInfoDialog(WindowModalDialog):
                 button.pressed.connect(lambda: window.init_lightning_dialog(self))
                 grid.addWidget(button, cur_row, 3)
             else:
-                grid.addWidget(WWLabel(_("Not available for this wallet.")), cur_row, 1)
-                grid.addWidget(HelpButton(_("Lightning is currently restricted to HD wallets with p2wpkh addresses.")), cur_row, 2)
+                # vtc: can_have_lightning() is always False, lightning is disabled
+                grid.addWidget(WWLabel(_("Off")), cur_row, 1)
+                grid.addWidget(HelpButton(_("Lightning is turned off in Electrum-VTC: no BOLT compatible "
+                                            "Lightning implementation has been ported to Vertcoin.")), cur_row, 2)
             cur_row += 1
         vbox.addLayout(grid)
 

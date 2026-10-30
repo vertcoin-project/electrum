@@ -321,6 +321,8 @@ Pane {
                 }
             }
             FlatButton {
+                // vtc: its relays are for submarine swaps, and lightning is disabled
+                visible: false
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 text: qsTr('Nostr Settings');
