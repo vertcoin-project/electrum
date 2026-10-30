@@ -75,6 +75,7 @@ VTC_UNSUPPORTED_PLUGINS = {
     'bitbox02', 'coldcard', 'digitalbitbox', 'jade',  # these devices sign Bitcoin only
     'keepkey', 'safe_t',  # asked to sign as Bitcoin; no Vertcoin support of theirs is known
     'nwc', 'swapserver', 'watchtower',  # Lightning, which is disabled
+    'psbt_nostr',  # Nostr Cosigner: not offered in Electrum-VTC
 }
 
 PLUGIN_PASSWORD_VERSION = 1

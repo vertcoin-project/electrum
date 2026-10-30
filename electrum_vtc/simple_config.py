@@ -973,10 +973,7 @@ Warning: setting this to too low will result in lots of payment failures."""),
                 'wss://eu.purplerelay.com,wss://nostr.einundzwanzig.space,wss://nostr.mom',
         type_=str,
         short_desc=lambda: _("Nostr relays"),
-        long_desc=lambda: ' '.join([
-            _('Nostr relays are used to send and receive submarine swap offers.'),
-            _('These relays are also used for some plugins, e.g. Nostr Wallet Connect or Nostr Cosigner'),
-        ]),
+        long_desc=lambda: _('Nostr relays are used to send and receive submarine swap offers.'),
     )
 
     # zeroconf channels

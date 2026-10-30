@@ -185,6 +185,7 @@ Pane {
                         Layout.columnSpan: 2
                         Layout.fillWidth: true
                         spacing: 0
+                        visible: false  // vtc: no Nostr Cosigner plugin
                         Switch {
                             id: psbtNostr
                             onCheckedChanged: {
