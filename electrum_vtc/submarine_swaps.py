@@ -1918,6 +1918,12 @@ class NostrTransport(SwapServerTransport):
     OFFER_UPDATE_INTERVAL_SEC = 60 * 10
     LIQUIDITY_UPDATE_INTERVAL_SEC = 30
 
+    @staticmethod
+    def _net_tag() -> str:
+        # vtc: Bitcoin Electrum tags its offers net:mainnet too, and the networks are
+        # both called mainnet: neither should list the other's swap servers
+        return f"net:vertcoin-{constants.net.NET_NAME}"
+
     def __init__(self, config, sm, keypair: Keypair):
         SwapServerTransport.__init__(self, config=config, sm=sm)
         self._offers = {}  # type: Dict[str, SwapOffer]
@@ -2059,7 +2065,7 @@ class NostrTransport(SwapServerTransport):
         }
         # the first value of a single letter tag is indexed and can be filtered for
         tags = [['d', f'electrum-swapserver-{self.NOSTR_EVENT_VERSION}'],
-                ['r', 'net:' + constants.net.NET_NAME],
+                ['r', self._net_tag()],
                 ['expiration', str(now() + self.OFFER_UPDATE_INTERVAL_SEC + 10)]]
         try:
             event_id = await aionostr._add_event(
@@ -2117,7 +2123,7 @@ class NostrTransport(SwapServerTransport):
             "kinds": [self.USER_STATUS_NIP38],
             "limit": 10,
             "#d": [f"electrum-swapserver-{self.NOSTR_EVENT_VERSION}"],
-            "#r": [f"net:{constants.net.NET_NAME}"],
+            "#r": [self._net_tag()],
             "since": now() - 60 * 60,
         }
         async for event in self.relay_manager.get_events(query, single_event=False, only_stored=False):
@@ -2131,7 +2137,7 @@ class NostrTransport(SwapServerTransport):
                 continue
             if tags.get('d') != f"electrum-swapserver-{self.NOSTR_EVENT_VERSION}":
                 continue
-            if tags.get('r') != f"net:{constants.net.NET_NAME}":
+            if tags.get('r') != self._net_tag():
                 continue
             if (event.created_at > now() + 60 * 60
                     or event.created_at < now() - 60 * 60):

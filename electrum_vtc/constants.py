@@ -174,11 +174,9 @@ class BitcoinMainnet(AbstractNet):
     XPUB_HEADERS_INV = inv_dict(XPUB_HEADERS)
     BIP44_COIN_TYPE = 28
     LN_REALM_BYTE = 0
-    LN_DNS_SEEDS = [
-        'nodes.lightning.directory.',
-        'lseed.bitcoinstats.com.',
-        'lseed.darosior.ninja',
-    ]
+    # vtc: no Vertcoin Lightning DNS seeds are known; upstream's (nodes.lightning.directory,
+    # lseed.bitcoinstats.com, lseed.darosior.ninja) return Bitcoin nodes
+    LN_DNS_SEEDS = []
 
     @classmethod
     def datadir_subdir(cls):
