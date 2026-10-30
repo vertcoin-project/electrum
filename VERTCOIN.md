@@ -35,20 +35,24 @@ Branch `vtc-4.8.3` starts from upstream tag `4.8.3`:
    - KGW is an exact integer port of `KimotoGravityWell()` from vertcoin-core `pow.cpp`: CBigNum truncating division, compact encoding, both pow limits, fork-block stops. It matched mainnet `nBits` on 133,501 checked heights, including the 26754, 1,080,000 and 1,500,000 boundaries and the last 106k blocks.
    - 4.8.3 only downloads headers above the max checkpoint. Below it, headers are only checked to link up to the checkpointed hashes. Above it, every header's `nBits` (KGW) and Verthash PoW are verified. The 2 checkpointed chunks that KGW needs as history are fetched before syncing.
    - The scrypt and Lyra2RE C extensions are no longer needed: every pre-Verthash block is far below the max checkpoint.
-   - **Verthash is native Python.** `verthash.dat` is generated in about 100 s with a pure-Python port of `verthash_datfile.cpp` / verthash-go `graph.go`. The result is checked against sha256 `a55531e8…aa48`. An existing file in the Electrum-VTC, Vertcoin Core or Vertcoin-OCM data dir (or the `verthash_datafile` config path) is reused. The file is memory-mapped and checked once per mtime. A pure-Python Verthash hash takes about 16 ms per header.
+   - **Verthash needs no separate program.** With vertcoinhash 1.1.0 or later installed, which every release build bundles, `verthash.dat` is generated in about 15 s by its C port of Vertcoin Core's generator, and headers are hashed by its C Verthash once that has been checked against a known hash. Without it, a pure-Python port of `verthash_datfile.cpp` / verthash-go `graph.go` generates the file in about 100 s, and a pure-Python Verthash hash takes about 16 ms per header. Generation runs in a child process, with its progress shown in both GUIs. The result is checked against sha256 `a55531e8…aa48`. An existing file in the Electrum-VTC, Vertcoin Core or Vertcoin-OCM data dir (or the `verthash_datafile` config path) is reused. The file is memory-mapped and checked once per mtime; where the OS has `MADV_RANDOM` (not Windows), the mapping is advised random and the file read through once in the background, as Vertcoin Core does. When it can't be mapped it is read from disk for every hash; free disk space is checked before generating.
    - Chainwork is summed per header, since KGW retargets every block.
    - Header chunks are verified off the asyncio event loop.
 4. **Fees, supply, derivation paths**: carried over. WIF now uses the standard `0x80` prefix, the same as Vertcoin Core, and still accepts Electrum-VTC 2.x `0xC7` keys as p2pkh.
-5. **Branding**: data dir, units, URI scheme, explorers, Qt titles and strings. The help-menu "Bitcoin Paper" entry is removed.
-6. **Disabled**: Lightning (no lnworker is ever created), update checks, crash-report sending, the Fiat tab.
+5. **Branding**: data dir, units, URI scheme, Qt and QML titles and strings, the logo (the white atom on a Vertcoin green tile), the terms of use. The help-menu "Bitcoin Paper" entry is removed. Android builds as `org.vertcoin.electrum_vtc`.
+6. **Block explorers**: cryptoID.info by default. When the chosen explorer doesn't answer, links open on vtcblocks.com (a Blockbook, checked to be in sync), then BitInfoCharts.
+7. **Hardware wallets**: Trezor signs as coin "Vertcoin" (One and Model T; the Safe 3, Safe 5 and Model R have no Vertcoin), and Ledger only with its Vertcoin app, through the legacy client.
+8. **Plugins not offered** (`VTC_UNSUPPORTED_PLUGINS` in `plugin.py`): trustedcoin, bitbox02, coldcard, digitalbitbox, jade, keepkey, safe_t, nwc, swapserver, watchtower, psbt_nostr and timelock_recovery. LabelSync stays, on `labels.electrum.org` as in every earlier release.
+9. **Update checks** are opt-in and ask GitHub for the latest Electrum-VTC release, instead of electrum.org's signed announcement.
+10. **Disabled**: Lightning (no lnworker is ever created; Bitcoin's Lightning DNS seeds and trampoline nodes are emptied, Nostr swap offers are tagged `net:vertcoin-mainnet`, the Nostr tab is gone), crash-report sending, the Fiat tab.
 
 ### Not carried over
 
 These were treated as out of scope:
 
 - The Docker-based build scripts (`contrib/build-linux`, `contrib/build-wine`, `contrib/osx`), `create-verthash-datafile` packaging and Tcl/Tk. Releases are built with Guix instead (see below). Only `make_libsecp256k1.sh` and `make_osx.sh` were updated for the renamed directory.
-- Kivy GUI: upstream removed it. The QML/Android GUI is renamed but not branded or tested.
-- Hardware-wallet plugin branding and disabling, and the Ledger `m/128'` path.
+- Kivy GUI: upstream removed it; the QML GUI replaces it on Android.
+- The Ledger `m/128'` path.
 - Tests: `tests/` imports were renamed, but the tests have not been updated for VTC.
 - Invoice import/export hiding.
 
@@ -68,6 +72,8 @@ Test setup: vertcoind (bitcoin v32 rebase) in WSL with `-txindex`, ElectrumX 2.0
 - the x86_64 AppImage;
 - the Windows setup, standalone and portable exes;
 - the x86_64 and arm64 macOS `Electrum-VTC.app` zips.
+
+Guix has no Android toolchain: CI builds the APKs with upstream's reproducible Docker build (`contrib/android/build.sh … release-unsigned`). They are signed afterwards, offline; see [contrib/android/Readme.md](contrib/android/Readme.md).
 
 At commit `30503e3` (2026-10-28), two clean builds of all five targets produced identical sha256s. Tested results:
 - The AppImage (in WSL Ubuntu) generated `verthash.dat` natively and synced to the tip against the local ElectrumX.
