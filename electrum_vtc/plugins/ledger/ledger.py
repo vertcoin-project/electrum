@@ -35,6 +35,7 @@ _logger = get_logger(__name__)
 try:
     import ledger_bitcoin
     from ledger_bitcoin import WalletPolicy, MultisigWallet, AddressType, Chain
+    from ledger_bitcoin.client_base import Client as LedgerAppClient
     from ledger_bitcoin.exception.errors import DenyError, NotSupportedError, SecurityStatusNotSatisfiedError
     from ledger_bitcoin.key import KeyOriginInfo
     from ledgercomm.interfaces.hid_device import HID
@@ -326,8 +327,11 @@ class Ledger_Client(HardwareClientBase, ABC):
         hid_device.path = device.path
         hid_device.open()
         transport = ledger_bitcoin.TransportClient('hid', hid=hid_device)
+        # vtc: only Ledger's Vertcoin app signs Vertcoin transactions, and it speaks the legacy
+        # protocol. ledger_bitcoin.createClient() picks the new one for a Bitcoin app 2.1 or
+        # later, which would sign as Bitcoin: so the legacy client, and only for the Vertcoin app.
         try:
-            cl = ledger_bitcoin.createClient(transport, chain=get_chain())
+            app_name, _app_version, _flags = LedgerAppClient(transport, chain=get_chain()).get_version()
         except (ledger_bitcoin.exception.errors.InsNotSupportedError,
                 ledger_bitcoin.exception.errors.ClaNotSupportedError) as e:
             # This can happen on very old versions.
@@ -335,14 +339,16 @@ class Ledger_Client(HardwareClientBase, ABC):
             #      - on machine one, ghost43 got InsNotSupportedError
             #      - on machine two, thomasv got ClaNotSupportedError
             #      unclear why the different exceptions, ledger_bitcoin version 0.2.1 in both cases
-            _logger.info(f"ledger_bitcoin.createClient() got exc: {e}. falling back to old plugin.")
-            cl = None
-        if isinstance(cl, ledger_bitcoin.client.NewClient):
-            _logger.debug(f"Ledger_Client.construct_new(). creating NewClient for {device=}.")
-            return Ledger_Client_New(hid_device, *args, plugin=plugin, **kwargs)
-        else:
-            _logger.debug(f"Ledger_Client.construct_new(). creating LegacyClient for {device=}.")
-            return Ledger_Client_Legacy(hid_device, *args, plugin=plugin, **kwargs)
+            _logger.info(f"ledger get_version() got exc: {e}. using the legacy client.")
+            app_name = None
+        if app_name is not None and app_name != "Vertcoin":
+            hid_device.close()
+            return HardwareClientDummy(
+                plugin=plugin,
+                error_text=_('Open the Vertcoin app on your Ledger (the open app is {}).').format(app_name),
+            )
+        _logger.debug(f"Ledger_Client.construct_new(). creating LegacyClient for {device=}.")
+        return Ledger_Client_Legacy(hid_device, *args, plugin=plugin, **kwargs)
 
     def __init__(self, *, plugin: HW_PluginBase):
         HardwareClientBase.__init__(self, plugin=plugin)

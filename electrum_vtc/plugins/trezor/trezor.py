@@ -249,7 +249,9 @@ class TrezorPlugin(HW_PluginBase):
         return client
 
     def get_coin_name(self):
-        return "Testnet" if constants.net.TESTNET else "Bitcoin"
+        # vtc: Trezor's Vertcoin (on the Trezor One and Model T; not on the Safe 3, Safe 5 or
+        # Model R). It has no Vertcoin testnet, so on testnet the device refuses our addresses.
+        return "Vertcoin"
 
     @runs_in_hwd_thread
     def _initialize_device(self, settings: TrezorInitSettings, method, device_id, handler):
