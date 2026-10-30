@@ -69,6 +69,14 @@ hook_names = set()
 hooks = {}
 _exec_module_failure = {}  # type: Dict[str, Exception]
 
+# vtc: built-in plugins that can't work with Vertcoin, so they are not offered
+VTC_UNSUPPORTED_PLUGINS = {
+    'trustedcoin',  # TrustedCoin's 2FA cosigning service is Bitcoin only
+    'bitbox02', 'coldcard', 'digitalbitbox', 'jade',  # these devices sign Bitcoin only
+    'keepkey', 'safe_t',  # asked to sign as Bitcoin; no Vertcoin support of theirs is known
+    'nwc', 'swapserver', 'watchtower',  # Lightning, which is disabled
+}
+
 PLUGIN_PASSWORD_VERSION = 1
 
 class IncorrectPluginHash(Exception):
@@ -185,6 +193,8 @@ class Plugins(DaemonThread):
             #       once as data and once as code. To honor the "no duplicates" rule below,
             #       we exclude the ones packaged as *code*, here:
             if loader.__class__.__qualname__ == "PyiFrozenImporter":
+                continue
+            if not external and name in VTC_UNSUPPORTED_PLUGINS:
                 continue
             module_path = os.path.join(pkg_path, name)
             if self.cmd_only and not self.config.get(f'plugins.{name}.enabled') is True:

@@ -43,6 +43,8 @@ WizardComponent {
             Layout.fillWidth: true
             ButtonGroup.group: wallettypegroup
             property string wallettype: '2fa'
+            // vtc: the trustedcoin plugin is not offered (TrustedCoin is Bitcoin only)
+            visible: false
             text: qsTr('Wallet with two-factor authentication')
         }
         ElRadioButton {
