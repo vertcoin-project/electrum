@@ -114,7 +114,11 @@ jobs:
           sums="$(ls guix-build-*/output/"$HOSTS"/SHA256SUMS.part)"
           echo "sums=$sums" >> "$GITHUB_OUTPUT"
           echo "dir=$(dirname "$sums")" >> "$GITHUB_OUTPUT"
+      # Only releases are attested: each attestation is a permanent entry in
+      # Sigstore's public log, and a slow or unavailable log would fail a build
+      # before its files are uploaded
       - name: attest build provenance
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-checksums: ${{ steps.build.outputs.sums }}
@@ -175,7 +179,11 @@ jobs:
           sha256sum -- *.apk > SHA256SUMS.part
           cat SHA256SUMS.part
           echo "sums=dist/SHA256SUMS.part" >> "$GITHUB_OUTPUT"
+      # Only releases are attested: each attestation is a permanent entry in
+      # Sigstore's public log, and a slow or unavailable log would fail a build
+      # before its files are uploaded
       - name: attest build provenance
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-checksums: ${{ steps.build.outputs.sums }}
