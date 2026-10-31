@@ -39,30 +39,37 @@ similar system.
 
 ## Signing a release (Electrum-VTC)
 
-The release build (`.github/workflows/guix.yml`, on a tag) attaches unsigned APKs,
-`electrum_vtc-<version>-<arch>-release-unsigned.apk`, to a draft release. They are signed
-offline, and only their detached signatures are published:
-[`apksig.sh`](apksig.sh) signs an APK and extracts its APK Signing Block with
-[apksigcopier](https://github.com/obfusk/apksigcopier), in a Debian image pinned by digest.
+The release build (`.github/workflows/guix.yml`, on a tag) keeps every release file as an
+artifact of its run, for 90 days, the APKs unsigned:
+`electrum_vtc-<version>-<arch>-release-unsigned.apk`. Each file has a build attestation.
+The maintainer signs the APKs offline and creates the release with all of them:
+[`apksig.sh`](apksig.sh) signs an APK and extracts its APK Signing Block, its detached
+signature, with [apksigcopier](https://github.com/obfusk/apksigcopier), in a Debian image
+pinned by digest.
 
-1. Download the unsigned APKs from the draft release:
+1. Download the run's files into `release/`, and check their attestations:
     ```
-    $ gh release download v4.8.3 --repo vertcoin-project/electrum --pattern '*-release-unsigned.apk'
+    $ gh run download RUN_ID --repo vertcoin-project/electrum --dir artifacts
+    $ mkdir release && find artifacts -type f ! -name SHA256SUMS.part -exec cp -t release {} +
+    $ for f in release/*; do gh attestation verify "$f" --repo vertcoin-project/electrum; done
     ```
-2. Sign them with the release key. Its password is asked for. This writes
+2. Sign the APKs with the release key. Its password is asked for. This writes
    `…-release.apk` and its signature `…-release.apk.sig.tar` next to each one, and prints
-   the certificate's SHA-256:
+   the certificate's SHA-256. The key and the APKs must be inside the current directory:
     ```
-    $ contrib/android/apksig.sh sign ~/electrum-vtc.keystore electrum-vtc *-release-unsigned.apk
+    $ contrib/android/apksig.sh sign electrum-vtc.keystore electrum-vtc release/*-release-unsigned.apk
     ```
-3. Upload only the signatures:
+3. List every file's hash in `SHA256SUMS`, and sign it:
     ```
-    $ gh release upload v4.8.3 --repo vertcoin-project/electrum *-release.apk.sig.tar
+    $ cd release && find . -maxdepth 1 -type f -printf '%P\n' | LC_ALL=C sort | xargs sha256sum -- > ../SHA256SUMS && mv ../SHA256SUMS .
+    $ gpg --armor --detach-sign SHA256SUMS
     ```
-4. Run the `apk signatures` workflow with the tag. It puts each signature on the unsigned
-   APK the release build made, checks that the result verifies, and uploads the signed
-   APKs and the updated `SHA256SUMS` to the draft. A signature of any other APK, such as
-   one built locally from different sources, does not verify there.
+4. Create the release with all of them, the unsigned APKs too: they are what the
+   attestations name, and anyone can check that a signed APK is its unsigned one plus a
+   signature (below).
+    ```
+    $ gh release create v4.8.3 --repo vertcoin-project/electrum --verify-tag --draft --title "Electrum-VTC 4.8.3" --notes-file NOTES.md ./*
+    ```
 
 The release key is created once (`keytool -genkeypair -keyalg RSA -keysize 4096
 -validity 10000 …`), never leaves the maintainer's machine, and is backed up: Android only
