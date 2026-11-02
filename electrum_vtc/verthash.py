@@ -1,10 +1,14 @@
 # Electrum-VTC - lightweight Vertcoin client
+# Copyright (c) 2026 Albert Kwon
+# Copyright (c) 2020-2026 The Vertcoin developers
 #
 # Verthash proof-of-work and native generation of the Verthash datafile.
 #
 # The datafile is a ~1.2 GiB proof-of-space graph built from SHA3-256 hashes.
 # This is a port of vertcoin-core's src/crypto/verthash_datfile.cpp
 # (also see github.com/gertjaap/verthash-go graph.go) and src/crypto/verthash.cpp.
+# The datafile's graph is ported from pos/graph.go in Albert Kwon's Spacemint,
+# https://github.com/kwonalbert/spacemint
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
